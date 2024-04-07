@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "lrzcc-rs"
+name = "lrzcc"
 version = "0.1.0"
