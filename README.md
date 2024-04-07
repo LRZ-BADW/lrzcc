@@ -1,2 +1,2 @@
 # lrzcc-rs
-Rust client and CLI application for the LRZ-specific features of the Openstack-based LRZ Compute Cloud.
+API bindings and CLI application written in Rust for LRZ-specific features of the Openstack-based LRZ Compute Cloud.
