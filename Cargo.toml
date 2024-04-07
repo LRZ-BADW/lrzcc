@@ -1,7 +1,15 @@
 [package]
-name = "lrzcc-rs"
-version = "0.1.0"
+name = "lrzcc"
+description = "Rust client and CLI application for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
+authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
+categories = ["api-bindings", "command-line-utilities"]
 edition = "2021"
+homepage = "https://github.com/LRZ-BADW/lrzcc-rs"
+repository = "https://github.com/LRZ-BADW/lrzcc-rs"
+exclude = []
+readme = "README.md"
+license = "MIT"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
