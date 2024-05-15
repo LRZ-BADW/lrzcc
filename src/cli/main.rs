@@ -1,5 +1,11 @@
-use clap::{Args, Parser, Subcommand};
-use lrzcc::hello_world;
+use clap::{Parser, Subcommand};
+use colored::Colorize;
+use lrzcc::Api;
+
+mod common;
+mod hello;
+
+use crate::common::Execute;
 
 #[derive(Parser, Debug)]
 #[command(name = "lrzcc")]
@@ -30,12 +36,22 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     #[clap(about = "Hello command")]
-    Hello,
+    Hello {
+        #[clap(subcommand)]
+        command: hello::HelloCommand,
+    },
 }
 
 fn main() {
     let cli = Cli::parse();
-    match cli.command {
-        Command::Hello => hello_world(),
-    };
+    let api = Api::new(cli.url, cli.token);
+    match match cli.command {
+        Command::Hello { ref command } => command.execute(api),
+    } {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!("{}: {}", "error".bold().red(), e);
+            std::process::exit(1);
+        }
+    }
 }
