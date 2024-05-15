@@ -20,6 +20,9 @@ struct Cli {
 
     // #[clap(flatten)]
     // credentials: CredentialArgs,
+    #[clap(short, long, help = "Openstack API token", env = "OS_TOKEN")]
+    token: String,
+
     #[clap(subcommand)]
     command: Command,
 }
