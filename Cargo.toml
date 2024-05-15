@@ -25,6 +25,7 @@ required-features = ["cli"]
 [features]
 default = ["cli"]
 cli = ["clap", "colored", "tabled"]
+vendored-tls = ["reqwest/native-tls-vendored"]
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "blocking"] }
