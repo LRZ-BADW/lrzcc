@@ -1,4 +1,7 @@
+use crate::{ApiError, ErrorResponse};
+use anyhow::Context;
 use reqwest::blocking::Client;
+use reqwest::StatusCode;
 use serde::Deserialize;
 use std::fmt::Display;
 use std::rc::Rc;
@@ -27,14 +30,62 @@ impl HelloApi {
         }
     }
 
-    pub fn admin(&self) {
+    pub fn admin(&self) -> Result<Hello, ApiError> {
         let url = format!("{}/admin", self.url);
-        let response = self.client.get(url).send().unwrap();
-        println!("response: {:?}", response.text());
+        let response = self
+            .client
+            .get(url)
+            .send()
+            .context("Could not send request.")?;
+        let status = response.status();
+        if status != StatusCode::OK {
+            let text = response
+                .text()
+                .context(
+                    format!("Could not retrieve response text on unexpected status code {}.",
+                        status)
+                    )?;
+            let err_resp: ErrorResponse = serde_json::from_str(text.as_str())
+                .context(format!(
+                "Unexpected status code {} without error message.",
+                status,
+            ))?;
+            return Err(ApiError::ResponseError(err_resp.detail));
+        }
+        let text = response
+            .text()
+            .context("Could not retrieve response text.")?;
+        let hello: Hello = serde_json::from_str(text.as_str())
+            .context(format!("Could not parse response text: {}", text))?;
+        Ok(hello)
     }
 
-    pub fn user(&self) {
-        let response = self.client.get(self.url.to_owned()).send().unwrap();
-        println!("response: {:?}", response.text());
+    pub fn user(&self) -> Result<Hello, ApiError> {
+        let response = self
+            .client
+            .get(self.url.clone())
+            .send()
+            .context("Could not send request.")?;
+        let status = response.status();
+        if status != StatusCode::OK {
+            let text = response
+                .text()
+                .context(
+                    format!("Could not retrieve response text on unexpected status code {}.",
+                        status)
+                    )?;
+            let err_resp: ErrorResponse = serde_json::from_str(text.as_str())
+                .context(format!(
+                "Unexpected status code {} without error message.",
+                status
+            ))?;
+            return Err(ApiError::ResponseError(err_resp.detail));
+        }
+        let text = response
+            .text()
+            .context("Could not retrieve response text.")?;
+        let hello: Hello = serde_json::from_str(text.as_str())
+            .context(format!("Could not parse response text: {}", text))?;
+        Ok(hello)
     }
 }
