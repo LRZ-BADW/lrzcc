@@ -1,14 +1,19 @@
-use reqwest::blocking::{Client, ClientBuilder};
+use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
+use std::rc::Rc;
+
+mod hello;
+use hello::HelloApi;
 
 pub struct Api {
-    url: String,
+    // url: Rc<str>,
     // token: String,
-    client: Client,
+    // client: Rc<Client>,
+    pub hello: HelloApi,
 }
 
 impl Api {
-    pub fn new(url: String, token: String) -> Self {
+    pub fn new(url: String, token: String) -> Api {
         let mut headers = HeaderMap::new();
         headers
             .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
@@ -20,20 +25,14 @@ impl Api {
             }
         };
         headers.insert("X-Auth-Token", value);
-        let client = ClientBuilder::new()
-            .default_headers(headers)
-            .build()
-            .unwrap();
-        Api { url, client }
-    }
-
-    pub fn hello_admin(self) {
-        let url = format!("{}/hello/admin", self.url);
-        let response = self.client.get(url).send().unwrap();
-        println!("response: {:?}", response.text());
-    }
-
-    pub fn hello_user(self) {
-        println!("Hello, user!");
+        let client = Rc::new(
+            ClientBuilder::new()
+                .default_headers(headers)
+                .build()
+                .unwrap(),
+        );
+        let url = Rc::from(url);
+        let hello = HelloApi::new(&url, &client);
+        Api { hello }
     }
 }
