@@ -1,4 +1,4 @@
-use crate::{ApiError, ErrorResponse};
+use crate::error::{ApiError, ErrorResponse};
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
