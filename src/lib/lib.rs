@@ -1,9 +1,24 @@
 use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
+use serde::Deserialize;
+use std::fmt::Debug;
 use std::rc::Rc;
 
 mod hello;
 use hello::HelloApi;
+
+#[derive(Deserialize)]
+pub(crate) struct ErrorResponse {
+    pub(crate) detail: String,
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ApiError {
+    #[error("{0}")]
+    ResponseError(String),
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
+}
 
 pub struct Api {
     // url: Rc<str>,
