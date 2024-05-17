@@ -14,18 +14,18 @@ pub(crate) enum HelloCommand {
 impl Execute for HelloCommand {
     fn execute(&self, api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
         match self {
-            HelloCommand::Admin {} => hello_admin(api),
-            HelloCommand::User {} => hello_user(api),
+            HelloCommand::Admin {} => admin(api),
+            HelloCommand::User {} => user(api),
         }
     }
 }
 
-fn hello_admin(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
-    api.hello_admin();
+fn admin(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
+    api.hello.admin();
     Ok(())
 }
 
-fn hello_user(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
-    api.hello_user();
+fn user(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
+    api.hello.user();
     Ok(())
 }
