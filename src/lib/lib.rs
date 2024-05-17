@@ -31,7 +31,6 @@ impl Api {
                 .build()
                 .unwrap(),
         );
-        let url = Rc::from(url);
         let hello = HelloApi::new(&url, &client);
         Api { hello }
     }
