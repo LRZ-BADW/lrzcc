@@ -29,7 +29,7 @@ vendored-tls = ["reqwest/native-tls-vendored"]
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "blocking"] }
-serde = "1.0"
+serde = { version = "1", features = ["derive"] }
 # cli
 clap = { version = "4.5", features = ["derive", "env"], optional = true }
 tabled = { version = "0.15", optional = true }
