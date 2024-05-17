@@ -21,11 +21,11 @@ impl Execute for HelloCommand {
 }
 
 fn admin(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
-    api.hello.admin();
+    println!("{}", api.hello.admin()?);
     Ok(())
 }
 
 fn user(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
-    api.hello.user();
+    println!("{}", api.hello.user()?);
     Ok(())
 }
