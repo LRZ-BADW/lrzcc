@@ -1,5 +1,18 @@
 use reqwest::blocking::Client;
+use serde::Deserialize;
+use std::fmt::Display;
 use std::rc::Rc;
+
+#[derive(Deserialize)]
+pub struct Hello {
+    pub message: String,
+}
+
+impl Display for Hello {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.message.as_str())
+    }
+}
 
 pub struct HelloApi {
     pub url: String,
