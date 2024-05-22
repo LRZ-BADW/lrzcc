@@ -1,11 +1,14 @@
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use lrzcc::Api;
+use std::str::FromStr;
 
 mod common;
 mod hello;
+mod token;
 
-use crate::common::Execute;
+use common::Execute;
+use token::Token;
 
 #[derive(Args, Debug)]
 #[group(required = true, multiple = true)]
@@ -125,21 +128,10 @@ enum Command {
     },
 }
 
-fn issue_api_token(
-    _auth_url: &str,
-    _username: &str,
-    _password: &str,
-    _project_name: &str,
-    _user_domain_name: &str,
-    _project_domain_id: &str,
-) -> Result<String, anyhow::Error> {
-    todo!()
-}
-
 fn main() {
     let cli = Cli::parse();
     let token = match cli.credentials.token {
-        Some(token) => token,
+        Some(token) => Token::from_str(token.as_str()).unwrap(),
         None => {
             let auth_url = cli.credentials.auth_url.unwrap();
             let username = cli.credentials.username.unwrap();
@@ -147,7 +139,7 @@ fn main() {
             let project_name = cli.credentials.project_name.unwrap();
             let user_domain_name = cli.credentials.user_domain_name.unwrap();
             let project_domain_id = cli.credentials.project_domain_id.unwrap();
-            match issue_api_token(
+            match Token::new(
                 auth_url.as_str(),
                 username.as_str(),
                 password.as_str(),
@@ -163,14 +155,16 @@ fn main() {
             }
         }
     };
-    let api = Api::new(cli.url, token);
+    let mut rc = 0;
+    let api = Api::new(cli.url, token.as_ref().to_string());
     match match cli.command {
         Command::Hello { ref command } => command.execute(api),
     } {
         Ok(_) => {}
         Err(error) => {
             eprintln!("{}: {}", "error".bold().red(), error);
-            std::process::exit(1);
+            rc = 1;
         }
     }
+    std::process::exit(rc);
 }
