@@ -1,6 +1,7 @@
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use lrzcc::Api;
+use std::process::ExitCode;
 use std::str::FromStr;
 
 mod common;
@@ -128,7 +129,7 @@ enum Command {
     },
 }
 
-fn main() {
+fn main() -> ExitCode {
     let cli = Cli::parse();
     let token = match cli.credentials.token {
         Some(token) => Token::from_str(token.as_str()).unwrap(),
@@ -166,5 +167,5 @@ fn main() {
             rc = 1;
         }
     }
-    std::process::exit(rc);
+    ExitCode::from(rc)
 }
