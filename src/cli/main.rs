@@ -1,4 +1,4 @@
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use lrzcc::Api;
 use std::process::ExitCode;
@@ -8,7 +8,7 @@ mod common;
 mod hello;
 mod token;
 
-use common::Execute;
+use common::{Execute, Format};
 use token::Token;
 
 #[derive(Args, Debug)]
@@ -97,25 +97,6 @@ struct CredentialArgs {
     project_domain_id: Option<String>,
 }
 
-#[derive(ValueEnum, Debug, Clone)]
-#[clap(rename_all = "kebab_case")]
-enum FormatArg {
-    Json,
-    Empty,
-    Blank,
-    Ascii,
-    Psql,
-    Markdown,
-    Modern,
-    Sharp,
-    Rounded,
-    ModernRounded,
-    Extended,
-    Dots,
-    ReStructuredText,
-    AsciiRounded,
-}
-
 #[derive(Parser, Debug)]
 #[command(name = "lrzcc")]
 #[command(author = "Sandro-Alessio Gierens <sandro@gierens.de>")]
@@ -141,9 +122,9 @@ struct Cli {
         short,
         long,
         help = "Format of the output",
-        default_value_t = FormatArg::Rounded,
+        default_value_t = Format::Rounded,
     )]
-    format: FormatArg,
+    format: Format,
 
     #[clap(subcommand)]
     command: Command,
@@ -188,7 +169,7 @@ fn main() -> ExitCode {
     let mut rc = 0;
     let api = Api::new(cli.url, token.as_ref().to_string());
     match match cli.command {
-        Command::Hello { ref command } => command.execute(api),
+        Command::Hello { ref command } => command.execute(api, cli.format),
     } {
         Ok(_) => {}
         Err(error) => {

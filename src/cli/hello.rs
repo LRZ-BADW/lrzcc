@@ -1,4 +1,4 @@
-use crate::common::Execute;
+use crate::common::{Execute, Format};
 use clap::Subcommand;
 use std::error::Error;
 
@@ -12,20 +12,24 @@ pub(crate) enum HelloCommand {
 }
 
 impl Execute for HelloCommand {
-    fn execute(&self, api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
+    fn execute(
+        &self,
+        api: lrzcc::Api,
+        format: Format,
+    ) -> Result<(), Box<dyn Error>> {
         match self {
-            HelloCommand::Admin {} => admin(api),
-            HelloCommand::User {} => user(api),
+            HelloCommand::Admin {} => admin(api, format),
+            HelloCommand::User {} => user(api, format),
         }
     }
 }
 
-fn admin(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
+fn admin(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     println!("{}", api.hello.admin()?);
     Ok(())
 }
 
-fn user(api: lrzcc::Api) -> Result<(), Box<dyn Error>> {
+fn user(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     println!("{}", api.hello.user()?);
     Ok(())
 }
