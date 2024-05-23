@@ -1,4 +1,4 @@
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use lrzcc::Api;
 use std::process::ExitCode;
@@ -39,6 +39,7 @@ struct CredentialArgs {
         requires = "password",
         requires = "project_name",
         requires = "user_domain_name",
+        value_enum,
         requires = "project_domain_id"
     )]
     username: Option<String>,
@@ -96,6 +97,25 @@ struct CredentialArgs {
     project_domain_id: Option<String>,
 }
 
+#[derive(ValueEnum, Debug, Clone)]
+#[clap(rename_all = "kebab_case")]
+enum FormatArg {
+    Json,
+    Empty,
+    Blank,
+    Ascii,
+    Psql,
+    Markdown,
+    Modern,
+    Sharp,
+    Rounded,
+    ModernRounded,
+    Extended,
+    Dots,
+    ReStructuredText,
+    AsciiRounded,
+}
+
 #[derive(Parser, Debug)]
 #[command(name = "lrzcc")]
 #[command(author = "Sandro-Alessio Gierens <sandro@gierens.de>")]
@@ -115,6 +135,15 @@ struct Cli {
 
     #[clap(flatten)]
     credentials: CredentialArgs,
+
+    #[clap(
+        value_enum,
+        short,
+        long,
+        help = "Format of the output",
+        default_value_t = FormatArg::Rounded,
+    )]
+    format: FormatArg,
 
     #[clap(subcommand)]
     command: Command,
