@@ -1,6 +1,11 @@
 use crate::common::{Execute, Format};
 use clap::Subcommand;
+use lrzcc::hello::Hello;
+use std::borrow::Cow;
 use std::error::Error;
+use tabled::builder::Builder;
+use tabled::settings::Style;
+use tabled::Tabled;
 
 #[derive(Subcommand, Debug)]
 pub(crate) enum HelloCommand {
@@ -28,7 +33,21 @@ fn admin(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let hello = api.hello.admin()?;
     match format {
         Format::Json => println!("{}", serde_json::to_string(&hello)?),
-        _ => println!("{}", hello),
+        _ => {
+            let mut keys = vec![Cow::Owned("key".to_owned())];
+            keys.extend(Hello::headers());
+            let mut values = vec![Cow::Owned("value".to_owned())];
+            values.extend(hello.fields());
+            let data = vec![keys, values];
+            let table = Builder::from_iter(data)
+                .index()
+                .column(0)
+                .transpose()
+                .build()
+                .with(Style::rounded())
+                .to_string();
+            println!("{table}");
+        }
     }
     Ok(())
 }
@@ -37,7 +56,21 @@ fn user(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let hello = api.hello.user()?;
     match format {
         Format::Json => println!("{}", serde_json::to_string(&hello)?),
-        _ => println!("{}", hello),
+        _ => {
+            let mut keys = vec![Cow::Owned("key".to_owned())];
+            keys.extend(Hello::headers());
+            let mut values = vec![Cow::Owned("value".to_owned())];
+            values.extend(hello.fields());
+            let data = vec![keys, values];
+            let table = Builder::from_iter(data)
+                .index()
+                .column(0)
+                .transpose()
+                .build()
+                .with(Style::rounded())
+                .to_string();
+            println!("{table}");
+        }
     }
     Ok(())
 }
