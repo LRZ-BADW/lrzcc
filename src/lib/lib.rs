@@ -2,8 +2,8 @@ use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
 
-mod error;
-mod hello;
+pub mod error;
+pub mod hello;
 
 use hello::HelloApi;
 
