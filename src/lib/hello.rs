@@ -5,8 +5,9 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::rc::Rc;
+use tabled::Tabled;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct Hello {
     pub message: String,
 }
