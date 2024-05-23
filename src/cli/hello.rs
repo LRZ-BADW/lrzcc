@@ -25,11 +25,19 @@ impl Execute for HelloCommand {
 }
 
 fn admin(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    println!("{}", api.hello.admin()?);
+    let hello = api.hello.admin()?;
+    match format {
+        Format::Json => println!("{}", serde_json::to_string(&hello)?),
+        _ => println!("{}", hello),
+    }
     Ok(())
 }
 
 fn user(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    println!("{}", api.hello.user()?);
+    let hello = api.hello.user()?;
+    match format {
+        Format::Json => println!("{}", serde_json::to_string(&hello)?),
+        _ => println!("{}", hello),
+    }
     Ok(())
 }
