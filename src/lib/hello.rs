@@ -2,11 +2,11 @@ use crate::error::{ApiError, ErrorResponse};
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use std::rc::Rc;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Hello {
     pub message: String,
 }
