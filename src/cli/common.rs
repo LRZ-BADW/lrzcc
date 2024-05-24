@@ -47,7 +47,7 @@ impl ValueEnum for Format {
         match self {
             Format::Json => Some(PossibleValue::new("json")),
             Format::Table(format) => match format {
-                TableFormat::Empty => Some(PossibleValue::new("tabled")),
+                TableFormat::Empty => Some(PossibleValue::new("empty")),
                 TableFormat::Blank => Some(PossibleValue::new("blank")),
                 TableFormat::Ascii => Some(PossibleValue::new("ascii")),
                 TableFormat::Psql => Some(PossibleValue::new("psql")),
@@ -61,7 +61,7 @@ impl ValueEnum for Format {
                 TableFormat::Extended => Some(PossibleValue::new("extended")),
                 TableFormat::Dots => Some(PossibleValue::new("dots")),
                 TableFormat::ReStructuredText => {
-                    Some(PossibleValue::new("restructuredtext"))
+                    Some(PossibleValue::new("re-structured-text"))
                 }
                 TableFormat::AsciiRounded => {
                     Some(PossibleValue::new("ascii-rounded"))
@@ -73,7 +73,7 @@ impl ValueEnum for Format {
     fn from_str(value: &str, _ignore_case: bool) -> Result<Self, String> {
         match value {
             "json" => Ok(Format::Json),
-            "tabled" => Ok(Format::Table(TableFormat::Empty)),
+            "empty" => Ok(Format::Table(TableFormat::Empty)),
             "blank" => Ok(Format::Table(TableFormat::Blank)),
             "ascii" => Ok(Format::Table(TableFormat::Ascii)),
             "psql" => Ok(Format::Table(TableFormat::Psql)),
@@ -84,7 +84,7 @@ impl ValueEnum for Format {
             "modern-rounded" => Ok(Format::Table(TableFormat::ModernRounded)),
             "extended" => Ok(Format::Table(TableFormat::Extended)),
             "dots" => Ok(Format::Table(TableFormat::Dots)),
-            "restructuredtext" => {
+            "re-structured-text" => {
                 Ok(Format::Table(TableFormat::ReStructuredText))
             }
             "ascii-rounded" => Ok(Format::Table(TableFormat::AsciiRounded)),
