@@ -1,4 +1,6 @@
 use clap::{builder::PossibleValue, ValueEnum};
+use tabled::settings::Style;
+use tabled::Table;
 
 #[derive(Debug, Clone)]
 pub(crate) enum TableFormat {
@@ -15,6 +17,26 @@ pub(crate) enum TableFormat {
     Dots,
     ReStructuredText,
     AsciiRounded,
+}
+
+pub(crate) fn apply_table_style(table: &mut Table, format: TableFormat) {
+    match format {
+        TableFormat::Empty => table.with(Style::empty()),
+        TableFormat::Blank => table.with(Style::blank()),
+        TableFormat::Ascii => table.with(Style::ascii()),
+        TableFormat::Psql => table.with(Style::psql()),
+        TableFormat::Markdown => table.with(Style::markdown()),
+        TableFormat::Modern => table.with(Style::modern()),
+        TableFormat::Sharp => table.with(Style::sharp()),
+        TableFormat::Rounded => table.with(Style::rounded()),
+        TableFormat::ModernRounded => table.with(Style::modern_rounded()),
+        TableFormat::Extended => table.with(Style::extended()),
+        TableFormat::Dots => table.with(Style::dots()),
+        TableFormat::ReStructuredText => {
+            table.with(Style::re_structured_text())
+        }
+        TableFormat::AsciiRounded => table.with(Style::ascii_rounded()),
+    };
 }
 
 #[derive(Debug, Clone)]
