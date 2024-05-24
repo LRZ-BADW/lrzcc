@@ -8,7 +8,7 @@ mod common;
 mod hello;
 mod token;
 
-use common::{Execute, Format};
+use common::{Execute, Format, TableFormat};
 use token::Token;
 
 #[derive(Args, Debug)]
@@ -122,7 +122,7 @@ struct Cli {
         short,
         long,
         help = "Format of the output",
-        default_value_t = Format::Rounded,
+        default_value_t = Format::Table(TableFormat::Rounded)
     )]
     format: Format,
 
