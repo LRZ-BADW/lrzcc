@@ -1,6 +1,9 @@
 use clap::{builder::PossibleValue, ValueEnum};
+use serde::Serialize;
+use std::borrow::Cow;
+use tabled::builder::Builder;
 use tabled::settings::Style;
-use tabled::Table;
+use tabled::{Table, Tabled};
 
 #[derive(Debug, Clone)]
 pub(crate) enum TableFormat {
@@ -37,6 +40,34 @@ pub(crate) fn apply_table_style(table: &mut Table, format: TableFormat) {
         }
         TableFormat::AsciiRounded => table.with(Style::ascii_rounded()),
     };
+}
+
+pub(crate) fn print_single_object<T>(
+    object: T,
+    format: Format,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    T: Serialize + Tabled,
+{
+    match format {
+        Format::Json => println!("{}", serde_json::to_string(&object)?),
+        Format::Table(format) => {
+            let mut keys = vec![Cow::Owned("key".to_owned())];
+            keys.extend(T::headers());
+            let mut values = vec![Cow::Owned("value".to_owned())];
+            values.extend(object.fields());
+            let data = vec![keys, values];
+            let mut table = Builder::from_iter(data)
+                .index()
+                .column(0)
+                .transpose()
+                .build();
+            apply_table_style(&mut table, format);
+            let output = table.to_string();
+            println!("{output}");
+        }
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone)]
