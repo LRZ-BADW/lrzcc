@@ -32,20 +32,15 @@ impl HelloApi {
     }
 
     pub fn admin(&self) -> Result<Hello, ApiError> {
-        Ok(request(
+        request(
             &self.client,
             Method::GET,
             format!("{}/admin", self.url).as_str(),
             StatusCode::OK,
-        )?)
+        )
     }
 
     pub fn user(&self) -> Result<Hello, ApiError> {
-        Ok(request(
-            &self.client,
-            Method::GET,
-            self.url.as_str(),
-            StatusCode::OK,
-        )?)
+        request(&self.client, Method::GET, self.url.as_str(), StatusCode::OK)
     }
 }
