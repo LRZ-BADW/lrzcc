@@ -167,7 +167,8 @@ fn main() -> ExitCode {
         }
     };
     let mut rc = 0;
-    let api = Api::new(cli.url, token.as_ref().to_string());
+    // TODO proper error handling
+    let api = Api::new(cli.url, token.as_ref().to_string()).unwrap();
     match match cli.command {
         Command::Hello { ref command } => command.execute(api, cli.format),
     } {
