@@ -1,3 +1,4 @@
+use anyhow::Context;
 use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
@@ -6,6 +7,7 @@ mod common;
 pub mod error;
 pub mod hello;
 
+use error::ApiError;
 use hello::HelloApi;
 
 pub struct Api {
@@ -16,25 +18,21 @@ pub struct Api {
 }
 
 impl Api {
-    pub fn new(url: String, token: String) -> Api {
+    // TODO add impersonation
+    pub fn new(url: String, token: String) -> Result<Api, ApiError> {
         let mut headers = HeaderMap::new();
         headers
             .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        let value = match HeaderValue::from_str(token.trim()) {
-            Ok(value) => value,
-            Err(e) => {
-                println!("Error: {}", e);
-                HeaderValue::from_static("")
-            }
-        };
+        let value = HeaderValue::from_str(token.trim())
+            .context("Failed to create token header value")?;
         headers.insert("X-Auth-Token", value);
         let client = Rc::new(
             ClientBuilder::new()
                 .default_headers(headers)
                 .build()
-                .unwrap(),
+                .context("Failed to build http client")?,
         );
         let hello = HelloApi::new(&url, &client);
-        Api { hello }
+        Ok(Api { hello })
     }
 }
