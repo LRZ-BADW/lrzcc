@@ -18,14 +18,26 @@ pub struct Api {
 }
 
 impl Api {
-    // TODO add impersonation
-    pub fn new(url: String, token: String) -> Result<Api, ApiError> {
+    pub fn new(
+        url: String,
+        token: String,
+        impersonate: Option<u32>,
+    ) -> Result<Api, ApiError> {
         let mut headers = HeaderMap::new();
         headers
             .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
-        let value = HeaderValue::from_str(token.trim())
-            .context("Failed to create token header value")?;
-        headers.insert("X-Auth-Token", value);
+        headers.insert(
+            "X-Auth-Token",
+            HeaderValue::from_str(token.trim())
+                .context("Failed to create token header value")?,
+        );
+        if let Some(impersonate) = impersonate {
+            headers.insert(
+                "X-Impersonate",
+                HeaderValue::from_str(format!("{impersonate}").as_str())
+                    .context("Failed to create impersonate header value")?,
+            );
+        }
         let client = Rc::new(
             ClientBuilder::new()
                 .default_headers(headers)
