@@ -170,18 +170,22 @@ fn main() -> ExitCode {
             }
         }
     };
-    let mut rc = 0;
-    // TODO proper error handling
     let api =
-        Api::new(cli.url, token.as_ref().to_string(), cli.impersonate).unwrap();
+        match Api::new(cli.url, token.as_ref().to_string(), cli.impersonate) {
+            Ok(api) => api,
+            Err(error) => {
+                eprintln!("{}: {}", "error".bold().red(), error);
+                return ExitCode::FAILURE;
+            }
+        };
     match match cli.command {
         Command::Hello { ref command } => command.execute(api, cli.format),
     } {
         Ok(_) => {}
         Err(error) => {
             eprintln!("{}: {}", "error".bold().red(), error);
-            rc = 1;
+            return ExitCode::FAILURE;
         }
     }
-    ExitCode::from(rc)
+    ExitCode::SUCCESS
 }
