@@ -5,11 +5,13 @@ use std::rc::Rc;
 
 mod common;
 pub mod error;
-pub mod hello;
-pub mod user;
+mod hello;
+mod project;
+mod user;
 
 use error::ApiError;
 use hello::HelloApi;
+use project::ProjectApi;
 use user::UserApi;
 
 pub struct Api {
@@ -17,6 +19,7 @@ pub struct Api {
     // token: String,
     // client: Rc<Client>,
     pub hello: HelloApi,
+    pub project: ProjectApi,
     pub user: UserApi,
 }
 
@@ -48,7 +51,12 @@ impl Api {
                 .context("Failed to build http client")?,
         );
         let hello = HelloApi::new(&url, &client);
+        let project = ProjectApi::new(&url, &client);
         let user = UserApi::new(&url, &client);
-        Ok(Api { hello, user })
+        Ok(Api {
+            hello,
+            project,
+            user,
+        })
     }
 }
