@@ -70,6 +70,25 @@ where
     Ok(())
 }
 
+pub(crate) fn print_object_list<T>(
+    objects: Vec<T>,
+    format: Format,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    T: Serialize + Tabled,
+{
+    match format {
+        Format::Json => println!("{}", serde_json::to_string(&objects)?),
+        Format::Table(format) => {
+            let mut table = Table::new(objects);
+            apply_table_style(&mut table, format);
+            let output = table.to_string();
+            println!("{output}");
+        }
+    }
+    Ok(())
+}
+
 #[derive(Debug, Clone)]
 pub(crate) enum Format {
     Json,
