@@ -64,7 +64,6 @@ impl UserListRequest {
     pub fn send(&self) -> Result<Vec<User>, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
-        println!("{}", url);
         request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 
