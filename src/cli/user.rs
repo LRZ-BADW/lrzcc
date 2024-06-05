@@ -9,6 +9,7 @@ pub(crate) struct UserListFilter {
     all: bool,
 
     #[clap(short, long, help = "Display users of project with given ID")]
+    // TODO validate that this is a valid project ID
     project: Option<u32>,
 }
 
