@@ -6,6 +6,7 @@ use std::str::FromStr;
 
 mod common;
 mod hello;
+mod project;
 mod token;
 mod user;
 
@@ -144,6 +145,12 @@ enum Command {
     },
 
     #[clap(about = "User command")]
+    Project {
+        #[clap(subcommand)]
+        command: project::ProjectCommand,
+    },
+
+    #[clap(about = "User command")]
     User {
         #[clap(subcommand)]
         command: user::UserCommand,
@@ -188,6 +195,7 @@ fn main() -> ExitCode {
     match match cli.command {
         Command::Hello { ref command } => command.execute(api, cli.format),
         Command::User { ref command } => command.execute(api, cli.format),
+        Command::Project { ref command } => command.execute(api, cli.format),
     } {
         Ok(_) => {}
         Err(error) => {
