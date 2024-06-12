@@ -6,12 +6,11 @@ use std::rc::Rc;
 mod common;
 pub mod error;
 mod hello;
-mod project;
 mod user;
 
 use error::ApiError;
 use hello::HelloApi;
-use project::ProjectApi;
+use user::ProjectApi;
 use user::UserApi;
 
 pub struct Api {
