@@ -147,7 +147,7 @@ enum Command {
     #[clap(about = "User command")]
     Project {
         #[clap(subcommand)]
-        command: project::ProjectCommand,
+        command: user::ProjectCommand,
     },
 
     #[clap(about = "User command")]
