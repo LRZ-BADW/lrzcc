@@ -7,11 +7,13 @@ mod common;
 pub mod error;
 mod hello;
 mod pricing;
+mod resources;
 mod user;
 
 use error::ApiError;
 use hello::HelloApi;
 use pricing::FlavorPriceApi;
+use resources::FlavorApi;
 use user::ProjectApi;
 use user::UserApi;
 
@@ -22,6 +24,7 @@ pub struct Api {
     pub hello: HelloApi,
     pub project: ProjectApi,
     pub user: UserApi,
+    pub flavor: FlavorApi,
     pub flavor_price: FlavorPriceApi,
 }
 
@@ -55,11 +58,13 @@ impl Api {
         let hello = HelloApi::new(&url, &client);
         let project = ProjectApi::new(&url, &client);
         let user = UserApi::new(&url, &client);
+        let flavor = FlavorApi::new(&url, &client);
         let flavor_price = FlavorPriceApi::new(&url, &client);
         Ok(Api {
             hello,
             project,
             user,
+            flavor,
             flavor_price,
         })
     }
