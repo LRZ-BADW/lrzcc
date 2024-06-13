@@ -7,6 +7,7 @@ use std::str::FromStr;
 mod common;
 mod hello;
 mod pricing;
+mod resources;
 mod token;
 mod user;
 
@@ -138,6 +139,12 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Command {
+    #[clap(about = "Flavor command")]
+    Flavor {
+        #[clap(subcommand)]
+        command: resources::FlavorCommand,
+    },
+
     #[clap(about = "Flavor price command")]
     FlavorPrice {
         #[clap(subcommand)]
@@ -205,6 +212,7 @@ fn main() -> ExitCode {
         Command::FlavorPrice { ref command } => {
             command.execute(api, cli.format)
         }
+        Command::Flavor { ref command } => command.execute(api, cli.format),
     } {
         Ok(_) => {}
         Err(error) => {
