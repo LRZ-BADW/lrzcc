@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{display_option, request};
 use crate::error::ApiError;
 use anyhow::Context;
 use reqwest::blocking::Client;
@@ -14,8 +14,10 @@ pub struct Flavor {
     id: u32,
     name: String,
     openstack_id: String, // UUIDv4
-    group: u32,
-    group_name: String,
+    #[tabled(display_with = "display_option")]
+    group: Option<u32>,
+    #[tabled(display_with = "display_option")]
+    group_name: Option<String>,
     weight: u32,
 }
 
@@ -34,6 +36,9 @@ pub struct FlavorApi {
 pub struct FlavorListRequest {
     url: String,
     client: Rc<Client>,
+
+    all: bool,
+    group: Option<u32>,
 }
 
 impl FlavorListRequest {
@@ -41,13 +46,35 @@ impl FlavorListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
+            all: false,
+            group: None,
         }
     }
 
+    fn params(&self) -> Vec<(&str, String)> {
+        let mut params = Vec::new();
+        if self.all {
+            params.push(("all", "1".to_string()));
+        } else if let Some(group) = self.group {
+            params.push(("flavorgroup", group.to_string()));
+        }
+        params
+    }
+
     pub fn send(&self) -> Result<Vec<Flavor>, ApiError> {
-        let url = Url::parse(self.url.as_str())
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
         request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+    }
+
+    pub fn all(&mut self) -> &mut Self {
+        self.all = true;
+        self
+    }
+
+    pub fn group(&mut self, group: u32) -> &mut Self {
+        self.group = Some(group);
+        self
     }
 }
 
