@@ -3,6 +3,7 @@ use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
+use std::fmt::Display;
 
 pub(crate) fn request<T>(
     client: &Client,
@@ -36,4 +37,11 @@ where
     let t: T = serde_json::from_str(text.as_str())
         .context(format!("Could not parse response text: {}", text))?;
     Ok(t)
+}
+
+pub(crate) fn display_option<T: Display>(option: &Option<T>) -> String {
+    match option {
+        Some(value) => value.to_string(),
+        None => "".to_string(),
+    }
 }
