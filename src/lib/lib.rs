@@ -14,6 +14,7 @@ use error::ApiError;
 use hello::HelloApi;
 use pricing::FlavorPriceApi;
 use resources::FlavorApi;
+use resources::FlavorGroupApi;
 use user::ProjectApi;
 use user::UserApi;
 
@@ -25,6 +26,7 @@ pub struct Api {
     pub project: ProjectApi,
     pub user: UserApi,
     pub flavor: FlavorApi,
+    pub flavor_group: FlavorGroupApi,
     pub flavor_price: FlavorPriceApi,
 }
 
@@ -59,12 +61,14 @@ impl Api {
         let project = ProjectApi::new(&url, &client);
         let user = UserApi::new(&url, &client);
         let flavor = FlavorApi::new(&url, &client);
+        let flavor_group = FlavorGroupApi::new(&url, &client);
         let flavor_price = FlavorPriceApi::new(&url, &client);
         Ok(Api {
             hello,
             project,
             user,
             flavor,
+            flavor_group,
             flavor_price,
         })
     }
