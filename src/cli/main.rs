@@ -145,6 +145,12 @@ enum Command {
         command: resources::FlavorCommand,
     },
 
+    #[clap(about = "Flavor group command")]
+    FlavorGroup {
+        #[clap(subcommand)]
+        command: resources::FlavorGroupCommand,
+    },
+
     #[clap(about = "Flavor price command")]
     FlavorPrice {
         #[clap(subcommand)]
@@ -213,6 +219,9 @@ fn main() -> ExitCode {
             command.execute(api, cli.format)
         }
         Command::Flavor { ref command } => command.execute(api, cli.format),
+        Command::FlavorGroup { ref command } => {
+            command.execute(api, cli.format)
+        }
     } {
         Ok(_) => {}
         Err(error) => {
