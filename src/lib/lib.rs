@@ -3,6 +3,7 @@ use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
 
+mod accounting;
 mod common;
 pub mod error;
 mod hello;
@@ -10,6 +11,7 @@ mod pricing;
 mod resources;
 mod user;
 
+use accounting::ServerStateApi;
 use error::ApiError;
 use hello::HelloApi;
 use pricing::FlavorPriceApi;
@@ -28,6 +30,7 @@ pub struct Api {
     pub flavor: FlavorApi,
     pub flavor_group: FlavorGroupApi,
     pub flavor_price: FlavorPriceApi,
+    pub server_state: ServerStateApi,
 }
 
 impl Api {
@@ -57,19 +60,14 @@ impl Api {
                 .build()
                 .context("Failed to build http client")?,
         );
-        let hello = HelloApi::new(&url, &client);
-        let project = ProjectApi::new(&url, &client);
-        let user = UserApi::new(&url, &client);
-        let flavor = FlavorApi::new(&url, &client);
-        let flavor_group = FlavorGroupApi::new(&url, &client);
-        let flavor_price = FlavorPriceApi::new(&url, &client);
         Ok(Api {
-            hello,
-            project,
-            user,
-            flavor,
-            flavor_group,
-            flavor_price,
+            hello: HelloApi::new(&url, &client),
+            project: ProjectApi::new(&url, &client),
+            user: UserApi::new(&url, &client),
+            flavor: FlavorApi::new(&url, &client),
+            flavor_group: FlavorGroupApi::new(&url, &client),
+            flavor_price: FlavorPriceApi::new(&url, &client),
+            server_state: ServerStateApi::new(&url, &client),
         })
     }
 }
