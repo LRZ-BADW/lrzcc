@@ -4,6 +4,7 @@ use lrzcc::Api;
 use std::process::ExitCode;
 use std::str::FromStr;
 
+mod accounting;
 mod common;
 mod hello;
 mod pricing;
@@ -174,6 +175,12 @@ enum Command {
         #[clap(subcommand)]
         command: user::UserCommand,
     },
+
+    #[clap(about = "Server state command")]
+    ServerState {
+        #[clap(subcommand)]
+        command: accounting::ServerStateCommand,
+    },
 }
 
 fn main() -> ExitCode {
@@ -220,6 +227,9 @@ fn main() -> ExitCode {
         }
         Command::Flavor { ref command } => command.execute(api, cli.format),
         Command::FlavorGroup { ref command } => {
+            command.execute(api, cli.format)
+        }
+        Command::ServerState { ref command } => {
             command.execute(api, cli.format)
         }
     } {
