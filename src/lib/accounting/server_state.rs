@@ -41,7 +41,7 @@ pub struct ServerStateListRequest {
     url: String,
     client: Rc<Client>,
 
-    server: Option<u32>,
+    server: Option<String>,
     user: Option<u32>,
     project: Option<u32>,
     all: bool,
@@ -61,7 +61,7 @@ impl ServerStateListRequest {
 
     fn params(&self) -> Vec<(&str, String)> {
         let mut params = Vec::new();
-        if let Some(server) = self.server {
+        if let Some(server) = &self.server {
             params.push(("server", server.to_string()));
         } else if let Some(user) = self.user {
             params.push(("user", user.to_string()));
@@ -79,8 +79,8 @@ impl ServerStateListRequest {
         request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 
-    pub fn server(&mut self, server: u32) -> &mut Self {
-        self.server = Some(server);
+    pub fn server(&mut self, server: &str) -> &mut Self {
+        self.server = Some(server.to_string());
         self
     }
 
@@ -103,7 +103,7 @@ impl ServerStateListRequest {
 impl ServerStateApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerStateApi {
         ServerStateApi {
-            url: format!("{}/resources/flavors", base_url),
+            url: format!("{}/accounting/serverstates", base_url),
             client: Rc::clone(client),
         }
     }
