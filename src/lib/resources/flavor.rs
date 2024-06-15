@@ -53,6 +53,8 @@ impl FlavorListRequest {
 
     fn params(&self) -> Vec<(&str, String)> {
         let mut params = Vec::new();
+        // TODO maybe flip the order here, since the most specific
+        // should take precedence
         if self.all {
             params.push(("all", "1".to_string()));
         } else if let Some(group) = self.group {
