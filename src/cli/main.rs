@@ -12,6 +12,7 @@ mod accounting;
 mod budgeting;
 #[cfg(feature = "hello")]
 mod hello;
+#[cfg(feature = "pricing")]
 mod pricing;
 mod resources;
 mod token;
@@ -157,6 +158,7 @@ enum Command {
         command: resources::FlavorGroupCommand,
     },
 
+    #[cfg(feature = "pricing")]
     #[clap(about = "Flavor price command")]
     FlavorPrice {
         #[clap(subcommand)]
@@ -237,6 +239,7 @@ fn main() -> ExitCode {
         Command::Hello { ref command } => command.execute(api, cli.format),
         Command::User { ref command } => command.execute(api, cli.format),
         Command::Project { ref command } => command.execute(api, cli.format),
+        #[cfg(feature = "pricing")]
         Command::FlavorPrice { ref command } => {
             command.execute(api, cli.format)
         }
