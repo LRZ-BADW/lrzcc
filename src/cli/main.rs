@@ -4,11 +4,12 @@ use lrzcc::Api;
 use std::process::ExitCode;
 use std::str::FromStr;
 
+mod common;
+
 #[cfg(feature = "accounting")]
 mod accounting;
 #[cfg(feature = "budgeting")]
 mod budgeting;
-mod common;
 mod hello;
 mod pricing;
 mod resources;
