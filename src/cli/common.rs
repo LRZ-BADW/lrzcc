@@ -42,6 +42,7 @@ pub(crate) fn apply_table_style(table: &mut Table, format: TableFormat) {
     };
 }
 
+#[allow(dead_code)]
 pub(crate) fn print_single_object<T>(
     object: T,
     format: Format,
