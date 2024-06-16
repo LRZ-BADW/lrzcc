@@ -27,6 +27,37 @@ impl Display for Flavor {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorGroupMinimal {
+    id: u32,
+    name: String,
+}
+
+// TODO maybe rethink the Display implementations
+impl Display for FlavorGroupMinimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorDetailed {
+    id: u32,
+    name: String,
+    openstack_id: String, // UUIDv4
+    #[tabled(display_with = "display_option")]
+    group: Option<FlavorGroupMinimal>,
+    #[tabled(display_with = "display_option")]
+    group_name: Option<String>,
+    weight: u32,
+}
+
+impl Display for FlavorDetailed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("Flavor(id={}, name={})", self.id, self.name))
+    }
+}
+
 pub struct FlavorApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -90,5 +121,11 @@ impl FlavorApi {
 
     pub fn list(&self) -> FlavorListRequest {
         FlavorListRequest::new(self.url.as_ref(), &self.client)
+    }
+
+    pub fn get(&self, id: u32) -> Result<FlavorDetailed, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}", self.url, id.to_string());
+        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 }
