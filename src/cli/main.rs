@@ -6,6 +6,7 @@ use std::str::FromStr;
 
 #[cfg(feature = "accounting")]
 mod accounting;
+#[cfg(feature = "budgeting")]
 mod budgeting;
 mod common;
 mod hello;
@@ -185,6 +186,7 @@ enum Command {
         command: accounting::ServerStateCommand,
     },
 
+    #[cfg(feature = "budgeting")]
     #[clap(about = "Project budget command")]
     ProjectBudget {
         #[clap(subcommand)]
@@ -242,6 +244,7 @@ fn main() -> ExitCode {
         Command::ServerState { ref command } => {
             command.execute(api, cli.format)
         }
+        #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)
         }
