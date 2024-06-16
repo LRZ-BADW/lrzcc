@@ -5,6 +5,7 @@ use std::rc::Rc;
 
 #[cfg(feature = "accounting")]
 mod accounting;
+#[cfg(feature = "budgeting")]
 mod budgeting;
 mod common;
 pub mod error;
@@ -15,6 +16,7 @@ mod user;
 
 #[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
+#[cfg(feature = "budgeting")]
 use budgeting::ProjectBudgetApi;
 use error::ApiError;
 use hello::HelloApi;
@@ -36,6 +38,7 @@ pub struct Api {
     pub flavor_price: FlavorPriceApi,
     #[cfg(feature = "accounting")]
     pub server_state: ServerStateApi,
+    #[cfg(feature = "budgeting")]
     pub project_budget: ProjectBudgetApi,
 }
 
@@ -75,6 +78,7 @@ impl Api {
             flavor_price: FlavorPriceApi::new(&url, &client),
             #[cfg(feature = "accounting")]
             server_state: ServerStateApi::new(&url, &client),
+            #[cfg(feature = "budgeting")]
             project_budget: ProjectBudgetApi::new(&url, &client),
         })
     }
