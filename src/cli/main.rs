@@ -5,6 +5,7 @@ use std::process::ExitCode;
 use std::str::FromStr;
 
 mod common;
+mod token;
 
 #[cfg(feature = "accounting")]
 mod accounting;
@@ -16,7 +17,7 @@ mod hello;
 mod pricing;
 #[cfg(feature = "resources")]
 mod resources;
-mod token;
+#[cfg(feature = "user")]
 mod user;
 
 use common::{Execute, Format, TableFormat};
@@ -175,12 +176,14 @@ enum Command {
         command: hello::HelloCommand,
     },
 
+    #[cfg(feature = "user")]
     #[clap(about = "User command")]
     Project {
         #[clap(subcommand)]
         command: user::ProjectCommand,
     },
 
+    #[cfg(feature = "user")]
     #[clap(about = "User command")]
     User {
         #[clap(subcommand)]
@@ -240,7 +243,9 @@ fn main() -> ExitCode {
     match match cli.command {
         #[cfg(feature = "hello")]
         Command::Hello { ref command } => command.execute(api, cli.format),
+        #[cfg(feature = "user")]
         Command::User { ref command } => command.execute(api, cli.format),
+        #[cfg(feature = "user")]
         Command::Project { ref command } => command.execute(api, cli.format),
         #[cfg(feature = "pricing")]
         Command::FlavorPrice { ref command } => {
