@@ -10,6 +10,7 @@ pub mod error;
 mod accounting;
 #[cfg(feature = "budgeting")]
 mod budgeting;
+#[cfg(feature = "hello")]
 mod hello;
 mod pricing;
 mod resources;
@@ -20,6 +21,7 @@ use accounting::ServerStateApi;
 #[cfg(feature = "budgeting")]
 use budgeting::ProjectBudgetApi;
 use error::ApiError;
+#[cfg(feature = "hello")]
 use hello::HelloApi;
 use pricing::FlavorPriceApi;
 use resources::FlavorApi;
@@ -31,6 +33,7 @@ pub struct Api {
     // url: Rc<str>,
     // token: String,
     // client: Rc<Client>,
+    #[cfg(feature = "hello")]
     pub hello: HelloApi,
     pub project: ProjectApi,
     pub user: UserApi,
@@ -71,6 +74,7 @@ impl Api {
                 .context("Failed to build http client")?,
         );
         Ok(Api {
+            #[cfg(feature = "hello")]
             hello: HelloApi::new(&url, &client),
             project: ProjectApi::new(&url, &client),
             user: UserApi::new(&url, &client),
