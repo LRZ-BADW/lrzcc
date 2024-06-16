@@ -71,6 +71,7 @@ where
     Ok(())
 }
 
+#[allow(dead_code)]
 pub(crate) fn print_object_list<T>(
     objects: Vec<T>,
     format: Format,
