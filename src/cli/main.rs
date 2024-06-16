@@ -240,6 +240,14 @@ fn main() -> ExitCode {
                 return ExitCode::FAILURE;
             }
         };
+    #[cfg(any(
+        feature = "accounting",
+        feature = "budgeting",
+        feature = "hello",
+        feature = "pricing",
+        feature = "resources",
+        feature = "user",
+    ))]
     match match cli.command {
         #[cfg(feature = "hello")]
         Command::Hello { ref command } => command.execute(api, cli.format),
