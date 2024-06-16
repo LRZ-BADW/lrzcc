@@ -5,6 +5,7 @@ use std::process::ExitCode;
 use std::str::FromStr;
 
 mod accounting;
+mod budgeting;
 mod common;
 mod hello;
 mod pricing;
@@ -181,6 +182,12 @@ enum Command {
         #[clap(subcommand)]
         command: accounting::ServerStateCommand,
     },
+
+    #[clap(about = "Project budget command")]
+    ProjectBudget {
+        #[clap(subcommand)]
+        command: budgeting::ProjectBudgetCommand,
+    },
 }
 
 fn main() -> ExitCode {
@@ -230,6 +237,9 @@ fn main() -> ExitCode {
             command.execute(api, cli.format)
         }
         Command::ServerState { ref command } => {
+            command.execute(api, cli.format)
+        }
+        Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)
         }
     } {
