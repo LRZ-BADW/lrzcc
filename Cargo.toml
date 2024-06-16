@@ -26,11 +26,12 @@ required-features = ["cli"]
 default = ["cli", "all"]
 cli = ["clap", "colored", "jzon"]
 vendored-tls = ["reqwest/native-tls-vendored"]
-all = ["accounting", "budgeting", "hello", "pricing"]
+all = ["accounting", "budgeting", "hello", "pricing", "resources"]
 accounting = []
 budgeting = []
 hello = []
 pricing = []
+resources = []
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "blocking"] }
