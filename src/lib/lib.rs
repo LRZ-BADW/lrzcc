@@ -3,12 +3,13 @@ use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
 
+mod common;
+pub mod error;
+
 #[cfg(feature = "accounting")]
 mod accounting;
 #[cfg(feature = "budgeting")]
 mod budgeting;
-mod common;
-pub mod error;
 mod hello;
 mod pricing;
 mod resources;
