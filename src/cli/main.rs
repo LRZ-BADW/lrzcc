@@ -15,6 +15,8 @@ mod budgeting;
 mod hello;
 #[cfg(feature = "pricing")]
 mod pricing;
+#[cfg(feature = "quota")]
+mod quota;
 #[cfg(feature = "resources")]
 mod resources;
 #[cfg(feature = "user")]
@@ -169,6 +171,13 @@ enum Command {
         command: pricing::FlavorPriceCommand,
     },
 
+    #[cfg(feature = "quota")]
+    #[clap(about = "Flavor quota command")]
+    FlavorQuota {
+        #[clap(subcommand)]
+        command: quota::FlavorQuotaCommand,
+    },
+
     #[cfg(feature = "hello")]
     #[clap(about = "Hello command")]
     Hello {
@@ -257,6 +266,10 @@ fn main() -> ExitCode {
         Command::Project { ref command } => command.execute(api, cli.format),
         #[cfg(feature = "pricing")]
         Command::FlavorPrice { ref command } => {
+            command.execute(api, cli.format)
+        }
+        #[cfg(feature = "quota")]
+        Command::FlavorQuota { ref command } => {
             command.execute(api, cli.format)
         }
         #[cfg(feature = "resources")]
