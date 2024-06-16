@@ -14,6 +14,8 @@ mod budgeting;
 mod hello;
 #[cfg(feature = "pricing")]
 mod pricing;
+#[cfg(feature = "quota")]
+mod quota;
 #[cfg(feature = "resources")]
 mod resources;
 #[cfg(feature = "user")]
@@ -28,6 +30,8 @@ use error::ApiError;
 use hello::HelloApi;
 #[cfg(feature = "pricing")]
 use pricing::FlavorPriceApi;
+#[cfg(feature = "quota")]
+use quota::FlavorQuotaApi;
 #[cfg(feature = "resources")]
 use resources::FlavorApi;
 #[cfg(feature = "resources")]
@@ -53,6 +57,8 @@ pub struct Api {
     pub flavor_group: FlavorGroupApi,
     #[cfg(feature = "pricing")]
     pub flavor_price: FlavorPriceApi,
+    #[cfg(feature = "quota")]
+    pub flavor_quota: FlavorQuotaApi,
     #[cfg(feature = "accounting")]
     pub server_state: ServerStateApi,
     #[cfg(feature = "budgeting")]
@@ -99,6 +105,8 @@ impl Api {
             flavor_group: FlavorGroupApi::new(&url, &client),
             #[cfg(feature = "pricing")]
             flavor_price: FlavorPriceApi::new(&url, &client),
+            #[cfg(feature = "quota")]
+            flavor_quota: FlavorQuotaApi::new(&url, &client),
             #[cfg(feature = "accounting")]
             server_state: ServerStateApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
