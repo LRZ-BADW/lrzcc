@@ -212,6 +212,13 @@ enum Command {
         #[clap(subcommand)]
         command: budgeting::ProjectBudgetCommand,
     },
+
+    #[cfg(feature = "budgeting")]
+    #[clap(about = "User budget command")]
+    UserBudget {
+        #[clap(subcommand)]
+        command: budgeting::UserBudgetCommand,
+    },
 }
 
 fn main() -> ExitCode {
@@ -286,6 +293,8 @@ fn main() -> ExitCode {
         Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)
         }
+        #[cfg(feature = "budgeting")]
+        Command::UserBudget { ref command } => command.execute(api, cli.format),
     } {
         Ok(_) => {}
         Err(error) => {
