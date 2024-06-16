@@ -14,6 +14,7 @@ mod budgeting;
 mod hello;
 #[cfg(feature = "pricing")]
 mod pricing;
+#[cfg(feature = "resources")]
 mod resources;
 mod user;
 
@@ -26,7 +27,9 @@ use error::ApiError;
 use hello::HelloApi;
 #[cfg(feature = "pricing")]
 use pricing::FlavorPriceApi;
+#[cfg(feature = "resources")]
 use resources::FlavorApi;
+#[cfg(feature = "resources")]
 use resources::FlavorGroupApi;
 use user::ProjectApi;
 use user::UserApi;
@@ -39,7 +42,9 @@ pub struct Api {
     pub hello: HelloApi,
     pub project: ProjectApi,
     pub user: UserApi,
+    #[cfg(feature = "resources")]
     pub flavor: FlavorApi,
+    #[cfg(feature = "resources")]
     pub flavor_group: FlavorGroupApi,
     #[cfg(feature = "pricing")]
     pub flavor_price: FlavorPriceApi,
@@ -81,7 +86,9 @@ impl Api {
             hello: HelloApi::new(&url, &client),
             project: ProjectApi::new(&url, &client),
             user: UserApi::new(&url, &client),
+            #[cfg(feature = "resources")]
             flavor: FlavorApi::new(&url, &client),
+            #[cfg(feature = "resources")]
             flavor_group: FlavorGroupApi::new(&url, &client),
             #[cfg(feature = "pricing")]
             flavor_price: FlavorPriceApi::new(&url, &client),
