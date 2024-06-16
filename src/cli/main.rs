@@ -10,6 +10,7 @@ mod common;
 mod accounting;
 #[cfg(feature = "budgeting")]
 mod budgeting;
+#[cfg(feature = "hello")]
 mod hello;
 mod pricing;
 mod resources;
@@ -162,6 +163,7 @@ enum Command {
         command: pricing::FlavorPriceCommand,
     },
 
+    #[cfg(feature = "hello")]
     #[clap(about = "Hello command")]
     Hello {
         #[clap(subcommand)]
@@ -231,6 +233,7 @@ fn main() -> ExitCode {
             }
         };
     match match cli.command {
+        #[cfg(feature = "hello")]
         Command::Hello { ref command } => command.execute(api, cli.format),
         Command::User { ref command } => command.execute(api, cli.format),
         Command::Project { ref command } => command.execute(api, cli.format),
