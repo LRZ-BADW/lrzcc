@@ -16,6 +16,7 @@ mod hello;
 mod pricing;
 #[cfg(feature = "resources")]
 mod resources;
+#[cfg(feature = "user")]
 mod user;
 
 #[cfg(feature = "accounting")]
@@ -31,7 +32,9 @@ use pricing::FlavorPriceApi;
 use resources::FlavorApi;
 #[cfg(feature = "resources")]
 use resources::FlavorGroupApi;
+#[cfg(feature = "user")]
 use user::ProjectApi;
+#[cfg(feature = "user")]
 use user::UserApi;
 
 pub struct Api {
@@ -40,7 +43,9 @@ pub struct Api {
     // client: Rc<Client>,
     #[cfg(feature = "hello")]
     pub hello: HelloApi,
+    #[cfg(feature = "user")]
     pub project: ProjectApi,
+    #[cfg(feature = "user")]
     pub user: UserApi,
     #[cfg(feature = "resources")]
     pub flavor: FlavorApi,
@@ -84,7 +89,9 @@ impl Api {
         Ok(Api {
             #[cfg(feature = "hello")]
             hello: HelloApi::new(&url, &client),
+            #[cfg(feature = "user")]
             project: ProjectApi::new(&url, &client),
+            #[cfg(feature = "user")]
             user: UserApi::new(&url, &client),
             #[cfg(feature = "resources")]
             flavor: FlavorApi::new(&url, &client),
