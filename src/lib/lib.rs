@@ -3,6 +3,7 @@ use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
 
+#[cfg(feature = "accounting")]
 mod accounting;
 mod budgeting;
 mod common;
