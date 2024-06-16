@@ -21,11 +21,14 @@ mod resources;
 #[cfg(feature = "user")]
 mod user;
 
+use error::ApiError;
+
 #[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
 #[cfg(feature = "budgeting")]
 use budgeting::ProjectBudgetApi;
-use error::ApiError;
+#[cfg(feature = "budgeting")]
+use budgeting::UserBudgetApi;
 #[cfg(feature = "hello")]
 use hello::HelloApi;
 #[cfg(feature = "pricing")]
@@ -63,6 +66,8 @@ pub struct Api {
     pub server_state: ServerStateApi,
     #[cfg(feature = "budgeting")]
     pub project_budget: ProjectBudgetApi,
+    #[cfg(feature = "budgeting")]
+    pub user_budget: UserBudgetApi,
 }
 
 impl Api {
@@ -111,6 +116,8 @@ impl Api {
             server_state: ServerStateApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
             project_budget: ProjectBudgetApi::new(&url, &client),
+            #[cfg(feature = "budgeting")]
+            user_budget: UserBudgetApi::new(&url, &client),
         })
     }
 }
