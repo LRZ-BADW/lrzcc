@@ -12,6 +12,7 @@ mod pricing;
 mod resources;
 mod user;
 
+#[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
 use budgeting::ProjectBudgetApi;
 use error::ApiError;
@@ -32,6 +33,7 @@ pub struct Api {
     pub flavor: FlavorApi,
     pub flavor_group: FlavorGroupApi,
     pub flavor_price: FlavorPriceApi,
+    #[cfg(feature = "accounting")]
     pub server_state: ServerStateApi,
     pub project_budget: ProjectBudgetApi,
 }
@@ -70,6 +72,7 @@ impl Api {
             flavor: FlavorApi::new(&url, &client),
             flavor_group: FlavorGroupApi::new(&url, &client),
             flavor_price: FlavorPriceApi::new(&url, &client),
+            #[cfg(feature = "accounting")]
             server_state: ServerStateApi::new(&url, &client),
             project_budget: ProjectBudgetApi::new(&url, &client),
         })
