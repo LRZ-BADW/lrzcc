@@ -4,6 +4,7 @@ use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::rc::Rc;
 
 mod accounting;
+mod budgeting;
 mod common;
 pub mod error;
 mod hello;
@@ -12,6 +13,7 @@ mod resources;
 mod user;
 
 use accounting::ServerStateApi;
+use budgeting::ProjectBudgetApi;
 use error::ApiError;
 use hello::HelloApi;
 use pricing::FlavorPriceApi;
@@ -31,6 +33,7 @@ pub struct Api {
     pub flavor_group: FlavorGroupApi,
     pub flavor_price: FlavorPriceApi,
     pub server_state: ServerStateApi,
+    pub project_budget: ProjectBudgetApi,
 }
 
 impl Api {
@@ -68,6 +71,7 @@ impl Api {
             flavor_group: FlavorGroupApi::new(&url, &client),
             flavor_price: FlavorPriceApi::new(&url, &client),
             server_state: ServerStateApi::new(&url, &client),
+            project_budget: ProjectBudgetApi::new(&url, &client),
         })
     }
 }
