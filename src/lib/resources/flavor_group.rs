@@ -1,5 +1,6 @@
 use crate::common::request;
 use crate::error::ApiError;
+use crate::user::ProjectMinimal;
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -21,19 +22,6 @@ pub struct FlavorGroup {
 impl Display for FlavorGroup {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ProjectMinimal {
-    id: u32,
-    name: String,
-    user_class: u32,
-}
-
-impl Display for ProjectMinimal {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("Project(id={}, name={})", self.id, self.name))
     }
 }
 
