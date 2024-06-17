@@ -29,6 +29,18 @@ impl Display for User {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserMinimal {
+    id: u32,
+    name: String,
+}
+
+impl Display for UserMinimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("User(id={}, name={}", self.id, self.name))
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct UserDetailed {
     id: u32,
     name: String,

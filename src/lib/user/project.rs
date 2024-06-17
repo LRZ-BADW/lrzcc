@@ -1,5 +1,7 @@
 use crate::common::request;
 use crate::error::ApiError;
+use crate::resources::FlavorGroupMinimal;
+use crate::user::UserMinimal;
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::Url;
