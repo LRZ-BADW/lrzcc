@@ -39,6 +39,8 @@ use quota::FlavorQuotaApi;
 use resources::FlavorApi;
 #[cfg(feature = "resources")]
 use resources::FlavorGroupApi;
+#[cfg(feature = "resources")]
+use resources::UsageApi;
 #[cfg(feature = "user")]
 use user::ProjectApi;
 #[cfg(feature = "user")]
@@ -58,6 +60,8 @@ pub struct Api {
     pub flavor: FlavorApi,
     #[cfg(feature = "resources")]
     pub flavor_group: FlavorGroupApi,
+    #[cfg(feature = "resources")]
+    pub usage: UsageApi,
     #[cfg(feature = "pricing")]
     pub flavor_price: FlavorPriceApi,
     #[cfg(feature = "quota")]
@@ -108,6 +112,8 @@ impl Api {
             flavor: FlavorApi::new(&url, &client),
             #[cfg(feature = "resources")]
             flavor_group: FlavorGroupApi::new(&url, &client),
+            #[cfg(feature = "resources")]
+            usage: UsageApi::new(&url, &client),
             #[cfg(feature = "pricing")]
             flavor_price: FlavorPriceApi::new(&url, &client),
             #[cfg(feature = "quota")]
