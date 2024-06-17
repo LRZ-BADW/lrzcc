@@ -1,5 +1,6 @@
 use crate::common::request;
 use crate::error::ApiError;
+use crate::user::ProjectMinimal;
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -25,6 +26,18 @@ impl Display for User {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("User(id={}, name={}", self.id, self.name))
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserDetailed {
+    id: u32,
+    name: String,
+    openstack_id: String, // UUIDv4 without dashes
+    project: ProjectMinimal,
+    project_name: String,
+    role: u32,
+    is_staff: bool,
+    is_active: bool,
 }
 
 pub struct UserApi {
@@ -88,5 +101,11 @@ impl UserApi {
 
     pub fn list(&self) -> UserListRequest {
         UserListRequest::new(self.url.as_ref(), &self.client)
+    }
+
+    pub fn get(&self, id: u32) -> Result<UserDetailed, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}", self.url, id.to_string());
+        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 }
