@@ -1,4 +1,4 @@
-use crate::common::{print_object_list, Execute, Format};
+use crate::common::{print_object_list, print_single_object, Execute, Format};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -28,6 +28,9 @@ pub(crate) enum FlavorQuotaCommand {
         #[clap(flatten)]
         filter: FlavorQuotaListFilter,
     },
+
+    #[clap(about = "Show flavor quota with given ID")]
+    Get { id: u32 },
 }
 
 impl Execute for FlavorQuotaCommand {
@@ -38,6 +41,7 @@ impl Execute for FlavorQuotaCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             FlavorQuotaCommand::List { filter } => list(api, format, filter),
+            FlavorQuotaCommand::Get { id } => get(api, format, id),
         }
     }
 }
@@ -56,4 +60,12 @@ fn list(
         request.user(user);
     }
     print_object_list(request.send()?, format)
+}
+
+fn get(
+    api: lrzcc::Api,
+    format: Format,
+    id: &u32,
+) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.flavor_quota.get(*id)?, format)
 }
