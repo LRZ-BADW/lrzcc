@@ -38,6 +38,30 @@ impl Display for ProjectMinimal {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct ProjectDetailed {
+    id: u32,
+    name: String,
+    openstack_id: String, // UUIDv4 without dashes
+    user_class: u32,
+    // TODO rethink list output in detailed structs:
+    // maybe we could have only the first few entries followed by ...
+    // in the output
+    #[tabled(skip)]
+    users: Vec<UserMinimal>,
+    #[tabled(skip)]
+    flavor_groups: Vec<FlavorGroupMinimal>,
+}
+
+impl Display for ProjectDetailed {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!(
+            "ProjectDetailed(id={}, name={}",
+            self.id, self.name
+        ))
+    }
+}
+
 pub struct ProjectApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -100,5 +124,11 @@ impl ProjectApi {
 
     pub fn list(&self) -> ProjectListRequest {
         ProjectListRequest::new(self.url.as_ref(), &self.client)
+    }
+
+    pub fn get(&self, id: u32) -> Result<ProjectDetailed, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}", self.url, id.to_string());
+        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 }
