@@ -1,4 +1,4 @@
-use crate::common::{print_object_list, Execute, Format};
+use crate::common::{print_object_list, print_single_object, Execute, Format};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -20,6 +20,9 @@ pub(crate) enum ProjectCommand {
         #[clap(flatten)]
         filter: ProjectListFilter,
     },
+
+    #[clap(about = "Show project with given ID")]
+    Get { id: u32 },
 }
 
 impl Execute for ProjectCommand {
@@ -30,6 +33,7 @@ impl Execute for ProjectCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             ProjectCommand::List { filter } => list(api, format, filter),
+            ProjectCommand::Get { id } => get(api, format, id),
         }
     }
 }
@@ -46,4 +50,12 @@ fn list(
         request.user_class(user_class);
     }
     print_object_list(request.send()?, format)
+}
+
+fn get(
+    api: lrzcc::Api,
+    format: Format,
+    id: &u32,
+) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.project.get(*id)?, format)
 }
