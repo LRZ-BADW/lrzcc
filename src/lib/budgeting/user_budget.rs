@@ -106,4 +106,10 @@ impl UserBudgetApi {
     pub fn list(&self) -> UserBudgetListRequest {
         UserBudgetListRequest::new(self.url.as_ref(), &self.client)
     }
+
+    pub fn get(&self, id: u32) -> Result<UserBudget, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}", self.url, id.to_string());
+        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+    }
 }
