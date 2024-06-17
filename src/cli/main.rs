@@ -164,6 +164,10 @@ enum Command {
         command: resources::FlavorGroupCommand,
     },
 
+    #[cfg(feature = "resources")]
+    #[clap(about = "Usage command")]
+    Usage,
+
     #[cfg(feature = "pricing")]
     #[clap(about = "Flavor price command")]
     FlavorPrice {
@@ -285,6 +289,8 @@ fn main() -> ExitCode {
         Command::FlavorGroup { ref command } => {
             command.execute(api, cli.format)
         }
+        #[cfg(feature = "resources")]
+        Command::Usage => resources::usage(api),
         #[cfg(feature = "accounting")]
         Command::ServerState { ref command } => {
             command.execute(api, cli.format)
