@@ -13,10 +13,53 @@ use tabled::Tabled;
 pub struct FlavorGroup {
     id: u32,
     name: String,
+    #[tabled(skip)]
+    flavors: Vec<u32>,
     project: u32,
 }
 
 impl Display for FlavorGroup {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct ProjectMinimal {
+    id: u32,
+    name: String,
+    user_class: u32,
+}
+
+impl Display for ProjectMinimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("Project(id={}, name={})", self.id, self.name))
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorMinimal {
+    id: u32,
+    name: String,
+}
+
+// TODO maybe rethink the Display implementations
+impl Display for FlavorMinimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("Flavor(id={}, name={})", self.id, self.name))
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorGroupDetailed {
+    id: u32,
+    name: String,
+    #[tabled(skip)]
+    flavors: Vec<FlavorMinimal>,
+    project: ProjectMinimal,
+}
+
+impl Display for FlavorGroupDetailed {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
     }
@@ -74,5 +117,11 @@ impl FlavorGroupApi {
 
     pub fn list(&self) -> FlavorGroupListRequest {
         FlavorGroupListRequest::new(self.url.as_ref(), &self.client)
+    }
+
+    pub fn get(&self, id: u32) -> Result<FlavorGroupDetailed, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}", self.url, id.to_string());
+        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
     }
 }
