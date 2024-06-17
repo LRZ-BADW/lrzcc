@@ -1,5 +1,6 @@
 mod flavor;
 mod flavor_group;
 
-pub use flavor::FlavorApi;
-pub use flavor_group::FlavorGroupApi;
+// TODO rethink the public export of minimal structs
+pub use flavor::{FlavorApi, FlavorMinimal};
+pub use flavor_group::{FlavorGroupApi, FlavorGroupMinimal};

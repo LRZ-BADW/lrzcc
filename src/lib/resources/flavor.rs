@@ -1,5 +1,6 @@
 use crate::common::{display_option, request};
 use crate::error::ApiError;
+use crate::resources::FlavorGroupMinimal;
 use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -28,15 +29,15 @@ impl Display for Flavor {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct FlavorGroupMinimal {
+pub struct FlavorMinimal {
     id: u32,
     name: String,
 }
 
 // TODO maybe rethink the Display implementations
-impl Display for FlavorGroupMinimal {
+impl Display for FlavorMinimal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
+        f.write_str(&format!("Flavor(id={}, name={})", self.id, self.name))
     }
 }
 
