@@ -1,4 +1,4 @@
-use crate::common::{print_object_list, Execute, Format};
+use crate::common::{print_object_list, print_single_object, Execute, Format};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -32,6 +32,9 @@ pub(crate) enum UserBudgetCommand {
         #[clap(flatten)]
         filter: UserBudgetListFilter,
     },
+
+    #[clap(about = "Show user budget with given ID")]
+    Get { id: u32 },
 }
 
 impl Execute for UserBudgetCommand {
@@ -42,6 +45,7 @@ impl Execute for UserBudgetCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             UserBudgetCommand::List { filter } => list(api, format, filter),
+            UserBudgetCommand::Get { id } => get(api, format, id),
         }
     }
 }
@@ -63,4 +67,12 @@ fn list(
         request.year(year);
     }
     print_object_list(request.send()?, format)
+}
+
+fn get(
+    api: lrzcc::Api,
+    format: Format,
+    id: &u32,
+) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.user_budget.get(*id)?, format)
 }
