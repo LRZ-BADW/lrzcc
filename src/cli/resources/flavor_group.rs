@@ -1,4 +1,4 @@
-use crate::common::{print_object_list, Execute, Format};
+use crate::common::{print_object_list, print_single_object, Execute, Format};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -16,6 +16,9 @@ pub(crate) enum FlavorGroupCommand {
         #[clap(flatten)]
         filter: FlavorGroupListFilter,
     },
+
+    #[clap(about = "Show flavor group with given ID")]
+    Get { id: u32 },
 }
 
 impl Execute for FlavorGroupCommand {
@@ -26,6 +29,7 @@ impl Execute for FlavorGroupCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             FlavorGroupCommand::List { filter } => list(api, format, filter),
+            FlavorGroupCommand::Get { id } => get(api, format, id),
         }
     }
 }
@@ -40,4 +44,12 @@ fn list(
         request.all();
     }
     print_object_list(request.send()?, format)
+}
+
+fn get(
+    api: lrzcc::Api,
+    format: Format,
+    id: &u32,
+) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.flavor_group.get(*id)?, format)
 }
