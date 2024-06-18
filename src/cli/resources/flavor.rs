@@ -23,6 +23,21 @@ pub(crate) enum FlavorCommand {
 
     #[clap(about = "Show flavor with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new flavor")]
+    Create {
+        #[clap(help = "Name of the flavor")]
+        name: String,
+
+        #[clap(help = "Openstack UUIDv4 of the flavor")]
+        openstack_id: String,
+
+        #[clap(help = "ID of the group this flavor belongs to")]
+        group: Option<u32>,
+
+        #[clap(help = "Weight of the flavor within the group")]
+        weight: Option<u32>,
+    },
 }
 
 impl Execute for FlavorCommand {
@@ -34,6 +49,19 @@ impl Execute for FlavorCommand {
         match self {
             FlavorCommand::List { filter } => list(api, format, filter),
             FlavorCommand::Get { id } => get(api, format, id),
+            FlavorCommand::Create {
+                name,
+                openstack_id,
+                group,
+                weight,
+            } => create(
+                api,
+                format,
+                name.to_owned(),
+                openstack_id.to_owned(),
+                *group,
+                *weight,
+            ),
         }
     }
 }
@@ -58,4 +86,22 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.flavor.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    name: String,
+    openstack_id: String,
+    group: Option<u32>,
+    weight: Option<u32>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor.create(name, openstack_id);
+    if let Some(group) = group {
+        request.group(group);
+    }
+    if let Some(weight) = weight {
+        request.weight(weight);
+    }
+    print_single_object(request.send()?, format)
 }
