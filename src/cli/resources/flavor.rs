@@ -38,6 +38,9 @@ pub(crate) enum FlavorCommand {
         #[clap(help = "Weight of the flavor within the group")]
         weight: Option<u32>,
     },
+
+    #[clap(about = "Delete flavor with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for FlavorCommand {
@@ -62,6 +65,7 @@ impl Execute for FlavorCommand {
                 *group,
                 *weight,
             ),
+            FlavorCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -104,4 +108,8 @@ fn create(
         request.weight(weight);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    Ok(api.flavor.delete(*id)?)
 }
