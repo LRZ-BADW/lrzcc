@@ -19,6 +19,12 @@ pub(crate) enum FlavorGroupCommand {
 
     #[clap(about = "Show flavor group with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new flavor group")]
+    Create {
+        #[clap(help = "Name of the flavor group")]
+        name: String,
+    },
 }
 
 impl Execute for FlavorGroupCommand {
@@ -30,6 +36,9 @@ impl Execute for FlavorGroupCommand {
         match self {
             FlavorGroupCommand::List { filter } => list(api, format, filter),
             FlavorGroupCommand::Get { id } => get(api, format, id),
+            FlavorGroupCommand::Create { name } => {
+                create(api, format, name.to_owned())
+            }
         }
     }
 }
@@ -52,4 +61,12 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.flavor_group.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    name: String,
+) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.flavor_group.create(name).send()?, format)
 }
