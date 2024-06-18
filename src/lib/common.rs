@@ -1,6 +1,6 @@
 use crate::error::{ApiError, ErrorResponse};
 use anyhow::Context;
-use reqwest::blocking::Client;
+use reqwest::blocking::{Client, Response};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
@@ -15,16 +15,15 @@ macro_rules! SerializableNone {
 }
 pub(crate) use SerializableNone;
 
-pub(crate) fn request<T, U>(
+pub(crate) fn request_bare<T>(
     client: &Client,
     method: Method,
     url: &str,
-    data: Option<U>,
+    data: Option<T>,
     expected_status: StatusCode,
-) -> Result<T, ApiError>
+) -> Result<Response, ApiError>
 where
-    T: DeserializeOwned,
-    U: Serialize + Debug,
+    T: Serialize + Debug,
 {
     let mut request = client.request(method, url);
     if let Some(data) = data {
@@ -46,12 +45,27 @@ where
             ))?;
         return Err(ApiError::ResponseError(err_resp.detail));
     }
+    Ok(response)
+}
+
+pub(crate) fn request<T, U>(
+    client: &Client,
+    method: Method,
+    url: &str,
+    data: Option<T>,
+    expected_status: StatusCode,
+) -> Result<U, ApiError>
+where
+    T: Serialize + Debug,
+    U: DeserializeOwned,
+{
+    let response = request_bare(client, method, url, data, expected_status)?;
     let text = response
         .text()
         .context("Could not retrieve response text.")?;
-    let t: T = serde_json::from_str(text.as_str())
+    let u: U = serde_json::from_str(text.as_str())
         .context(format!("Could not parse response text: {}", text))?;
-    Ok(t)
+    Ok(u)
 }
 
 #[allow(dead_code)]
