@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
@@ -65,6 +65,12 @@ impl UsageApi {
     }
 
     pub fn get(&self) -> Result<CloudUsage, ApiError> {
-        request(&self.client, Method::GET, self.url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            self.url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }

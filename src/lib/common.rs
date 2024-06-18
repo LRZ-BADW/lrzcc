@@ -3,21 +3,36 @@ use anyhow::Context;
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
-use std::fmt::Display;
+use serde::ser::Serialize;
+use std::fmt::{Debug, Display};
 
-pub(crate) fn request<T>(
+#[derive(serde::Serialize, Debug)]
+pub(crate) struct SerializableFoo {}
+macro_rules! SerializableNone {
+    () => {
+        None::<crate::common::SerializableFoo>
+    };
+}
+pub(crate) use SerializableNone;
+
+pub(crate) fn request<T, U>(
     client: &Client,
     method: Method,
     url: &str,
+    data: Option<U>,
     expected_status: StatusCode,
 ) -> Result<T, ApiError>
 where
     T: DeserializeOwned,
+    U: Serialize + Debug,
 {
-    let response = client
-        .request(method, url)
-        .send()
-        .context("Could not send request.")?;
+    let mut request = client.request(method, url);
+    if let Some(data) = data {
+        request = request.body(serde_json::to_string(&data).context(
+            format!("Could not serialize json request body from {:?}", data),
+        )?);
+    }
+    let response = request.send().context("Could not send request.")?;
     let status = response.status();
     if status != expected_status {
         let text = response.text().context(format!(

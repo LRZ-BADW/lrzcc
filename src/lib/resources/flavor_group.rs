@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use crate::resources::FlavorMinimal;
 use crate::user::ProjectMinimal;
@@ -87,7 +87,13 @@ impl FlavorGroupListRequest {
     pub fn send(&self) -> Result<Vec<FlavorGroup>, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -111,6 +117,12 @@ impl FlavorGroupApi {
     pub fn get(&self, id: u32) -> Result<FlavorGroupDetailed, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id.to_string());
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }

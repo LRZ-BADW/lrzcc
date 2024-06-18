@@ -1,4 +1,4 @@
-use crate::common::{display_option, request};
+use crate::common::{display_option, request, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, Utc};
@@ -76,7 +76,13 @@ impl ServerStateListRequest {
     pub fn send(&self) -> Result<Vec<ServerState>, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
     pub fn server(&mut self, server: &str) -> &mut Self {
@@ -115,6 +121,12 @@ impl ServerStateApi {
     pub fn get(&self, id: u32) -> Result<ServerState, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id.to_string());
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }

@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use reqwest::blocking::Client;
@@ -72,7 +72,13 @@ impl FlavorQuotaListRequest {
     pub fn send(&self) -> Result<Vec<FlavorQuota>, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -106,6 +112,12 @@ impl FlavorQuotaApi {
     pub fn get(&self, id: u32) -> Result<FlavorQuota, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id.to_string());
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }

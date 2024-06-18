@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
@@ -36,11 +36,18 @@ impl HelloApi {
             &self.client,
             Method::GET,
             format!("{}/admin", self.url).as_str(),
+            SerializableNone!(),
             StatusCode::OK,
         )
     }
 
     pub fn user(&self) -> Result<Hello, ApiError> {
-        request(&self.client, Method::GET, self.url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            self.url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }

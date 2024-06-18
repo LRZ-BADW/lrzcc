@@ -1,4 +1,4 @@
-use crate::common::request;
+use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, Utc};
@@ -51,7 +51,13 @@ impl FlavorPriceListRequest {
     pub fn send(&self) -> Result<Vec<FlavorPrice>, ApiError> {
         let url = Url::parse(self.url.as_str())
             .context("Could not parse URL GET parameters.")?;
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
 
@@ -70,6 +76,12 @@ impl FlavorPriceApi {
     pub fn get(&self, id: u32) -> Result<FlavorPrice, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id.to_string());
-        request(&self.client, Method::GET, url.as_str(), StatusCode::OK)
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
