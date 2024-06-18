@@ -95,6 +95,16 @@ impl FlavorListRequest {
         params
     }
 
+    pub fn all(&mut self) -> &mut Self {
+        self.all = true;
+        self
+    }
+
+    pub fn group(&mut self, group: u32) -> &mut Self {
+        self.group = Some(group);
+        self
+    }
+
     pub fn send(&self) -> Result<Vec<Flavor>, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
@@ -106,15 +116,61 @@ impl FlavorListRequest {
             StatusCode::OK,
         )
     }
+}
 
-    pub fn all(&mut self) -> &mut Self {
-        self.all = true;
-        self
+#[derive(Clone, Debug, Serialize)]
+struct FlavorCreateData {
+    name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    group: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    weight: Option<u32>,
+}
+
+impl FlavorCreateData {
+    fn new(name: String) -> Self {
+        Self {
+            name,
+            group: None,
+            weight: None,
+        }
+    }
+}
+
+pub struct FlavorCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorCreateData,
+}
+
+impl FlavorCreateRequest {
+    pub fn new(url: &str, client: &Rc<Client>, name: String) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorCreateData::new(name),
+        }
     }
 
     pub fn group(&mut self, group: u32) -> &mut Self {
-        self.group = Some(group);
+        self.data.group = Some(group);
         self
+    }
+
+    pub fn weight(&mut self, weight: u32) -> &mut Self {
+        self.data.weight = Some(weight);
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorDetailed, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
     }
 }
 
@@ -140,5 +196,9 @@ impl FlavorApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+    }
+
+    pub fn create(&self, name: String) -> FlavorCreateRequest {
+        FlavorCreateRequest::new(self.url.as_ref(), &self.client, name)
     }
 }
