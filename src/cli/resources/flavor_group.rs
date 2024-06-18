@@ -25,6 +25,9 @@ pub(crate) enum FlavorGroupCommand {
         #[clap(help = "Name of the flavor group")]
         name: String,
     },
+
+    #[clap(about = "Delete flavor group with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for FlavorGroupCommand {
@@ -39,6 +42,7 @@ impl Execute for FlavorGroupCommand {
             FlavorGroupCommand::Create { name } => {
                 create(api, format, name.to_owned())
             }
+            FlavorGroupCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -69,4 +73,8 @@ fn create(
     name: String,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.flavor_group.create(name).send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    Ok(api.flavor_group.delete(*id)?)
 }
