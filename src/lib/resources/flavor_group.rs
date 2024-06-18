@@ -1,4 +1,4 @@
-use crate::common::{request, SerializableNone};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use crate::resources::FlavorMinimal;
 use crate::user::ProjectMinimal;
@@ -187,5 +187,18 @@ impl FlavorGroupApi {
         // TODO use Url.join
         let url = format!("{}/", self.url);
         FlavorGroupCreateRequest::new(url.as_ref(), &self.client, name)
+    }
+
+    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id.to_string());
+        request_bare(
+            &self.client,
+            Method::DELETE,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::NO_CONTENT,
+        )?;
+        Ok(())
     }
 }
