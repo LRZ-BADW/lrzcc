@@ -121,6 +121,7 @@ impl FlavorListRequest {
 #[derive(Clone, Debug, Serialize)]
 struct FlavorCreateData {
     name: String,
+    openstack_id: String, // UUIDv4
     #[serde(skip_serializing_if = "Option::is_none")]
     group: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -128,9 +129,10 @@ struct FlavorCreateData {
 }
 
 impl FlavorCreateData {
-    fn new(name: String) -> Self {
+    fn new(name: String, openstack_id: String) -> Self {
         Self {
             name,
+            openstack_id,
             group: None,
             weight: None,
         }
@@ -145,11 +147,16 @@ pub struct FlavorCreateRequest {
 }
 
 impl FlavorCreateRequest {
-    pub fn new(url: &str, client: &Rc<Client>, name: String) -> Self {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        name: String,
+        openstack_id: String,
+    ) -> Self {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            data: FlavorCreateData::new(name),
+            data: FlavorCreateData::new(name, openstack_id),
         }
     }
 
@@ -198,7 +205,13 @@ impl FlavorApi {
         )
     }
 
-    pub fn create(&self, name: String) -> FlavorCreateRequest {
-        FlavorCreateRequest::new(self.url.as_ref(), &self.client, name)
+    pub fn create(
+        &self,
+        name: String,
+        openstack_id: String,
+    ) -> FlavorCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        FlavorCreateRequest::new(url.as_ref(), &self.client, name, openstack_id)
     }
 }
