@@ -54,6 +54,21 @@ impl Display for FlavorGroupDetailed {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorGroupCreated {
+    id: u32,
+    name: String,
+    #[tabled(skip)]
+    flavors: Vec<FlavorMinimal>,
+    project: u32,
+}
+
+impl Display for FlavorGroupCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("FlavorGroup(id={}, name={})", self.id, self.name))
+    }
+}
+
 pub struct FlavorGroupApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -102,6 +117,48 @@ impl FlavorGroupListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorGroupCreateData {
+    name: String,
+    flavors: Vec<u32>,
+}
+
+impl FlavorGroupCreateData {
+    fn new(name: String) -> Self {
+        Self {
+            name,
+            flavors: vec![],
+        }
+    }
+}
+
+pub struct FlavorGroupCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorGroupCreateData,
+}
+
+impl FlavorGroupCreateRequest {
+    pub fn new(url: &str, client: &Rc<Client>, name: String) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorGroupCreateData::new(name),
+        }
+    }
+
+    pub fn send(&self) -> Result<FlavorGroupCreated, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl FlavorGroupApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorGroupApi {
         FlavorGroupApi {
@@ -124,5 +181,11 @@ impl FlavorGroupApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+    }
+
+    pub fn create(&self, name: String) -> FlavorGroupCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        FlavorGroupCreateRequest::new(url.as_ref(), &self.client, name)
     }
 }
