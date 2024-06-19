@@ -4,6 +4,7 @@ use reqwest::blocking::{Client, Response};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
+use std::borrow::Borrow;
 use std::fmt::{Debug, Display};
 
 #[derive(serde::Serialize, Debug)]
@@ -74,4 +75,12 @@ pub(crate) fn display_option<T: Display>(option: &Option<T>) -> String {
         Some(value) => value.to_string(),
         None => "".to_string(),
     }
+}
+
+pub(crate) fn is_true(b: impl Borrow<bool>) -> bool {
+    *b.borrow()
+}
+
+pub(crate) fn is_false(b: impl Borrow<bool>) -> bool {
+    !b.borrow()
 }
