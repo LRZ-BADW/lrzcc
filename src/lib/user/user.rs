@@ -1,4 +1,4 @@
-use crate::common::{request, SerializableNone};
+use crate::common::{is_false, is_true, request, SerializableNone};
 use crate::error::ApiError;
 use crate::user::ProjectMinimal;
 use anyhow::Context;
@@ -46,6 +46,20 @@ pub struct UserDetailed {
     name: String,
     openstack_id: String, // UUIDv4 without dashes
     project: ProjectMinimal,
+    project_name: String,
+    role: u32,
+    is_staff: bool,
+    is_active: bool,
+}
+
+// TODO can we merge this with UserDetailed via some enum
+// in the project field
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserCreated {
+    id: u32,
+    name: String,
+    openstack_id: String, // UUIDv4 without dashes
+    project: u32,
     project_name: String,
     role: u32,
     is_staff: bool,
@@ -109,6 +123,82 @@ impl UserListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct UserCreateData {
+    name: String,
+    openstack_id: String, // UUIDv4
+    // TODO can't this be optional?
+    project: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    // this could be an enum right
+    role: Option<u32>,
+    #[serde(skip_serializing_if = "is_false")]
+    is_staff: bool,
+    #[serde(skip_serializing_if = "is_true")]
+    is_active: bool,
+}
+
+impl UserCreateData {
+    fn new(name: String, openstack_id: String, project: u32) -> Self {
+        Self {
+            name,
+            openstack_id,
+            project,
+            role: None,
+            is_staff: false,
+            is_active: true,
+        }
+    }
+}
+
+pub struct UserCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: UserCreateData,
+}
+
+impl UserCreateRequest {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        name: String,
+        openstack_id: String,
+        project: u32,
+    ) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: UserCreateData::new(name, openstack_id, project),
+        }
+    }
+
+    pub fn role(&mut self, role: u32) -> &mut Self {
+        self.data.role = Some(role);
+        self
+    }
+
+    pub fn staff(&mut self) -> &mut Self {
+        self.data.is_staff = true;
+        self
+    }
+
+    pub fn inactive(&mut self) -> &mut Self {
+        self.data.is_active = false;
+        self
+    }
+
+    pub fn send(&self) -> Result<UserCreated, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl UserApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserApi {
         UserApi {
@@ -130,6 +220,23 @@ impl UserApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::OK,
+        )
+    }
+
+    pub fn create(
+        &self,
+        name: String,
+        openstack_id: String,
+        project: u32,
+    ) -> UserCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        UserCreateRequest::new(
+            url.as_ref(),
+            &self.client,
+            name,
+            openstack_id,
+            project,
         )
     }
 }
