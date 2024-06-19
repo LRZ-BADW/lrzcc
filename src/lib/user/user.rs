@@ -1,4 +1,6 @@
-use crate::common::{is_false, is_true, request, SerializableNone};
+use crate::common::{
+    is_false, is_true, request, request_bare, SerializableNone,
+};
 use crate::error::ApiError;
 use crate::user::ProjectMinimal;
 use anyhow::Context;
@@ -238,5 +240,18 @@ impl UserApi {
             openstack_id,
             project,
         )
+    }
+
+    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id.to_string());
+        request_bare(
+            &self.client,
+            Method::DELETE,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::NO_CONTENT,
+        )?;
+        Ok(())
     }
 }
