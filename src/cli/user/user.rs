@@ -45,6 +45,9 @@ pub(crate) enum UserCommand {
         #[clap(long, short, help = "Whether the user is inactive", action)]
         inactive: bool,
     },
+
+    #[clap(about = "Delete user with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for UserCommand {
@@ -73,6 +76,7 @@ impl Execute for UserCommand {
                 *staff,
                 *inactive,
             ),
+            UserCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -120,4 +124,10 @@ fn create(
         request.inactive();
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    // TODO dangerous operations like this one should be protected by a
+    // confirmation prompt
+    Ok(api.user.delete(*id)?)
 }
