@@ -55,10 +55,27 @@ pub struct ProjectDetailed {
 
 impl Display for ProjectDetailed {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
-            "ProjectDetailed(id={}, name={}",
-            self.id, self.name
-        ))
+        f.write_str(&format!("Project(id={}, name={}", self.id, self.name))
+    }
+}
+
+// TODO can we merge this with ProjectDetailed via some enum
+// in the project field
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct ProjectCreated {
+    id: u32,
+    name: String,
+    openstack_id: String, // UUIDv4 without dashes
+    user_class: u32,
+    #[tabled(skip)]
+    users: Vec<u32>,
+    #[tabled(skip)]
+    flavor_groups: Vec<u32>,
+}
+
+impl Display for ProjectCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("Project(id={}, name={}", self.id, self.name))
     }
 }
 
@@ -120,6 +137,61 @@ impl ProjectListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ProjectCreateData {
+    name: String,
+    openstack_id: String, // UUIDv4
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    user_class: Option<u32>,
+}
+
+impl ProjectCreateData {
+    fn new(name: String, openstack_id: String) -> Self {
+        Self {
+            name,
+            openstack_id,
+            user_class: None,
+        }
+    }
+}
+
+pub struct ProjectCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: ProjectCreateData,
+}
+
+impl ProjectCreateRequest {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        name: String,
+        openstack_id: String,
+    ) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: ProjectCreateData::new(name, openstack_id),
+        }
+    }
+
+    pub fn user_class(&mut self, user_class: u32) -> &mut Self {
+        self.data.user_class = Some(user_class);
+        self
+    }
+
+    pub fn send(&self) -> Result<ProjectCreated, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl ProjectApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ProjectApi {
         ProjectApi {
@@ -141,6 +213,21 @@ impl ProjectApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::OK,
+        )
+    }
+
+    pub fn create(
+        &self,
+        name: String,
+        openstack_id: String,
+    ) -> ProjectCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        ProjectCreateRequest::new(
+            url.as_ref(),
+            &self.client,
+            name,
+            openstack_id,
         )
     }
 }
