@@ -31,6 +31,18 @@ pub(crate) enum FlavorQuotaCommand {
 
     #[clap(about = "Show flavor quota with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new flavor quota")]
+    Create {
+        #[clap(help = "ID of the flavor group")]
+        flavor_group: u32,
+
+        #[clap(help = "ID of the user")]
+        user: u32,
+
+        #[clap(long, short, help = "Amount of the quota")]
+        quota: Option<i64>,
+    },
 }
 
 impl Execute for FlavorQuotaCommand {
@@ -42,6 +54,11 @@ impl Execute for FlavorQuotaCommand {
         match self {
             FlavorQuotaCommand::List { filter } => list(api, format, filter),
             FlavorQuotaCommand::Get { id } => get(api, format, id),
+            FlavorQuotaCommand::Create {
+                flavor_group,
+                user,
+                quota,
+            } => create(api, format, *flavor_group, *user, *quota),
         }
     }
 }
@@ -68,4 +85,18 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.flavor_quota.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    flavor_group: u32,
+    user: u32,
+    quota: Option<i64>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor_quota.create(flavor_group, user);
+    if let Some(quota) = quota {
+        request.quota(quota);
+    }
+    print_single_object(request.send()?, format)
 }
