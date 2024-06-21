@@ -14,7 +14,7 @@ pub struct FlavorQuota {
     id: u32,
     user: u32,
     username: String,
-    quota: u32,
+    quota: i64,
     flavor_group: u32,
     flavor_group_name: String,
 }
