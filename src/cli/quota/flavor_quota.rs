@@ -43,6 +43,9 @@ pub(crate) enum FlavorQuotaCommand {
         #[clap(long, short, help = "Amount of the quota")]
         quota: Option<i64>,
     },
+
+    #[clap(about = "Delete flavor quota with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for FlavorQuotaCommand {
@@ -59,6 +62,7 @@ impl Execute for FlavorQuotaCommand {
                 user,
                 quota,
             } => create(api, format, *flavor_group, *user, *quota),
+            FlavorQuotaCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -99,4 +103,8 @@ fn create(
         request.quota(quota);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    Ok(api.flavor_quota.delete(*id)?)
 }
