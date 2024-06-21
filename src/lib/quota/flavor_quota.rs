@@ -97,6 +97,61 @@ impl FlavorQuotaListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorQuotaCreateData {
+    flavor_group: u32,
+    user: u32,
+    // TODO: maybe use Option<i64> here
+    quota: i64,
+}
+
+impl FlavorQuotaCreateData {
+    fn new(flavor_group: u32, user: u32) -> Self {
+        Self {
+            flavor_group,
+            user,
+            quota: -1,
+        }
+    }
+}
+
+pub struct FlavorQuotaCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorQuotaCreateData,
+}
+
+impl FlavorQuotaCreateRequest {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        flavor_group: u32,
+        user: u32,
+    ) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorQuotaCreateData::new(flavor_group, user),
+        }
+    }
+
+    pub fn quota(&mut self, quota: i64) -> &mut Self {
+        self.data.quota = quota;
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorQuota, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl FlavorQuotaApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorQuotaApi {
         FlavorQuotaApi {
@@ -118,6 +173,21 @@ impl FlavorQuotaApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::OK,
+        )
+    }
+
+    pub fn create(
+        &self,
+        flavor_group: u32,
+        user: u32,
+    ) -> FlavorQuotaCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        FlavorQuotaCreateRequest::new(
+            url.as_ref(),
+            &self.client,
+            flavor_group,
+            user,
         )
     }
 }
