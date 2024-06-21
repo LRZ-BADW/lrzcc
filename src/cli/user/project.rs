@@ -40,6 +40,9 @@ pub(crate) enum ProjectCommand {
         )]
         user_class: Option<u32>,
     },
+
+    #[clap(about = "Delete project with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for ProjectCommand {
@@ -62,6 +65,7 @@ impl Execute for ProjectCommand {
                 openstack_id.to_owned(),
                 *user_class,
             ),
+            ProjectCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -101,4 +105,10 @@ fn create(
         request.user_class(user_class);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    // TODO dangerous operations like this one should be protected by a
+    // confirmation prompt
+    Ok(api.project.delete(*id)?)
 }
