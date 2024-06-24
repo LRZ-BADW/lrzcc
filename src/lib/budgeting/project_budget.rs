@@ -101,6 +101,62 @@ impl ProjectBudgetListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ProjectBudgetCreateData {
+    project: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    year: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    amount: Option<i64>,
+}
+
+impl ProjectBudgetCreateData {
+    fn new(project: u32) -> Self {
+        Self {
+            project,
+            year: None,
+            amount: None,
+        }
+    }
+}
+
+pub struct ProjectBudgetCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: ProjectBudgetCreateData,
+}
+
+impl ProjectBudgetCreateRequest {
+    pub fn new(url: &str, client: &Rc<Client>, project: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: ProjectBudgetCreateData::new(project),
+        }
+    }
+
+    pub fn year(&mut self, year: u32) -> &mut Self {
+        self.data.year = Some(year);
+        self
+    }
+
+    pub fn amount(&mut self, amount: i64) -> &mut Self {
+        self.data.amount = Some(amount);
+        self
+    }
+
+    pub fn send(&self) -> Result<ProjectBudget, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl ProjectBudgetApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ProjectBudgetApi {
         ProjectBudgetApi {
@@ -123,5 +179,11 @@ impl ProjectBudgetApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+    }
+
+    pub fn create(&self, project: u32) -> ProjectBudgetCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        ProjectBudgetCreateRequest::new(url.as_ref(), &self.client, project)
     }
 }
