@@ -39,6 +39,22 @@ pub(crate) enum ProjectBudgetCommand {
 
     #[clap(about = "Show project budget with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new project budget")]
+    Create {
+        #[clap(help = "Id of the project of the budget")]
+        project: u32,
+
+        #[clap(
+            long,
+            short,
+            help = "Year of the budget, default: current year"
+        )]
+        year: Option<u32>,
+
+        #[clap(long, short, help = "Amount of the budget, default: 0")]
+        amount: Option<i64>,
+    },
 }
 
 impl Execute for ProjectBudgetCommand {
@@ -50,6 +66,11 @@ impl Execute for ProjectBudgetCommand {
         match self {
             ProjectBudgetCommand::List { filter } => list(api, format, filter),
             ProjectBudgetCommand::Get { id } => get(api, format, id),
+            ProjectBudgetCommand::Create {
+                project,
+                year,
+                amount,
+            } => create(api, format, *project, *year, *amount),
         }
     }
 }
@@ -79,4 +100,21 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.project_budget.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    project: u32,
+    year: Option<u32>,
+    amount: Option<i64>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.project_budget.create(project);
+    if let Some(year) = year {
+        request.year(year);
+    }
+    if let Some(amount) = amount {
+        request.amount(amount);
+    }
+    print_single_object(request.send()?, format)
 }
