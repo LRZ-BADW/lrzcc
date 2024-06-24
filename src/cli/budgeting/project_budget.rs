@@ -55,6 +55,9 @@ pub(crate) enum ProjectBudgetCommand {
         #[clap(long, short, help = "Amount of the budget, default: 0")]
         amount: Option<i64>,
     },
+
+    #[clap(about = "Delete project budget with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for ProjectBudgetCommand {
@@ -71,6 +74,7 @@ impl Execute for ProjectBudgetCommand {
                 year,
                 amount,
             } => create(api, format, *project, *year, *amount),
+            ProjectBudgetCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -117,4 +121,10 @@ fn create(
         request.amount(amount);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    // TODO dangerous operations like this one should be protected by a
+    // confirmation prompt
+    Ok(api.project_budget.delete(*id)?)
 }
