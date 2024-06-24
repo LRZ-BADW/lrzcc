@@ -35,6 +35,22 @@ pub(crate) enum UserBudgetCommand {
 
     #[clap(about = "Show user budget with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new user budget")]
+    Create {
+        #[clap(help = "Id of the user of the budget")]
+        user: u32,
+
+        #[clap(
+            long,
+            short,
+            help = "Year of the budget, default: current year"
+        )]
+        year: Option<u32>,
+
+        #[clap(long, short, help = "Amount of the budget, default: 0")]
+        amount: Option<i64>,
+    },
 }
 
 impl Execute for UserBudgetCommand {
@@ -46,6 +62,9 @@ impl Execute for UserBudgetCommand {
         match self {
             UserBudgetCommand::List { filter } => list(api, format, filter),
             UserBudgetCommand::Get { id } => get(api, format, id),
+            UserBudgetCommand::Create { user, year, amount } => {
+                create(api, format, *user, *year, *amount)
+            }
         }
     }
 }
@@ -75,4 +94,21 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.user_budget.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    user: u32,
+    year: Option<u32>,
+    amount: Option<i64>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.user_budget.create(user);
+    if let Some(year) = year {
+        request.year(year);
+    }
+    if let Some(amount) = amount {
+        request.amount(amount);
+    }
+    print_single_object(request.send()?, format)
 }
