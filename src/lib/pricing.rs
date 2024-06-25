@@ -61,6 +61,70 @@ impl FlavorPriceListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorPriceCreateData {
+    flavor: u32,
+    // TODO use an enum for this
+    user_class: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    price: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    start_time: Option<DateTime<Utc>>,
+}
+
+impl FlavorPriceCreateData {
+    fn new(flavor: u32, user_class: u32) -> Self {
+        Self {
+            flavor,
+            user_class,
+            price: None,
+            start_time: None,
+        }
+    }
+}
+
+pub struct FlavorPriceCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorPriceCreateData,
+}
+
+impl FlavorPriceCreateRequest {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        flavor: u32,
+        user_class: u32,
+    ) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorPriceCreateData::new(flavor, user_class),
+        }
+    }
+
+    pub fn price(&mut self, price: f64) -> &mut Self {
+        self.data.price = Some(price);
+        self
+    }
+
+    pub fn start_time(&mut self, start_time: DateTime<Utc>) -> &mut Self {
+        self.data.start_time = Some(start_time);
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorPrice, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl FlavorPriceApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorPriceApi {
         FlavorPriceApi {
@@ -82,6 +146,21 @@ impl FlavorPriceApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::OK,
+        )
+    }
+
+    pub fn create(
+        &self,
+        flavor: u32,
+        user_class: u32,
+    ) -> FlavorPriceCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        FlavorPriceCreateRequest::new(
+            url.as_ref(),
+            &self.client,
+            flavor,
+            user_class,
         )
     }
 }
