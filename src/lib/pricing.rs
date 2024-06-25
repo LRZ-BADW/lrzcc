@@ -1,4 +1,4 @@
-use crate::common::{request, SerializableNone};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, Utc};
@@ -162,5 +162,18 @@ impl FlavorPriceApi {
             flavor,
             user_class,
         )
+    }
+
+    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id.to_string());
+        request_bare(
+            &self.client,
+            Method::DELETE,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::NO_CONTENT,
+        )?;
+        Ok(())
     }
 }
