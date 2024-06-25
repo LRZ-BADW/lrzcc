@@ -25,6 +25,9 @@ pub(crate) enum FlavorPriceCommand {
         #[clap(long, short, help = "Start time of the price, default: now")]
         start_time: Option<DateTime<Utc>>,
     },
+
+    #[clap(about = "Delete flavor price with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for FlavorPriceCommand {
@@ -42,6 +45,7 @@ impl Execute for FlavorPriceCommand {
                 price,
                 start_time,
             } => create(api, format, *flavor, *user_class, *price, *start_time),
+            FlavorPriceCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -75,4 +79,10 @@ fn create(
         request.start_time(start_time);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    // TODO dangerous operations like this one should be protected by a
+    // confirmation prompt
+    Ok(api.flavor_price.delete(*id)?)
 }
