@@ -10,6 +10,7 @@ pub(crate) enum HelloCommand {
     #[clap(about = "Hello user command")]
     User,
 }
+pub(crate) use HelloCommand::*;
 
 impl Execute for HelloCommand {
     fn execute(
@@ -18,8 +19,8 @@ impl Execute for HelloCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            HelloCommand::Admin {} => admin(api, format),
-            HelloCommand::User {} => user(api, format),
+            Admin {} => admin(api, format),
+            User {} => user(api, format),
         }
     }
 }

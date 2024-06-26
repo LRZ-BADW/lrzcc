@@ -42,6 +42,7 @@ pub(crate) enum FlavorCommand {
     #[clap(about = "Delete flavor with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use FlavorCommand::*;
 
 impl Execute for FlavorCommand {
     fn execute(
@@ -50,9 +51,9 @@ impl Execute for FlavorCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            FlavorCommand::List { filter } => list(api, format, filter),
-            FlavorCommand::Get { id } => get(api, format, id),
-            FlavorCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 name,
                 openstack_id,
                 group,
@@ -65,7 +66,7 @@ impl Execute for FlavorCommand {
                 *group,
                 *weight,
             ),
-            FlavorCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

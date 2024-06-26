@@ -29,6 +29,7 @@ pub(crate) enum FlavorGroupCommand {
     #[clap(about = "Delete flavor group with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use FlavorGroupCommand::*;
 
 impl Execute for FlavorGroupCommand {
     fn execute(
@@ -37,12 +38,10 @@ impl Execute for FlavorGroupCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            FlavorGroupCommand::List { filter } => list(api, format, filter),
-            FlavorGroupCommand::Get { id } => get(api, format, id),
-            FlavorGroupCommand::Create { name } => {
-                create(api, format, name.to_owned())
-            }
-            FlavorGroupCommand::Delete { id } => delete(api, id),
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create { name } => create(api, format, name.to_owned()),
+            Delete { id } => delete(api, id),
         }
     }
 }

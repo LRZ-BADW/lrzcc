@@ -71,6 +71,7 @@ pub(crate) enum ServerStateCommand {
     #[clap(about = "Delete server state with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use ServerStateCommand::*;
 
 impl Execute for ServerStateCommand {
     fn execute(
@@ -79,9 +80,9 @@ impl Execute for ServerStateCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            ServerStateCommand::List { filter } => list(api, format, filter),
-            ServerStateCommand::Get { id } => get(api, format, id),
-            ServerStateCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 begin,
                 end,
                 instance_id,
@@ -100,7 +101,7 @@ impl Execute for ServerStateCommand {
                 status.clone(),
                 *user,
             ),
-            ServerStateCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

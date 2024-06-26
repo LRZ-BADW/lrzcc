@@ -29,6 +29,7 @@ pub(crate) enum FlavorPriceCommand {
     #[clap(about = "Delete flavor price with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use FlavorPriceCommand::*;
 
 impl Execute for FlavorPriceCommand {
     fn execute(
@@ -37,15 +38,15 @@ impl Execute for FlavorPriceCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            FlavorPriceCommand::List => list(api, format),
-            FlavorPriceCommand::Get { id } => get(api, format, id),
-            FlavorPriceCommand::Create {
+            List => list(api, format),
+            Get { id } => get(api, format, id),
+            Create {
                 flavor,
                 user_class,
                 price,
                 start_time,
             } => create(api, format, *flavor, *user_class, *price, *start_time),
-            FlavorPriceCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

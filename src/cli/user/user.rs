@@ -49,6 +49,7 @@ pub(crate) enum UserCommand {
     #[clap(about = "Delete user with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use UserCommand::*;
 
 impl Execute for UserCommand {
     fn execute(
@@ -57,9 +58,9 @@ impl Execute for UserCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            UserCommand::List { filter } => list(api, format, filter),
-            UserCommand::Get { id } => get(api, format, id),
-            UserCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 name,
                 openstack_id,
                 project,
@@ -76,7 +77,7 @@ impl Execute for UserCommand {
                 *staff,
                 *inactive,
             ),
-            UserCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

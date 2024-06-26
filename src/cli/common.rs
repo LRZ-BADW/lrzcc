@@ -21,24 +21,23 @@ pub(crate) enum TableFormat {
     ReStructuredText,
     AsciiRounded,
 }
+pub(crate) use TableFormat::*;
 
 pub(crate) fn apply_table_style(table: &mut Table, format: TableFormat) {
     match format {
-        TableFormat::Empty => table.with(Style::empty()),
-        TableFormat::Blank => table.with(Style::blank()),
-        TableFormat::Ascii => table.with(Style::ascii()),
-        TableFormat::Psql => table.with(Style::psql()),
-        TableFormat::Markdown => table.with(Style::markdown()),
-        TableFormat::Modern => table.with(Style::modern()),
-        TableFormat::Sharp => table.with(Style::sharp()),
-        TableFormat::Rounded => table.with(Style::rounded()),
-        TableFormat::ModernRounded => table.with(Style::modern_rounded()),
-        TableFormat::Extended => table.with(Style::extended()),
-        TableFormat::Dots => table.with(Style::dots()),
-        TableFormat::ReStructuredText => {
-            table.with(Style::re_structured_text())
-        }
-        TableFormat::AsciiRounded => table.with(Style::ascii_rounded()),
+        Empty => table.with(Style::empty()),
+        Blank => table.with(Style::blank()),
+        Ascii => table.with(Style::ascii()),
+        Psql => table.with(Style::psql()),
+        Markdown => table.with(Style::markdown()),
+        Modern => table.with(Style::modern()),
+        Sharp => table.with(Style::sharp()),
+        Rounded => table.with(Style::rounded()),
+        ModernRounded => table.with(Style::modern_rounded()),
+        Extended => table.with(Style::extended()),
+        Dots => table.with(Style::dots()),
+        ReStructuredText => table.with(Style::re_structured_text()),
+        AsciiRounded => table.with(Style::ascii_rounded()),
     };
 }
 
@@ -96,24 +95,25 @@ pub(crate) enum Format {
     Json,
     Table(TableFormat),
 }
+pub(crate) use Format::*;
 
 impl ValueEnum for Format {
     fn value_variants<'a>() -> &'a [Self] {
         &[
-            Format::Json,
-            Format::Table(TableFormat::Empty),
-            Format::Table(TableFormat::Blank),
-            Format::Table(TableFormat::Ascii),
-            Format::Table(TableFormat::Psql),
-            Format::Table(TableFormat::Markdown),
-            Format::Table(TableFormat::Modern),
-            Format::Table(TableFormat::Sharp),
-            Format::Table(TableFormat::Rounded),
-            Format::Table(TableFormat::ModernRounded),
-            Format::Table(TableFormat::Extended),
-            Format::Table(TableFormat::Dots),
-            Format::Table(TableFormat::ReStructuredText),
-            Format::Table(TableFormat::AsciiRounded),
+            Json,
+            Table(Empty),
+            Table(Blank),
+            Table(Ascii),
+            Table(Psql),
+            Table(Markdown),
+            Table(Modern),
+            Table(Sharp),
+            Table(Rounded),
+            Table(ModernRounded),
+            Table(Extended),
+            Table(Dots),
+            Table(ReStructuredText),
+            Table(AsciiRounded),
         ]
     }
 
@@ -121,47 +121,41 @@ impl ValueEnum for Format {
         match self {
             Format::Json => Some(PossibleValue::new("json")),
             Format::Table(format) => match format {
-                TableFormat::Empty => Some(PossibleValue::new("empty")),
-                TableFormat::Blank => Some(PossibleValue::new("blank")),
-                TableFormat::Ascii => Some(PossibleValue::new("ascii")),
-                TableFormat::Psql => Some(PossibleValue::new("psql")),
-                TableFormat::Markdown => Some(PossibleValue::new("markdown")),
-                TableFormat::Modern => Some(PossibleValue::new("modern")),
-                TableFormat::Sharp => Some(PossibleValue::new("sharp")),
-                TableFormat::Rounded => Some(PossibleValue::new("rounded")),
-                TableFormat::ModernRounded => {
-                    Some(PossibleValue::new("modern-rounded"))
-                }
-                TableFormat::Extended => Some(PossibleValue::new("extended")),
-                TableFormat::Dots => Some(PossibleValue::new("dots")),
-                TableFormat::ReStructuredText => {
+                Empty => Some(PossibleValue::new("empty")),
+                Blank => Some(PossibleValue::new("blank")),
+                Ascii => Some(PossibleValue::new("ascii")),
+                Psql => Some(PossibleValue::new("psql")),
+                Markdown => Some(PossibleValue::new("markdown")),
+                Modern => Some(PossibleValue::new("modern")),
+                Sharp => Some(PossibleValue::new("sharp")),
+                Rounded => Some(PossibleValue::new("rounded")),
+                ModernRounded => Some(PossibleValue::new("modern-rounded")),
+                Extended => Some(PossibleValue::new("extended")),
+                Dots => Some(PossibleValue::new("dots")),
+                ReStructuredText => {
                     Some(PossibleValue::new("re-structured-text"))
                 }
-                TableFormat::AsciiRounded => {
-                    Some(PossibleValue::new("ascii-rounded"))
-                }
+                AsciiRounded => Some(PossibleValue::new("ascii-rounded")),
             },
         }
     }
 
     fn from_str(value: &str, _ignore_case: bool) -> Result<Self, String> {
         match value {
-            "json" => Ok(Format::Json),
-            "empty" => Ok(Format::Table(TableFormat::Empty)),
-            "blank" => Ok(Format::Table(TableFormat::Blank)),
-            "ascii" => Ok(Format::Table(TableFormat::Ascii)),
-            "psql" => Ok(Format::Table(TableFormat::Psql)),
-            "markdown" => Ok(Format::Table(TableFormat::Markdown)),
-            "modern" => Ok(Format::Table(TableFormat::Modern)),
-            "sharp" => Ok(Format::Table(TableFormat::Sharp)),
-            "rounded" => Ok(Format::Table(TableFormat::Rounded)),
-            "modern-rounded" => Ok(Format::Table(TableFormat::ModernRounded)),
-            "extended" => Ok(Format::Table(TableFormat::Extended)),
-            "dots" => Ok(Format::Table(TableFormat::Dots)),
-            "re-structured-text" => {
-                Ok(Format::Table(TableFormat::ReStructuredText))
-            }
-            "ascii-rounded" => Ok(Format::Table(TableFormat::AsciiRounded)),
+            "json" => Ok(Json),
+            "empty" => Ok(Table(Empty)),
+            "blank" => Ok(Table(Blank)),
+            "ascii" => Ok(Table(Ascii)),
+            "psql" => Ok(Table(Psql)),
+            "markdown" => Ok(Table(Markdown)),
+            "modern" => Ok(Table(Modern)),
+            "sharp" => Ok(Table(Sharp)),
+            "rounded" => Ok(Table(Rounded)),
+            "modern-rounded" => Ok(Table(ModernRounded)),
+            "extended" => Ok(Table(Extended)),
+            "dots" => Ok(Table(Dots)),
+            "re-structured-text" => Ok(Table(ReStructuredText)),
+            "ascii-rounded" => Ok(Table(AsciiRounded)),
             _ => Err(format!("Invalid format: {}", value)),
         }
     }

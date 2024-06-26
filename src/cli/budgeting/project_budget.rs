@@ -59,6 +59,7 @@ pub(crate) enum ProjectBudgetCommand {
     #[clap(about = "Delete project budget with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use ProjectBudgetCommand::*;
 
 impl Execute for ProjectBudgetCommand {
     fn execute(
@@ -67,14 +68,14 @@ impl Execute for ProjectBudgetCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            ProjectBudgetCommand::List { filter } => list(api, format, filter),
-            ProjectBudgetCommand::Get { id } => get(api, format, id),
-            ProjectBudgetCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 project,
                 year,
                 amount,
             } => create(api, format, *project, *year, *amount),
-            ProjectBudgetCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

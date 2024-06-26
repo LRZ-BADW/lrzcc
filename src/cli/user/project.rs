@@ -44,6 +44,7 @@ pub(crate) enum ProjectCommand {
     #[clap(about = "Delete project with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use ProjectCommand::*;
 
 impl Execute for ProjectCommand {
     fn execute(
@@ -52,9 +53,9 @@ impl Execute for ProjectCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            ProjectCommand::List { filter } => list(api, format, filter),
-            ProjectCommand::Get { id } => get(api, format, id),
-            ProjectCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 name,
                 openstack_id,
                 user_class,
@@ -65,7 +66,7 @@ impl Execute for ProjectCommand {
                 openstack_id.to_owned(),
                 *user_class,
             ),
-            ProjectCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }

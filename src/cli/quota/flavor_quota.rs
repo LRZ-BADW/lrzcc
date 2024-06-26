@@ -47,6 +47,7 @@ pub(crate) enum FlavorQuotaCommand {
     #[clap(about = "Delete flavor quota with given ID")]
     Delete { id: u32 },
 }
+pub(crate) use FlavorQuotaCommand::*;
 
 impl Execute for FlavorQuotaCommand {
     fn execute(
@@ -55,14 +56,14 @@ impl Execute for FlavorQuotaCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            FlavorQuotaCommand::List { filter } => list(api, format, filter),
-            FlavorQuotaCommand::Get { id } => get(api, format, id),
-            FlavorQuotaCommand::Create {
+            List { filter } => list(api, format, filter),
+            Get { id } => get(api, format, id),
+            Create {
                 flavor_group,
                 user,
                 quota,
             } => create(api, format, *flavor_group, *user, *quota),
-            FlavorQuotaCommand::Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id),
         }
     }
 }
