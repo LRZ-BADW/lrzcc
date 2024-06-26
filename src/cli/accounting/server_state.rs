@@ -67,6 +67,9 @@ pub(crate) enum ServerStateCommand {
         #[clap(help = "End of the server state")]
         end: Option<DateTime<Utc>>,
     },
+
+    #[clap(about = "Delete server state with given ID")]
+    Delete { id: u32 },
 }
 
 impl Execute for ServerStateCommand {
@@ -97,6 +100,7 @@ impl Execute for ServerStateCommand {
                 status.clone(),
                 *user,
             ),
+            ServerStateCommand::Delete { id } => delete(api, id),
         }
     }
 }
@@ -150,4 +154,10 @@ fn create(
         request.end(end);
     }
     print_single_object(request.send()?, format)
+}
+
+fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    // TODO dangerous operations like this one should be protected by a
+    // confirmation prompt
+    Ok(api.server_state.delete(*id)?)
 }
