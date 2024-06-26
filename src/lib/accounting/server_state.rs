@@ -109,15 +109,14 @@ impl ServerStateListRequest {
 #[derive(Clone, Debug, Serialize)]
 struct ServerStateCreateData {
     begin: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     end: Option<DateTime<Utc>>,
     instance_id: String, // UUIDv4
     instance_name: String,
     flavor: u32,
-    flavor_name: String,
     // TODO we need an enum here
     status: String,
     user: u32,
-    username: String,
 }
 
 impl ServerStateCreateData {
@@ -126,10 +125,8 @@ impl ServerStateCreateData {
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
-        flavor_name: String,
         status: String,
         user: u32,
-        username: String,
     ) -> Self {
         Self {
             begin,
@@ -137,10 +134,8 @@ impl ServerStateCreateData {
             instance_id,
             instance_name,
             flavor,
-            flavor_name,
             status,
             user,
-            username,
         }
     }
 }
@@ -160,10 +155,8 @@ impl ServerStateCreateRequest {
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
-        flavor_name: String,
         status: String,
         user: u32,
-        username: String,
     ) -> Self {
         Self {
             url: url.to_string(),
@@ -173,10 +166,8 @@ impl ServerStateCreateRequest {
                 instance_id,
                 instance_name,
                 flavor,
-                flavor_name,
                 status,
                 user,
-                username,
             ),
         }
     }
@@ -227,10 +218,8 @@ impl ServerStateApi {
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
-        flavor_name: String,
         status: String,
         user: u32,
-        username: String,
     ) -> ServerStateCreateRequest {
         // TODO use Url.join
         let url = format!("{}/", self.url);
@@ -241,10 +230,8 @@ impl ServerStateApi {
             instance_id,
             instance_name,
             flavor,
-            flavor_name,
             status,
             user,
-            username,
         )
     }
 
