@@ -1,4 +1,4 @@
-use crate::common::{display_option, request, SerializableNone};
+use crate::common::{display_option, request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, Utc};
@@ -246,5 +246,18 @@ impl ServerStateApi {
             user,
             username,
         )
+    }
+
+    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id.to_string());
+        request_bare(
+            &self.client,
+            Method::DELETE,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::NO_CONTENT,
+        )?;
+        Ok(())
     }
 }
