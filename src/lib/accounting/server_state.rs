@@ -106,6 +106,97 @@ impl ServerStateListRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ServerStateCreateData {
+    begin: DateTime<Utc>,
+    end: Option<DateTime<Utc>>,
+    instance_id: String, // UUIDv4
+    instance_name: String,
+    flavor: u32,
+    flavor_name: String,
+    // TODO we need an enum here
+    status: String,
+    user: u32,
+    username: String,
+}
+
+impl ServerStateCreateData {
+    fn new(
+        begin: DateTime<Utc>,
+        instance_id: String, // UUIDv4
+        instance_name: String,
+        flavor: u32,
+        flavor_name: String,
+        status: String,
+        user: u32,
+        username: String,
+    ) -> Self {
+        Self {
+            begin,
+            end: None,
+            instance_id,
+            instance_name,
+            flavor,
+            flavor_name,
+            status,
+            user,
+            username,
+        }
+    }
+}
+
+pub struct ServerStateCreateRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: ServerStateCreateData,
+}
+
+impl ServerStateCreateRequest {
+    pub fn new(
+        url: &str,
+        client: &Rc<Client>,
+        begin: DateTime<Utc>,
+        instance_id: String, // UUIDv4
+        instance_name: String,
+        flavor: u32,
+        flavor_name: String,
+        status: String,
+        user: u32,
+        username: String,
+    ) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: ServerStateCreateData::new(
+                begin,
+                instance_id,
+                instance_name,
+                flavor,
+                flavor_name,
+                status,
+                user,
+                username,
+            ),
+        }
+    }
+
+    pub fn end(&mut self, end: DateTime<Utc>) -> &mut Self {
+        self.data.end = Some(end);
+        self
+    }
+
+    pub fn send(&self) -> Result<ServerState, ApiError> {
+        request(
+            &self.client,
+            Method::POST,
+            &self.url,
+            Some(&self.data),
+            StatusCode::CREATED,
+        )
+    }
+}
+
 impl ServerStateApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerStateApi {
         ServerStateApi {
@@ -127,6 +218,33 @@ impl ServerStateApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::OK,
+        )
+    }
+
+    pub fn create(
+        &self,
+        begin: DateTime<Utc>,
+        instance_id: String, // UUIDv4
+        instance_name: String,
+        flavor: u32,
+        flavor_name: String,
+        status: String,
+        user: u32,
+        username: String,
+    ) -> ServerStateCreateRequest {
+        // TODO use Url.join
+        let url = format!("{}/", self.url);
+        ServerStateCreateRequest::new(
+            url.as_ref(),
+            &self.client,
+            begin,
+            instance_id,
+            instance_name,
+            flavor,
+            flavor_name,
+            status,
+            user,
+            username,
         )
     }
 }
