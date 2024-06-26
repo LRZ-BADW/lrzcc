@@ -1,4 +1,5 @@
 use crate::common::{print_object_list, print_single_object, Execute, Format};
+use chrono::{DateTime, Utc};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -39,6 +40,33 @@ pub(crate) enum ServerStateCommand {
 
     #[clap(about = "Show server state with given ID")]
     Get { id: u32 },
+
+    #[clap(about = "Create a new server state")]
+    Create {
+        #[clap(help = "Begin of the server state")]
+        begin: DateTime<Utc>,
+
+        #[clap(help = "UUIDv4 of the instance")]
+        instance_id: String, // UUIDv4
+
+        #[clap(help = "Name of the instance")]
+        instance_name: String,
+
+        // TODO validate this
+        #[clap(help = "ID of the flavor")]
+        flavor: u32,
+
+        // TODO need some enum of choices here
+        #[clap(help = "Status of the instance")]
+        status: String,
+
+        // TODO validate this
+        #[clap(help = "ID of the user")]
+        user: u32,
+
+        #[clap(help = "End of the server state")]
+        end: Option<DateTime<Utc>>,
+    },
 }
 
 impl Execute for ServerStateCommand {
@@ -50,6 +78,25 @@ impl Execute for ServerStateCommand {
         match self {
             ServerStateCommand::List { filter } => list(api, format, filter),
             ServerStateCommand::Get { id } => get(api, format, id),
+            ServerStateCommand::Create {
+                begin,
+                end,
+                instance_id,
+                instance_name,
+                flavor,
+                status,
+                user,
+            } => create(
+                api,
+                format,
+                *begin,
+                *end,
+                instance_id.clone(),
+                instance_name.clone(),
+                *flavor,
+                status.clone(),
+                *user,
+            ),
         }
     }
 }
@@ -78,4 +125,29 @@ fn get(
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
     print_single_object(api.server_state.get(*id)?, format)
+}
+
+fn create(
+    api: lrzcc::Api,
+    format: Format,
+    begin: DateTime<Utc>,
+    end: Option<DateTime<Utc>>,
+    instance_id: String, // UUIDv4
+    instance_name: String,
+    flavor: u32,
+    status: String,
+    user: u32,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.server_state.create(
+        begin,
+        instance_id,
+        instance_name,
+        flavor,
+        status,
+        user,
+    );
+    if let Some(end) = end {
+        request.end(end);
+    }
+    print_single_object(request.send()?, format)
 }
