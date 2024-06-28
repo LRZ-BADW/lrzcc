@@ -1,0 +1,54 @@
+name: linting
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'src/**/*'
+      - 'tests/**/*'
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+      - '.rustfmt.toml'
+      - 'docker-compose.yml'
+      - '.github/workflows/linting.yml'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - 'src/**/*'
+      - 'tests/**/*'
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+      - '.rustfmt.toml'
+      - 'docker-compose.yml'
+      - '.github/workflows/linting.yml'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Enforce formatting
+        run: cargo fmt --check
+
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: install fuse
+        run: sudo apt update && sudo apt install -y libfuse3-dev
+      - name: linting
+        run: cargo clippy --features cli --features fuse -- -D warnings
