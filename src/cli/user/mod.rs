@@ -1,4 +1,5 @@
 mod project;
+#[allow(clippy::module_inception)]
 mod user;
 
 pub(crate) use project::ProjectCommand;

@@ -215,7 +215,7 @@ impl UserApi {
 
     pub fn get(&self, id: u32) -> Result<UserDetailed, ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}", self.url, id.to_string());
+        let url = format!("{}/{}", self.url, id);
         request(
             &self.client,
             Method::GET,
@@ -244,7 +244,7 @@ impl UserApi {
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}/", self.url, id.to_string());
+        let url = format!("{}/{}/", self.url, id);
         request_bare(
             &self.client,
             Method::DELETE,

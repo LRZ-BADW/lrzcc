@@ -104,6 +104,7 @@ fn get(
     print_single_object(api.user.get(*id)?, format)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn create(
     api: lrzcc::Api,
     format: Format,

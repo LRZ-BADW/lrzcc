@@ -148,6 +148,7 @@ pub struct ServerStateCreateRequest {
 }
 
 impl ServerStateCreateRequest {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         url: &str,
         client: &Rc<Client>,
@@ -202,7 +203,7 @@ impl ServerStateApi {
 
     pub fn get(&self, id: u32) -> Result<ServerState, ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}", self.url, id.to_string());
+        let url = format!("{}/{}", self.url, id);
         request(
             &self.client,
             Method::GET,
@@ -237,7 +238,7 @@ impl ServerStateApi {
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}/", self.url, id.to_string());
+        let url = format!("{}/{}/", self.url, id);
         request_bare(
             &self.client,
             Method::DELETE,

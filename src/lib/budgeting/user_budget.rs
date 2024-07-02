@@ -171,7 +171,7 @@ impl UserBudgetApi {
 
     pub fn get(&self, id: u32) -> Result<UserBudget, ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}", self.url, id.to_string());
+        let url = format!("{}/{}", self.url, id);
         request(
             &self.client,
             Method::GET,
@@ -189,7 +189,7 @@ impl UserBudgetApi {
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
-        let url = format!("{}/{}/", self.url, id.to_string());
+        let url = format!("{}/{}/", self.url, id);
         request_bare(
             &self.client,
             Method::DELETE,
