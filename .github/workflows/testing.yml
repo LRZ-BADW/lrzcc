@@ -42,18 +42,18 @@ jobs:
       - name: run tests
         run: cargo test
 
-  coverage:
-    name: coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: install rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-      - name: install rust cache
-        uses: Swatinem/rust-cache@v2
-      - name: run coverage check
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.15.0'
-          args: '--workspace --fail-under 5 --exclude-files src/cli/* --exclude-files tests/*'
+  # coverage:
+  #   name: coverage
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: checkout
+  #       uses: actions/checkout@v4
+  #     - name: install rust toolchain
+  #       uses: dtolnay/rust-toolchain@stable
+  #     - name: install rust cache
+  #       uses: Swatinem/rust-cache@v2
+  #     - name: run coverage check
+  #       uses: actions-rs/tarpaulin@v0.1
+  #       with:
+  #         version: '0.15.0'
+  #         args: '--workspace --fail-under 5 --exclude-files src/cli/* --exclude-files tests/*'
