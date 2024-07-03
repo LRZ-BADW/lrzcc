@@ -201,6 +201,95 @@ impl UserCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct UserModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    openstack_id: Option<String>, // UUIDv4
+    #[serde(skip_serializing_if = "Option::is_none")]
+    project: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    role: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    is_staff: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    is_active: Option<bool>,
+}
+
+impl UserModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            name: None,
+            openstack_id: None,
+            project: None,
+            role: None,
+            is_staff: None,
+            is_active: None,
+        }
+    }
+}
+
+pub struct UserModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: UserModifyData,
+}
+
+impl UserModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: UserModifyData::new(id),
+        }
+    }
+
+    pub fn name(&mut self, name: String) -> &mut Self {
+        self.data.name = Some(name);
+        self
+    }
+
+    pub fn openstack_id(&mut self, openstack_id: String) -> &mut Self {
+        self.data.openstack_id = Some(openstack_id);
+        self
+    }
+
+    pub fn project(&mut self, project: u32) -> &mut Self {
+        self.data.project = Some(project);
+        self
+    }
+
+    pub fn role(&mut self, role: u32) -> &mut Self {
+        self.data.role = Some(role);
+        self
+    }
+
+    pub fn is_staff(&mut self, is_staff: bool) -> &mut Self {
+        self.data.is_staff = Some(is_staff);
+        self
+    }
+
+    pub fn is_active(&mut self, is_active: bool) -> &mut Self {
+        self.data.is_active = Some(is_active);
+        self
+    }
+
+    pub fn send(&self) -> Result<User, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl UserApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserApi {
         UserApi {
@@ -240,6 +329,12 @@ impl UserApi {
             openstack_id,
             project,
         )
+    }
+
+    pub fn modify(&self, id: u32) -> UserModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        UserModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
