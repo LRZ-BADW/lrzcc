@@ -192,6 +192,71 @@ impl ProjectCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ProjectModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    openstack_id: Option<String>, // UUIDv4
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_class: Option<u32>,
+}
+
+impl ProjectModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            name: None,
+            openstack_id: None,
+            user_class: None,
+        }
+    }
+}
+
+pub struct ProjectModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: ProjectModifyData,
+}
+
+impl ProjectModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: ProjectModifyData::new(id),
+        }
+    }
+
+    pub fn name(&mut self, name: String) -> &mut Self {
+        self.data.name = Some(name);
+        self
+    }
+
+    pub fn openstack_id(&mut self, openstack_id: String) -> &mut Self {
+        self.data.openstack_id = Some(openstack_id);
+        self
+    }
+
+    pub fn user_class(&mut self, user_class: u32) -> &mut Self {
+        self.data.user_class = Some(user_class);
+        self
+    }
+
+    pub fn send(&self) -> Result<Project, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl ProjectApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ProjectApi {
         ProjectApi {
@@ -229,6 +294,12 @@ impl ProjectApi {
             name,
             openstack_id,
         )
+    }
+
+    pub fn modify(&self, id: u32) -> ProjectModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        ProjectModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
