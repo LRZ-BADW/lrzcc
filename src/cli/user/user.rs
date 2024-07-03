@@ -46,6 +46,31 @@ pub(crate) enum UserCommand {
         inactive: bool,
     },
 
+    #[clap(about = "Modify a user")]
+    Modify {
+        #[clap(help = "ID of the user")]
+        id: u32,
+
+        #[clap(long, short, help = "Name of the user")]
+        name: Option<String>,
+
+        #[clap(long, short, help = "Openstack UUIDv4 of the user")]
+        openstack_id: Option<String>,
+
+        #[clap(long, short, help = "ID of the project this user belongs to")]
+        project: Option<u32>,
+
+        // TODO we need some enum here
+        #[clap(long, short, help = "Role of the user (1=user, 2=masteruser)")]
+        role: Option<u32>,
+
+        #[clap(long, short, help = "Whether the user is an admin")]
+        staff: Option<bool>,
+
+        #[clap(long, short, help = "Whether the user is inactive")]
+        active: Option<bool>,
+    },
+
     #[clap(about = "Delete user with given ID")]
     Delete { id: u32 },
 }
@@ -76,6 +101,25 @@ impl Execute for UserCommand {
                 *role,
                 *staff,
                 *inactive,
+            ),
+            Modify {
+                id,
+                name,
+                openstack_id,
+                project,
+                role,
+                staff,
+                active,
+            } => modify(
+                api,
+                format,
+                id.to_owned(),
+                name.to_owned(),
+                openstack_id.to_owned(),
+                project.to_owned(),
+                role.to_owned(),
+                staff.to_owned(),
+                active.to_owned(),
             ),
             Delete { id } => delete(api, id),
         }
@@ -124,6 +168,40 @@ fn create(
     }
     if inactive {
         request.inactive();
+    }
+    print_single_object(request.send()?, format)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    name: Option<String>,
+    openstack_id: Option<String>,
+    project: Option<u32>,
+    role: Option<u32>,
+    staff: Option<bool>,
+    active: Option<bool>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.user.modify(id);
+    if let Some(name) = name {
+        request.name(name);
+    }
+    if let Some(openstack_id) = openstack_id {
+        request.openstack_id(openstack_id);
+    }
+    if let Some(project) = project {
+        request.project(project);
+    }
+    if let Some(role) = role {
+        request.role(role);
+    }
+    if let Some(staff) = staff {
+        request.is_staff(staff);
+    }
+    if let Some(active) = active {
+        request.is_active(active);
     }
     print_single_object(request.send()?, format)
 }
