@@ -41,6 +41,26 @@ pub(crate) enum ProjectCommand {
         user_class: Option<u32>,
     },
 
+    #[clap(about = "Modify a project")]
+    Modify {
+        #[clap(help = "ID of the project")]
+        id: u32,
+
+        #[clap(long, short, help = "Name of the project")]
+        name: Option<String>,
+
+        #[clap(long, short, help = "Openstack UUIDv4 of the project")]
+        openstack_id: Option<String>,
+
+        // TODO we need some enum here
+        #[clap(
+            long,
+            short,
+            help = "User class of the project (0,1,2,3,4,5,6)"
+        )]
+        user_class: Option<u32>,
+    },
+
     #[clap(about = "Delete project with given ID")]
     Delete { id: u32 },
 }
@@ -62,6 +82,19 @@ impl Execute for ProjectCommand {
             } => create(
                 api,
                 format,
+                name.to_owned(),
+                openstack_id.to_owned(),
+                *user_class,
+            ),
+            Modify {
+                id,
+                name,
+                openstack_id,
+                user_class,
+            } => modify(
+                api,
+                format,
+                *id,
                 name.to_owned(),
                 openstack_id.to_owned(),
                 *user_class,
@@ -102,6 +135,28 @@ fn create(
     user_class: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.project.create(name, openstack_id);
+    if let Some(user_class) = user_class {
+        request.user_class(user_class);
+    }
+    print_single_object(request.send()?, format)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    name: Option<String>,
+    openstack_id: Option<String>,
+    user_class: Option<u32>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.project.modify(id);
+    if let Some(name) = name {
+        request.name(name);
+    }
+    if let Some(openstack_id) = openstack_id {
+        request.openstack_id(openstack_id);
+    }
     if let Some(user_class) = user_class {
         request.user_class(user_class);
     }
