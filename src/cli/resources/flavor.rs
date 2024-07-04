@@ -39,6 +39,30 @@ pub(crate) enum FlavorCommand {
         weight: Option<u32>,
     },
 
+    #[clap(about = "Modify a flavor")]
+    Modify {
+        #[clap(help = "ID of the flavor")]
+        id: u32,
+
+        #[clap(long, short, help = "Name of the flavor")]
+        name: Option<String>,
+
+        #[clap(long, short, help = "Openstack UUIDv4 of the flavor")]
+        openstack_id: Option<String>,
+
+        #[clap(long, short, help = "ID of the group this flavor belongs to")]
+        group: Option<u32>,
+
+        #[clap(
+            long,
+            short = 'G',
+            help = "Remove flavor from its group",
+            action,
+            conflicts_with = "group"
+        )]
+        no_group: bool,
+    },
+
     #[clap(about = "Delete flavor with given ID")]
     Delete { id: u32 },
 }
@@ -65,6 +89,21 @@ impl Execute for FlavorCommand {
                 openstack_id.to_owned(),
                 *group,
                 *weight,
+            ),
+            Modify {
+                id,
+                name,
+                openstack_id,
+                group,
+                no_group,
+            } => modify(
+                api,
+                format,
+                *id,
+                name.clone(),
+                openstack_id.clone(),
+                *group,
+                *no_group,
             ),
             Delete { id } => delete(api, id),
         }
@@ -107,6 +146,30 @@ fn create(
     }
     if let Some(weight) = weight {
         request.weight(weight);
+    }
+    print_single_object(request.send()?, format)
+}
+
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    name: Option<String>,
+    openstack_id: Option<String>,
+    group: Option<u32>,
+    no_group: bool,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor.modify(id);
+    if let Some(name) = name {
+        request.name(name);
+    }
+    if let Some(openstack_id) = openstack_id {
+        request.openstack_id(openstack_id);
+    }
+    if let Some(group) = group {
+        request.group(group);
+    } else if no_group {
+        request.no_group();
     }
     print_single_object(request.send()?, format)
 }
