@@ -159,6 +159,63 @@ impl FlavorGroupCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorGroupModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    project: Option<u32>,
+}
+
+impl FlavorGroupModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            name: None,
+            project: None,
+        }
+    }
+}
+
+pub struct FlavorGroupModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorGroupModifyData,
+}
+
+impl FlavorGroupModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorGroupModifyData::new(id),
+        }
+    }
+
+    pub fn name(&mut self, name: String) -> &mut Self {
+        self.data.name = Some(name);
+        self
+    }
+
+    pub fn project(&mut self, project: u32) -> &mut Self {
+        self.data.project = Some(project);
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorGroup, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorGroupApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorGroupApi {
         FlavorGroupApi {
@@ -187,6 +244,12 @@ impl FlavorGroupApi {
         // TODO use Url.join
         let url = format!("{}/", self.url);
         FlavorGroupCreateRequest::new(url.as_ref(), &self.client, name)
+    }
+
+    pub fn modify(&self, id: u32) -> FlavorGroupModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        FlavorGroupModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
