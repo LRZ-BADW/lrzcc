@@ -181,6 +181,84 @@ impl FlavorCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    openstack_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    group: Option<Option<u32>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    weight: Option<u32>,
+}
+
+impl FlavorModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            name: None,
+            openstack_id: None,
+            group: None,
+            weight: None,
+        }
+    }
+}
+
+pub struct FlavorModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorModifyData,
+}
+
+impl FlavorModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorModifyData::new(id),
+        }
+    }
+
+    pub fn name(&mut self, name: String) -> &mut Self {
+        self.data.name = Some(name);
+        self
+    }
+
+    pub fn openstack_id(&mut self, openstack_id: String) -> &mut Self {
+        self.data.openstack_id = Some(openstack_id);
+        self
+    }
+
+    pub fn group(&mut self, group: u32) -> &mut Self {
+        self.data.group = Some(Some(group));
+        self
+    }
+
+    pub fn no_group(&mut self) -> &mut Self {
+        self.data.group = Some(None);
+        self
+    }
+
+    pub fn weight(&mut self, weight: u32) -> &mut Self {
+        self.data.weight = Some(weight);
+        self
+    }
+
+    pub fn send(&self) -> Result<Flavor, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorApi {
         FlavorApi {
@@ -213,6 +291,12 @@ impl FlavorApi {
         // TODO use Url.join
         let url = format!("{}/", self.url);
         FlavorCreateRequest::new(url.as_ref(), &self.client, name, openstack_id)
+    }
+
+    pub fn modify(&self, id: u32) -> FlavorModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        FlavorModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
