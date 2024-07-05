@@ -125,6 +125,79 @@ impl FlavorPriceCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorPriceModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flavor: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_class: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    unit_price: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    start_time: Option<DateTime<Utc>>,
+}
+
+impl FlavorPriceModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            flavor: None,
+            user_class: None,
+            unit_price: None,
+            start_time: None,
+        }
+    }
+}
+
+pub struct FlavorPriceModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorPriceModifyData,
+}
+
+impl FlavorPriceModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorPriceModifyData::new(id),
+        }
+    }
+
+    pub fn flavor(&mut self, flavor: u32) -> &mut Self {
+        self.data.flavor = Some(flavor);
+        self
+    }
+
+    pub fn user_class(&mut self, user_class: u32) -> &mut Self {
+        self.data.user_class = Some(user_class);
+        self
+    }
+
+    pub fn unit_price(&mut self, unit_price: f64) -> &mut Self {
+        self.data.unit_price = Some(unit_price);
+        self
+    }
+
+    pub fn start_time(&mut self, start_time: DateTime<Utc>) -> &mut Self {
+        self.data.start_time = Some(start_time);
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorPrice, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorPriceApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorPriceApi {
         FlavorPriceApi {
@@ -162,6 +235,12 @@ impl FlavorPriceApi {
             flavor,
             user_class,
         )
+    }
+
+    pub fn modify(&self, id: u32) -> FlavorPriceModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        FlavorPriceModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
