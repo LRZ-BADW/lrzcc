@@ -26,6 +26,24 @@ pub(crate) enum FlavorPriceCommand {
         start_time: Option<DateTime<Utc>>,
     },
 
+    #[clap(about = "Modify a flavor price")]
+    Modify {
+        #[clap(help = "ID of the flavor price")]
+        id: u32,
+
+        #[clap(long, short, help = "Flavor the price belongs to")]
+        flavor: Option<u32>,
+
+        #[clap(long, short, help = "User class of the price (1-6)")]
+        user_class: Option<u32>,
+
+        #[clap(long, short, help = "Unit price of the flavor")]
+        price: Option<f64>,
+
+        #[clap(long, short, help = "Start time of the flavor price")]
+        start_time: Option<DateTime<Utc>>,
+    },
+
     #[clap(about = "Delete flavor price with given ID")]
     Delete { id: u32 },
 }
@@ -46,6 +64,21 @@ impl Execute for FlavorPriceCommand {
                 price,
                 start_time,
             } => create(api, format, *flavor, *user_class, *price, *start_time),
+            Modify {
+                id,
+                flavor,
+                user_class,
+                price,
+                start_time,
+            } => modify(
+                api,
+                format,
+                *id,
+                *flavor,
+                *user_class,
+                *price,
+                *start_time,
+            ),
             Delete { id } => delete(api, id),
         }
     }
@@ -82,6 +115,30 @@ fn create(
     print_single_object(request.send()?, format)
 }
 
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    flavor: Option<u32>,
+    user_class: Option<u32>,
+    unit_price: Option<f64>,
+    start_time: Option<DateTime<Utc>>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor_price.modify(id);
+    if let Some(flavor) = flavor {
+        request.flavor(flavor);
+    }
+    if let Some(user_class) = user_class {
+        request.user_class(user_class);
+    }
+    if let Some(unit_price) = unit_price {
+        request.unit_price(unit_price);
+    }
+    if let Some(start_time) = start_time {
+        request.start_time(start_time);
+    }
+    print_single_object(request.send()?, format)
+}
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     // TODO dangerous operations like this one should be protected by a
     // confirmation prompt
