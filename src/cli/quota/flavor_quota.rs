@@ -44,6 +44,25 @@ pub(crate) enum FlavorQuotaCommand {
         quota: Option<i64>,
     },
 
+    #[clap(about = "Modify a flavor quota")]
+    Modify {
+        #[clap(help = "ID of the flavor quota")]
+        id: u32,
+
+        #[clap(long, short, help = "User the quota is for")]
+        user: Option<u32>,
+
+        #[clap(long, short, help = "Quota amount")]
+        quota: Option<i64>,
+
+        #[clap(
+            long,
+            short,
+            help = "ID of the flavor group that should be limited"
+        )]
+        flavor_group: Option<u32>,
+    },
+
     #[clap(about = "Delete flavor quota with given ID")]
     Delete { id: u32 },
 }
@@ -63,6 +82,12 @@ impl Execute for FlavorQuotaCommand {
                 user,
                 quota,
             } => create(api, format, *flavor_group, *user, *quota),
+            Modify {
+                id,
+                user,
+                quota,
+                flavor_group,
+            } => modify(api, format, *id, *user, *quota, *flavor_group),
             Delete { id } => delete(api, id),
         }
     }
@@ -102,6 +127,27 @@ fn create(
     let mut request = api.flavor_quota.create(flavor_group, user);
     if let Some(quota) = quota {
         request.quota(quota);
+    }
+    print_single_object(request.send()?, format)
+}
+
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    user: Option<u32>,
+    quota: Option<i64>,
+    flavor_group: Option<u32>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor_quota.modify(id);
+    if let Some(user) = user {
+        request.user(user);
+    }
+    if let Some(quota) = quota {
+        request.quota(quota);
+    }
+    if let Some(flavor_group) = flavor_group {
+        request.flavor_group(flavor_group);
     }
     print_single_object(request.send()?, format)
 }
