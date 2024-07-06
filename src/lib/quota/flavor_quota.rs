@@ -152,6 +152,71 @@ impl FlavorQuotaCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct FlavorQuotaModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    quota: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flavor_group: Option<u32>,
+}
+
+impl FlavorQuotaModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            user: None,
+            quota: None,
+            flavor_group: None,
+        }
+    }
+}
+
+pub struct FlavorQuotaModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: FlavorQuotaModifyData,
+}
+
+impl FlavorQuotaModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: FlavorQuotaModifyData::new(id),
+        }
+    }
+
+    pub fn user(&mut self, user: u32) -> &mut Self {
+        self.data.user = Some(user);
+        self
+    }
+
+    pub fn quota(&mut self, quota: i64) -> &mut Self {
+        self.data.quota = Some(quota);
+        self
+    }
+
+    pub fn flavor_group(&mut self, flavor_group: u32) -> &mut Self {
+        self.data.flavor_group = Some(flavor_group);
+        self
+    }
+
+    pub fn send(&self) -> Result<FlavorQuota, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorQuotaApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorQuotaApi {
         FlavorQuotaApi {
@@ -189,6 +254,12 @@ impl FlavorQuotaApi {
             flavor_group,
             user,
         )
+    }
+
+    pub fn modify(&self, id: u32) -> FlavorQuotaModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        FlavorQuotaModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
