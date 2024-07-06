@@ -139,6 +139,7 @@ fn modify(
     }
     print_single_object(request.send()?, format)
 }
+
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     // TODO dangerous operations like this one should be protected by a
     // confirmation prompt
