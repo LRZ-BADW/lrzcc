@@ -1,4 +1,4 @@
-use crate::common::{request, request_bare, SerializableNone};
+use crate::common::{is_false, request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use reqwest::blocking::Client;
@@ -157,6 +157,63 @@ impl UserBudgetCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct UserBudgetModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    amount: Option<u32>,
+    #[serde(skip_serializing_if = "is_false")]
+    force: bool,
+}
+
+impl UserBudgetModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            amount: None,
+            force: false,
+        }
+    }
+}
+
+pub struct UserBudgetModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: UserBudgetModifyData,
+}
+
+impl UserBudgetModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: UserBudgetModifyData::new(id),
+        }
+    }
+
+    pub fn amount(&mut self, amount: u32) -> &mut Self {
+        self.data.amount = Some(amount);
+        self
+    }
+
+    pub fn force(&mut self) -> &mut Self {
+        self.data.force = true;
+        self
+    }
+
+    pub fn send(&self) -> Result<UserBudget, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl UserBudgetApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserBudgetApi {
         UserBudgetApi {
@@ -185,6 +242,12 @@ impl UserBudgetApi {
         // TODO use Url.join
         let url = format!("{}/", self.url);
         UserBudgetCreateRequest::new(url.as_ref(), &self.client, user)
+    }
+
+    pub fn modify(&self, id: u32) -> UserBudgetModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        UserBudgetModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
