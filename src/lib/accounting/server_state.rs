@@ -189,6 +189,104 @@ impl ServerStateCreateRequest {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+struct ServerStateModifyData {
+    id: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    begin: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    end: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    instance_id: Option<String>, // UUIDv4
+    #[serde(skip_serializing_if = "Option::is_none")]
+    instance_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flavor: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    // TODO we need an enum here
+    status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user: Option<u32>,
+}
+
+impl ServerStateModifyData {
+    fn new(id: u32) -> Self {
+        Self {
+            id,
+            begin: None,
+            end: None,
+            instance_id: None,
+            instance_name: None,
+            flavor: None,
+            status: None,
+            user: None,
+        }
+    }
+}
+
+pub struct ServerStateModifyRequest {
+    url: String,
+    client: Rc<Client>,
+
+    data: ServerStateModifyData,
+}
+
+impl ServerStateModifyRequest {
+    pub fn new(url: &str, client: &Rc<Client>, id: u32) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+            data: ServerStateModifyData::new(id),
+        }
+    }
+
+    pub fn begin(&mut self, begin: DateTime<Utc>) -> &mut Self {
+        self.data.begin = Some(begin);
+        self
+    }
+
+    pub fn end(&mut self, end: DateTime<Utc>) -> &mut Self {
+        self.data.end = Some(end);
+        self
+    }
+
+    pub fn instance_id(&mut self, instance_id: String) -> &mut Self {
+        self.data.instance_id = Some(instance_id);
+        self
+    }
+
+    pub fn instance_name(&mut self, instance_name: String) -> &mut Self {
+        self.data.instance_name = Some(instance_name);
+        self
+    }
+
+    pub fn flavor(&mut self, flavor: u32) -> &mut Self {
+        self.data.flavor = Some(flavor);
+        self
+    }
+
+    pub fn status(&mut self, status: String) -> &mut Self {
+        self.data.status = Some(status);
+        self
+    }
+
+    pub fn user(&mut self, user: u32) -> &mut Self {
+        self.data.user = Some(user);
+        self
+    }
+
+    pub fn send(&self) -> Result<ServerState, ApiError> {
+        request(
+            &self.client,
+            Method::PATCH,
+            &self.url,
+            Some(&self.data),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl ServerStateApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerStateApi {
         ServerStateApi {
@@ -234,6 +332,12 @@ impl ServerStateApi {
             status,
             user,
         )
+    }
+
+    pub fn modify(&self, id: u32) -> ServerStateModifyRequest {
+        // TODO use Url.join
+        let url = format!("{}/{}/", self.url, id);
+        ServerStateModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
     pub fn delete(&self, id: u32) -> Result<(), ApiError> {
