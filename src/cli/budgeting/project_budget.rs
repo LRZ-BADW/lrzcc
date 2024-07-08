@@ -56,6 +56,18 @@ pub(crate) enum ProjectBudgetCommand {
         amount: Option<i64>,
     },
 
+    #[clap(about = "Modify a project budget")]
+    Modify {
+        #[clap(help = "ID of the project budget")]
+        id: u32,
+
+        #[clap(long, short, help = "Amount of the budget")]
+        amount: Option<u32>,
+
+        #[clap(long, short, help = "Force the amount to be set", action)]
+        force: bool,
+    },
+
     #[clap(about = "Delete project budget with given ID")]
     Delete { id: u32 },
 }
@@ -75,6 +87,9 @@ impl Execute for ProjectBudgetCommand {
                 year,
                 amount,
             } => create(api, format, *project, *year, *amount),
+            Modify { id, amount, force } => {
+                modify(api, format, *id, *amount, *force)
+            }
             Delete { id } => delete(api, id),
         }
     }
@@ -120,6 +135,24 @@ fn create(
     }
     if let Some(amount) = amount {
         request.amount(amount);
+    }
+    print_single_object(request.send()?, format)
+}
+
+#[allow(clippy::too_many_arguments)]
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    amount: Option<u32>,
+    force: bool,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.project_budget.modify(id);
+    if let Some(amount) = amount {
+        request.amount(amount);
+    }
+    if force {
+        request.force();
     }
     print_single_object(request.send()?, format)
 }
