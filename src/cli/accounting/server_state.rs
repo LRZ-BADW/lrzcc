@@ -68,6 +68,54 @@ pub(crate) enum ServerStateCommand {
         end: Option<DateTime<Utc>>,
     },
 
+    #[clap(about = "Modify a server state")]
+    Modify {
+        #[clap(help = "ID of the server state")]
+        id: u32,
+
+        #[clap(long, short, help = "Begin of the server state")]
+        begin: Option<DateTime<Utc>>,
+
+        #[clap(long, short, help = "End of the server state")]
+        end: Option<DateTime<Utc>>,
+
+        #[clap(
+            long,
+            short,
+            help = "ID of the instance the server state belongs to"
+        )]
+        instance_id: Option<String>,
+
+        #[clap(
+            long,
+            short = 'I',
+            help = "Current name of the instance the server state belongs to"
+        )]
+        instance_name: Option<String>,
+
+        #[clap(
+            long,
+            short,
+            help = "Current flavor of the instance the server state belongs to"
+        )]
+        flavor: Option<u32>,
+
+        // TODO we need some enum here
+        #[clap(
+            long,
+            short,
+            help = "Current status of the instance the server state belongs to"
+        )]
+        status: Option<String>,
+
+        #[clap(
+            long,
+            short,
+            help = "ID of the user the instance of the state belongs to"
+        )]
+        user: Option<u32>,
+    },
+
     #[clap(about = "Delete server state with given ID")]
     Delete { id: u32 },
 }
@@ -95,6 +143,27 @@ impl Execute for ServerStateCommand {
                 format,
                 *begin,
                 *end,
+                instance_id.clone(),
+                instance_name.clone(),
+                *flavor,
+                status.clone(),
+                *user,
+            ),
+            Modify {
+                id,
+                begin,
+                end,
+                instance_id,
+                instance_name,
+                flavor,
+                status,
+                user,
+            } => modify(
+                api,
+                format,
+                *id,
+                begin.clone(),
+                end.clone(),
                 instance_id.clone(),
                 instance_name.clone(),
                 *flavor,
@@ -154,6 +223,43 @@ fn create(
     );
     if let Some(end) = end {
         request.end(end);
+    }
+    print_single_object(request.send()?, format)
+}
+
+fn modify(
+    api: lrzcc::Api,
+    format: Format,
+    id: u32,
+    begin: Option<DateTime<Utc>>,
+    end: Option<DateTime<Utc>>,
+    instance_id: Option<String>,
+    instance_name: Option<String>,
+    flavor: Option<u32>,
+    status: Option<String>,
+    user: Option<u32>,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.server_state.modify(id);
+    if let Some(begin) = begin {
+        request.begin(begin);
+    }
+    if let Some(end) = end {
+        request.end(end);
+    }
+    if let Some(instance_id) = instance_id {
+        request.instance_id(instance_id);
+    }
+    if let Some(instance_name) = instance_name {
+        request.instance_name(instance_name);
+    }
+    if let Some(flavor) = flavor {
+        request.flavor(flavor);
+    }
+    if let Some(status) = status {
+        request.status(status);
+    }
+    if let Some(user) = user {
+        request.user(user);
     }
     print_single_object(request.send()?, format)
 }
