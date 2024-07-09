@@ -162,8 +162,8 @@ impl Execute for ServerStateCommand {
                 api,
                 format,
                 *id,
-                begin.clone(),
-                end.clone(),
+                *begin,
+                *end,
                 instance_id.clone(),
                 instance_name.clone(),
                 *flavor,
@@ -227,6 +227,7 @@ fn create(
     print_single_object(request.send()?, format)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn modify(
     api: lrzcc::Api,
     format: Format,
