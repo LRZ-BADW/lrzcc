@@ -1,4 +1,7 @@
-use crate::common::{print_object_list, print_single_object, Execute, Format};
+use crate::common::{
+    ask_for_confirmation, print_object_list, print_single_object, Execute,
+    Format,
+};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -111,5 +114,6 @@ fn modify(
 }
 
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+    ask_for_confirmation()?;
     Ok(api.flavor_group.delete(*id)?)
 }

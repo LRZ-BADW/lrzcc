@@ -1,4 +1,7 @@
-use crate::common::{print_object_list, print_single_object, Execute, Format};
+use crate::common::{
+    ask_for_confirmation, print_object_list, print_single_object, Execute,
+    Format,
+};
 use chrono::{DateTime, Utc};
 use clap::{Args, Subcommand};
 use std::error::Error;
@@ -213,6 +216,7 @@ fn create(
     status: String,
     user: u32,
 ) -> Result<(), Box<dyn Error>> {
+    ask_for_confirmation()?;
     let mut request = api.server_state.create(
         begin,
         instance_id,
@@ -240,6 +244,7 @@ fn modify(
     status: Option<String>,
     user: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
+    ask_for_confirmation()?;
     let mut request = api.server_state.modify(id);
     if let Some(begin) = begin {
         request.begin(begin);
@@ -266,7 +271,6 @@ fn modify(
 }
 
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
-    // TODO dangerous operations like this one should be protected by a
-    // confirmation prompt
+    ask_for_confirmation()?;
     Ok(api.server_state.delete(*id)?)
 }

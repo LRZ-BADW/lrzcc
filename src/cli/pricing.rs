@@ -1,4 +1,7 @@
-use crate::common::{print_object_list, print_single_object, Execute, Format};
+use crate::common::{
+    ask_for_confirmation, print_object_list, print_single_object, Execute,
+    Format,
+};
 use chrono::{DateTime, Utc};
 use clap::Subcommand;
 use std::error::Error;
@@ -141,7 +144,6 @@ fn modify(
 }
 
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
-    // TODO dangerous operations like this one should be protected by a
-    // confirmation prompt
+    ask_for_confirmation()?;
     Ok(api.flavor_price.delete(*id)?)
 }
