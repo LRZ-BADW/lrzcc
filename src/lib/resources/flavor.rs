@@ -12,14 +12,14 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct Flavor {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4
     #[tabled(display_with = "display_option")]
-    group: Option<u32>,
+    pub group: Option<u32>,
     #[tabled(display_with = "display_option")]
     group_name: Option<String>,
-    weight: u32,
+    pub weight: u32,
 }
 
 impl Display for Flavor {
@@ -30,8 +30,8 @@ impl Display for Flavor {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorMinimal {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
 }
 
 // TODO maybe rethink the Display implementations
@@ -43,14 +43,14 @@ impl Display for FlavorMinimal {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorDetailed {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4
     #[tabled(display_with = "display_option")]
-    group: Option<FlavorGroupMinimal>,
+    pub group: Option<FlavorGroupMinimal>,
     #[tabled(display_with = "display_option")]
-    group_name: Option<String>,
-    weight: u32,
+    pub group_name: Option<String>,
+    pub weight: u32,
 }
 
 impl Display for FlavorDetailed {

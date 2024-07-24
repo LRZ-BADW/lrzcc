@@ -12,17 +12,17 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct ServerState {
-    id: u32,
-    begin: DateTime<Utc>,
+    pub id: u32,
+    pub begin: DateTime<Utc>,
     #[tabled(display_with = "display_option")]
-    end: Option<DateTime<Utc>>,
-    instance_id: String, // UUIDv4
-    instance_name: String,
-    flavor: u32,
-    flavor_name: String,
-    status: String,
-    user: u32,
-    username: String,
+    pub end: Option<DateTime<Utc>>,
+    pub instance_id: String, // UUIDv4
+    pub instance_name: String,
+    pub flavor: u32,
+    pub flavor_name: String,
+    pub status: String,
+    pub user: u32,
+    pub username: String,
 }
 
 impl Display for ServerState {

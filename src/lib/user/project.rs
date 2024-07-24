@@ -13,10 +13,10 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct Project {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    user_class: u32,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub user_class: u32,
 }
 
 impl Display for Project {
@@ -27,9 +27,9 @@ impl Display for Project {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct ProjectMinimal {
-    id: u32,
-    name: String,
-    user_class: u32,
+    pub id: u32,
+    pub name: String,
+    pub user_class: u32,
 }
 
 impl Display for ProjectMinimal {
@@ -40,17 +40,17 @@ impl Display for ProjectMinimal {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct ProjectDetailed {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    user_class: u32,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub user_class: u32,
     // TODO rethink list output in detailed structs:
     // maybe we could have only the first few entries followed by ...
     // in the output
     #[tabled(skip)]
-    users: Vec<UserMinimal>,
+    pub users: Vec<UserMinimal>,
     #[tabled(skip)]
-    flavor_groups: Vec<FlavorGroupMinimal>,
+    pub flavor_groups: Vec<FlavorGroupMinimal>,
 }
 
 impl Display for ProjectDetailed {
@@ -63,14 +63,14 @@ impl Display for ProjectDetailed {
 // in the project field
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct ProjectCreated {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    user_class: u32,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub user_class: u32,
     #[tabled(skip)]
-    users: Vec<u32>,
+    pub users: Vec<u32>,
     #[tabled(skip)]
-    flavor_groups: Vec<u32>,
+    pub flavor_groups: Vec<u32>,
 }
 
 impl Display for ProjectCreated {

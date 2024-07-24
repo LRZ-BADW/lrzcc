@@ -11,12 +11,12 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorQuota {
-    id: u32,
-    user: u32,
-    username: String,
-    quota: i64,
-    flavor_group: u32,
-    flavor_group_name: String,
+    pub id: u32,
+    pub user: u32,
+    pub username: String,
+    pub quota: i64,
+    pub flavor_group: u32,
+    pub flavor_group_name: String,
 }
 
 impl Display for FlavorQuota {

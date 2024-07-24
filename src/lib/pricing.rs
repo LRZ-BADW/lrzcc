@@ -12,12 +12,12 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorPrice {
-    id: u32,
-    flavor: u32,
-    flavor_name: String,
-    user_class: u32,
-    unit_price: f64,
-    start_time: DateTime<Utc>,
+    pub id: u32,
+    pub flavor: u32,
+    pub flavor_name: String,
+    pub user_class: u32,
+    pub unit_price: f64,
+    pub start_time: DateTime<Utc>,
 }
 
 impl Display for FlavorPrice {

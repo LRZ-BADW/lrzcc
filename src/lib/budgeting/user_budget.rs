@@ -11,11 +11,11 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct UserBudget {
-    id: u32,
-    user: u32,
-    username: String,
-    year: u32,
-    amount: u32,
+    pub id: u32,
+    pub user: u32,
+    pub username: String,
+    pub year: u32,
+    pub amount: u32,
 }
 
 impl Display for UserBudget {

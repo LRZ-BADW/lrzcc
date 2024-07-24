@@ -14,14 +14,14 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct User {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    project: u32,
-    project_name: String,
-    role: u32,
-    is_staff: bool,
-    is_active: bool,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub project: u32,
+    pub project_name: String,
+    pub role: u32,
+    pub is_staff: bool,
+    pub is_active: bool,
 }
 
 impl Display for User {
@@ -32,8 +32,8 @@ impl Display for User {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct UserMinimal {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
 }
 
 impl Display for UserMinimal {
@@ -44,28 +44,28 @@ impl Display for UserMinimal {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct UserDetailed {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    project: ProjectMinimal,
-    project_name: String,
-    role: u32,
-    is_staff: bool,
-    is_active: bool,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub project: ProjectMinimal,
+    pub project_name: String,
+    pub role: u32,
+    pub is_staff: bool,
+    pub is_active: bool,
 }
 
 // TODO can we merge this with UserDetailed via some enum
 // in the project field
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct UserCreated {
-    id: u32,
-    name: String,
-    openstack_id: String, // UUIDv4 without dashes
-    project: u32,
-    project_name: String,
-    role: u32,
-    is_staff: bool,
-    is_active: bool,
+    pub id: u32,
+    pub name: String,
+    pub openstack_id: String, // UUIDv4 without dashes
+    pub project: u32,
+    pub project_name: String,
+    pub role: u32,
+    pub is_staff: bool,
+    pub is_active: bool,
 }
 
 pub struct UserApi {

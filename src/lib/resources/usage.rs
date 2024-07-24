@@ -7,48 +7,48 @@ use std::rc::Rc;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsageOverviewInner {
-    total: u64,
-    used: u64,
+    pub total: u64,
+    pub used: u64,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsageOverviewInnerFloat {
-    total: f64,
-    used: f64,
+    pub total: f64,
+    pub used: f64,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsageOverview {
-    vcpus: CloudUsageOverviewInner,
-    ram: CloudUsageOverviewInner,
-    gpus: CloudUsageOverviewInner,
-    storage: CloudUsageOverviewInnerFloat,
-    mwn_ips: CloudUsageOverviewInner,
-    www_ips: CloudUsageOverviewInner,
+    pub vcpus: CloudUsageOverviewInner,
+    pub ram: CloudUsageOverviewInner,
+    pub gpus: CloudUsageOverviewInner,
+    pub storage: CloudUsageOverviewInnerFloat,
+    pub mwn_ips: CloudUsageOverviewInner,
+    pub www_ips: CloudUsageOverviewInner,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsageFlavorSlot {
-    name: String,
-    free: u32,
-    total: u32,
+    pub name: String,
+    pub free: u32,
+    pub total: u32,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsageAggregate {
-    name: String,
-    title: String,
-    flavors: Vec<CloudUsageFlavorSlot>,
+    pub name: String,
+    pub title: String,
+    pub flavors: Vec<CloudUsageFlavorSlot>,
 }
 
 // TODO how could we handle a table representation of this?
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct CloudUsage {
-    overview: CloudUsageOverview,
-    lrz_flavor_slots: Vec<CloudUsageAggregate>,
-    ach_flavor_slots: Vec<CloudUsageAggregate>,
-    other_flavor_slots: Vec<CloudUsageAggregate>,
-    datetime: String,
+    pub overview: CloudUsageOverview,
+    pub lrz_flavor_slots: Vec<CloudUsageAggregate>,
+    pub ach_flavor_slots: Vec<CloudUsageAggregate>,
+    pub other_flavor_slots: Vec<CloudUsageAggregate>,
+    pub datetime: String,
 }
 
 pub struct UsageApi {

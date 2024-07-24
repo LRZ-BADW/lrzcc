@@ -13,11 +13,11 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorGroup {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
     #[tabled(skip)]
-    flavors: Vec<u32>,
-    project: u32,
+    pub flavors: Vec<u32>,
+    pub project: u32,
 }
 
 impl Display for FlavorGroup {
@@ -28,8 +28,8 @@ impl Display for FlavorGroup {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorGroupMinimal {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
 }
 
 // TODO maybe rethink the Display implementations
@@ -41,11 +41,11 @@ impl Display for FlavorGroupMinimal {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorGroupDetailed {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
     #[tabled(skip)]
-    flavors: Vec<FlavorMinimal>,
-    project: ProjectMinimal,
+    pub flavors: Vec<FlavorMinimal>,
+    pub project: ProjectMinimal,
 }
 
 impl Display for FlavorGroupDetailed {
@@ -56,11 +56,11 @@ impl Display for FlavorGroupDetailed {
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorGroupCreated {
-    id: u32,
-    name: String,
+    pub id: u32,
+    pub name: String,
     #[tabled(skip)]
-    flavors: Vec<FlavorMinimal>,
-    project: u32,
+    pub flavors: Vec<FlavorMinimal>,
+    pub project: u32,
 }
 
 impl Display for FlavorGroupCreated {
