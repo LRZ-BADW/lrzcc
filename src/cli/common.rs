@@ -1,6 +1,8 @@
+use anyhow::{anyhow, Context};
 use clap::{builder::PossibleValue, ValueEnum};
 use serde::Serialize;
 use std::borrow::Cow;
+use std::io::{stdin, stdout, Write};
 use tabled::builder::Builder;
 use tabled::settings::Style;
 use tabled::{Table, Tabled};
@@ -167,4 +169,24 @@ pub(crate) trait Execute {
         api: lrzcc::Api,
         format: Format,
     ) -> Result<(), Box<dyn std::error::Error>>;
+}
+
+pub(crate) fn ask_for_confirmation() -> Result<(), anyhow::Error> {
+    let confirmation = "Yes, I really really mean it!".to_owned();
+    print!("This is dangerous. Are you sure? Type: {confirmation}\n> ");
+    let _ = stdout().flush();
+    let mut input = String::new();
+    stdin()
+        .read_line(&mut input)
+        .context("Confirmation input was not a valid string.")?;
+    if let Some('\n') = input.chars().next_back() {
+        input.pop();
+    }
+    if let Some('\n') = input.chars().next_back() {
+        input.pop();
+    }
+    if input != confirmation {
+        return Err(anyhow!("No confirmation provided! Aborting!"));
+    }
+    Ok(())
 }
