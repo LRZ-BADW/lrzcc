@@ -190,3 +190,14 @@ pub(crate) fn ask_for_confirmation() -> Result<(), anyhow::Error> {
     }
     Ok(())
 }
+
+#[allow(dead_code)]
+pub(crate) fn find_id(
+    _api: &lrzcc::Api,
+    name_or_id: &str,
+) -> Result<u32, anyhow::Error> {
+    if let Ok(id) = name_or_id.parse::<u32>() {
+        return Ok(id);
+    }
+    Err(anyhow!("Could not find item with name: {name_or_id}"))
+}
