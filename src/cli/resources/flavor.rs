@@ -181,3 +181,28 @@ fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor.delete(*id)?)
 }
+
+pub(crate) fn find_id(
+    api: &lrzcc::Api,
+    name_or_id: &str,
+) -> Result<u32, anyhow::Error> {
+    if let Ok(id) = name_or_id.parse::<u32>() {
+        return Ok(id);
+    }
+    // TODO cache me across arguments
+    let me = api.user.me().context("Failed to get own user")?;
+    let mut request = api.flavor.list();
+    if me.is_staff {
+        request.all();
+    }
+    let projects = request.send()?;
+    if let Some(project) = projects
+        .into_iter()
+        .find(|f| f.openstack_id == name_or_id || f.name == name_or_id)
+    {
+        return Ok(project.id);
+    }
+    Err(anyhow!(
+        "Could not find flavor with name or openstack ID: {name_or_id}"
+    ))
+}
