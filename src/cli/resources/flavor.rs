@@ -2,6 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
+use crate::resources::flavor_group::find_id as flavor_group_find_id;
 use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
@@ -12,9 +13,12 @@ pub(crate) struct FlavorListFilter {
     #[clap(short, long, help = "Display all flavors", action)]
     all: bool,
 
-    #[clap(short, long, help = "Display flavors of group with given ID")]
-    // TODO validate that this is a valid group ID
-    group: Option<u32>,
+    #[clap(
+        short,
+        long,
+        help = "Display flavors of group with given name or ID"
+    )]
+    group: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -37,8 +41,8 @@ pub(crate) enum FlavorCommand {
         #[clap(help = "Openstack UUIDv4 of the flavor")]
         openstack_id: String,
 
-        #[clap(help = "ID of the group this flavor belongs to")]
-        group: Option<u32>,
+        #[clap(help = "Name or ID of the group this flavor belongs to")]
+        group: Option<String>,
 
         #[clap(help = "Weight of the flavor within the group")]
         weight: Option<u32>,
@@ -55,8 +59,12 @@ pub(crate) enum FlavorCommand {
         #[clap(long, short, help = "Openstack UUIDv4 of the flavor")]
         openstack_id: Option<String>,
 
-        #[clap(long, short, help = "ID of the group this flavor belongs to")]
-        group: Option<u32>,
+        #[clap(
+            long,
+            short,
+            help = "Name or ID of the group this flavor belongs to"
+        )]
+        group: Option<String>,
 
         #[clap(
             long,
@@ -92,7 +100,7 @@ impl Execute for FlavorCommand {
                 format,
                 name.to_owned(),
                 openstack_id.to_owned(),
-                *group,
+                group.to_owned(),
                 *weight,
             ),
             Modify {
@@ -107,7 +115,7 @@ impl Execute for FlavorCommand {
                 name_or_id,
                 name.clone(),
                 openstack_id.clone(),
-                *group,
+                group.to_owned(),
                 *no_group,
             ),
             Delete { name_or_id } => delete(api, name_or_id),
@@ -123,8 +131,9 @@ fn list(
     let mut request = api.flavor.list();
     if filter.all {
         request.all();
-    } else if let Some(group) = filter.group {
-        request.group(group);
+    } else if let Some(group) = filter.group.to_owned() {
+        let group_id = flavor_group_find_id(&api, &group)?;
+        request.group(group_id);
     }
     print_object_list(request.send()?, format)
 }
@@ -143,12 +152,13 @@ fn create(
     format: Format,
     name: String,
     openstack_id: String,
-    group: Option<u32>,
+    group: Option<String>,
     weight: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor.create(name, openstack_id);
     if let Some(group) = group {
-        request.group(group);
+        let group_id = flavor_group_find_id(&api, &group)?;
+        request.group(group_id);
     }
     if let Some(weight) = weight {
         request.weight(weight);
@@ -162,7 +172,7 @@ fn modify(
     name_or_id: &str,
     name: Option<String>,
     openstack_id: Option<String>,
-    group: Option<u32>,
+    group: Option<String>,
     no_group: bool,
 ) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
@@ -174,7 +184,8 @@ fn modify(
         request.openstack_id(openstack_id);
     }
     if let Some(group) = group {
-        request.group(group);
+        let group_id = flavor_group_find_id(&api, &group)?;
+        request.group(group_id);
     } else if no_group {
         request.no_group();
     }
