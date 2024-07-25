@@ -188,6 +188,7 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     Ok(api.flavor.delete(id)?)
 }
 
+// TODO the find id functions can be condensed into a macro
 pub(crate) fn find_id(
     api: &lrzcc::Api,
     name_or_id: &str,
