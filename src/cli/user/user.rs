@@ -76,6 +76,9 @@ pub(crate) enum UserCommand {
 
     #[clap(about = "Delete user with given ID")]
     Delete { id: u32 },
+
+    #[clap(about = "Show own user")]
+    Me,
 }
 pub(crate) use UserCommand::*;
 
@@ -125,6 +128,7 @@ impl Execute for UserCommand {
                 active.to_owned(),
             ),
             Delete { id } => delete(api, id),
+            Me => me(api, format),
         }
     }
 }
@@ -235,4 +239,8 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.user.delete(*id)?)
+}
+
+fn me(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.user.me()?, format)
 }
