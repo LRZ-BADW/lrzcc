@@ -148,30 +148,6 @@ fn list(
     print_object_list(request.send()?, format)
 }
 
-fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
-    if let Ok(id) = name_or_id.parse::<u32>() {
-        return Ok(id);
-    }
-    // TODO cache me across arguments
-    let me = api.user.me().context("Failed to get own user")?;
-    let mut request = api.user.list();
-    if me.is_staff {
-        request.all();
-    } else if me.role == 2 {
-        request.project(me.project.id);
-    }
-    let users = request.send()?;
-    if let Some(user) = users
-        .into_iter()
-        .find(|u| u.openstack_id == name_or_id || u.name == name_or_id)
-    {
-        return Ok(user.id);
-    }
-    Err(anyhow!(
-        "Could not find user with name or openstack ID: {name_or_id}"
-    ))
-}
-
 fn get(
     api: lrzcc::Api,
     format: Format,
@@ -248,4 +224,28 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
 
 fn me(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.user.me()?, format)
+}
+
+fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
+    if let Ok(id) = name_or_id.parse::<u32>() {
+        return Ok(id);
+    }
+    // TODO cache me across arguments
+    let me = api.user.me().context("Failed to get own user")?;
+    let mut request = api.user.list();
+    if me.is_staff {
+        request.all();
+    } else if me.role == 2 {
+        request.project(me.project.id);
+    }
+    let users = request.send()?;
+    if let Some(user) = users
+        .into_iter()
+        .find(|u| u.openstack_id == name_or_id || u.name == name_or_id)
+    {
+        return Ok(user.id);
+    }
+    Err(anyhow!(
+        "Could not find user with name or openstack ID: {name_or_id}"
+    ))
 }
