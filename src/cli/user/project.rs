@@ -176,7 +176,10 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     Ok(api.project.delete(id)?)
 }
 
-fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
+pub(crate) fn find_id(
+    api: &lrzcc::Api,
+    name_or_id: &str,
+) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {
         return Ok(id);
     }
