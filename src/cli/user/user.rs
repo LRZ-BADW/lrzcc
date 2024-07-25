@@ -2,6 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
+use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -147,22 +148,28 @@ fn list(
     print_object_list(request.send()?, format)
 }
 
-fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, Box<dyn Error>> {
+fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {
         return Ok(id);
     }
-    // TODO get only visible users
-    let users = api.user.list().all().send()?;
+    // TODO cache me across arguments
+    let me = api.user.me().context("Failed to get own user")?;
+    let mut request = api.user.list();
+    if me.is_staff {
+        request.all();
+    } else if me.role == 2 {
+        request.project(me.project.id);
+    }
+    let users = request.send()?;
     if let Some(user) = users
         .into_iter()
         .find(|u| u.openstack_id == name_or_id || u.name == name_or_id)
     {
         return Ok(user.id);
     }
-    Err(
-        format!("Could not find user with name or openstack ID: {name_or_id}")
-            .into(),
-    )
+    Err(anyhow!(
+        "Could not find user with name or openstack ID: {name_or_id}"
+    ))
 }
 
 fn get(
@@ -173,10 +180,6 @@ fn get(
     let id = find_id(&api, name_or_id)?;
     print_single_object(api.user.get(id)?, format)
 }
-
-// TODO add user me call and command
-// TODO use me to obtain user visible items
-// TODO cache me across arguments
 
 #[allow(clippy::too_many_arguments)]
 fn create(
