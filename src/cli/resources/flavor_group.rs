@@ -6,6 +6,11 @@ use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
+#[cfg(not(feature = "user"))]
+use crate::common::find_id as project_find_id;
+#[cfg(feature = "user")]
+use crate::user::project::find_id as project_find_id;
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct FlavorGroupListFilter {
@@ -41,9 +46,9 @@ pub(crate) enum FlavorGroupCommand {
         #[clap(
             long,
             short,
-            help = "ID of the project this flavor group belongs to"
+            help = "Name, ID or OpenStack ID of the project this flavor group belongs to"
         )]
-        project: Option<u32>,
+        project: Option<String>,
     },
 
     #[clap(about = "Delete flavor group with given name or ID")]
@@ -111,7 +116,7 @@ fn modify(
     format: Format,
     name_or_id: &str,
     name: Option<String>,
-    project: Option<u32>,
+    project: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     let mut request = api.flavor_group.modify(id);
@@ -119,7 +124,8 @@ fn modify(
         request.name(name);
     }
     if let Some(project) = project {
-        request.project(project);
+        let project_id = project_find_id(&api, &project)?;
+        request.project(project_id);
     }
     print_single_object(request.send()?, format)
 }
