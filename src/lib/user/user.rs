@@ -349,4 +349,22 @@ impl UserApi {
         )?;
         Ok(())
     }
+
+    pub fn me(&self) -> Result<UserDetailed, ApiError> {
+        // TODO use Url.join
+        let url = format!(
+            "{}/me",
+            self.url
+                .rfind('/')
+                .map(|i| &self.url[..i])
+                .unwrap_or(&self.url)
+        );
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
 }
