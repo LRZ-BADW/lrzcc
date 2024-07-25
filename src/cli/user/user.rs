@@ -240,7 +240,10 @@ fn me(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.user.me()?, format)
 }
 
-fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
+pub(crate) fn find_id(
+    api: &lrzcc::Api,
+    name_or_id: &str,
+) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {
         return Ok(id);
     }
