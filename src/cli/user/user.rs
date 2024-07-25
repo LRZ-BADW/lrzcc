@@ -2,6 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
+use crate::user::project::find_id as project_find_id;
 use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
@@ -12,9 +13,13 @@ pub(crate) struct UserListFilter {
     #[clap(short, long, help = "Display all users", action)]
     all: bool,
 
-    #[clap(short, long, help = "Display users of project with given ID")]
+    #[clap(
+        short,
+        long,
+        help = "Display users of project with given name, ID, or OpenStack ID"
+    )]
     // TODO validate that this is a valid project ID
-    project: Option<u32>,
+    project: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -36,8 +41,10 @@ pub(crate) enum UserCommand {
         #[clap(help = "Openstack UUIDv4 of the user")]
         openstack_id: String,
 
-        #[clap(help = "ID of the project this user belongs to")]
-        project: u32,
+        #[clap(
+            help = "Name, ID or OpenStack ID of the project this user belongs to"
+        )]
+        project: String,
 
         // TODO we need some enum here
         #[clap(long, short, help = "Role of the user (1=user, 2=masteruser)")]
@@ -61,8 +68,12 @@ pub(crate) enum UserCommand {
         #[clap(long, short, help = "Openstack UUIDv4 of the user")]
         openstack_id: Option<String>,
 
-        #[clap(long, short, help = "ID of the project this user belongs to")]
-        project: Option<u32>,
+        #[clap(
+            long,
+            short,
+            help = "Name, ID or OpenStack ID of the project this user belongs to"
+        )]
+        project: Option<String>,
 
         // TODO we need some enum here
         #[clap(long, short, help = "Role of the user (1=user, 2=masteruser)")]
@@ -104,7 +115,7 @@ impl Execute for UserCommand {
                 format,
                 name.to_owned(),
                 openstack_id.to_owned(),
-                *project,
+                project,
                 *role,
                 *staff,
                 *inactive,
@@ -142,8 +153,9 @@ fn list(
     let mut request = api.user.list();
     if filter.all {
         request.all();
-    } else if let Some(project) = filter.project {
-        request.project(project);
+    } else if let Some(project) = &filter.project {
+        let project_id = project_find_id(&api, project)?;
+        request.project(project_id);
     }
     print_object_list(request.send()?, format)
 }
@@ -163,12 +175,13 @@ fn create(
     format: Format,
     name: String,
     openstack_id: String,
-    project: u32,
+    project: &str,
     role: Option<u32>,
     staff: bool,
     inactive: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let mut request = api.user.create(name, openstack_id, project);
+    let project_id = project_find_id(&api, project)?;
+    let mut request = api.user.create(name, openstack_id, project_id);
     if let Some(role) = role {
         request.role(role);
     }
@@ -188,7 +201,7 @@ fn modify(
     name_or_id: &str,
     name: Option<String>,
     openstack_id: Option<String>,
-    project: Option<u32>,
+    project: Option<String>,
     role: Option<u32>,
     staff: Option<bool>,
     active: Option<bool>,
@@ -202,7 +215,8 @@ fn modify(
         request.openstack_id(openstack_id);
     }
     if let Some(project) = project {
-        request.project(project);
+        let project_id = project_find_id(&api, &project)?;
+        request.project(project_id);
     }
     if let Some(role) = role {
         request.role(role);
