@@ -52,8 +52,8 @@ pub(crate) enum UserCommand {
 
     #[clap(about = "Modify a user")]
     Modify {
-        #[clap(help = "ID of the user")]
-        id: u32,
+        #[clap(help = "Name, ID or openstack ID of the user")]
+        name_or_id: String,
 
         #[clap(long, short, help = "Name of the user")]
         name: Option<String>,
@@ -75,8 +75,8 @@ pub(crate) enum UserCommand {
         active: Option<bool>,
     },
 
-    #[clap(about = "Delete user with given ID")]
-    Delete { id: u32 },
+    #[clap(about = "Delete user with given name, ID or openstack ID")]
+    Delete { name_or_id: String },
 
     #[clap(about = "Show own user")]
     Me,
@@ -110,7 +110,7 @@ impl Execute for UserCommand {
                 *inactive,
             ),
             Modify {
-                id,
+                name_or_id,
                 name,
                 openstack_id,
                 project,
@@ -120,7 +120,7 @@ impl Execute for UserCommand {
             } => modify(
                 api,
                 format,
-                id.to_owned(),
+                name_or_id,
                 name.to_owned(),
                 openstack_id.to_owned(),
                 project.to_owned(),
@@ -128,7 +128,7 @@ impl Execute for UserCommand {
                 staff.to_owned(),
                 active.to_owned(),
             ),
-            Delete { id } => delete(api, id),
+            Delete { name_or_id } => delete(api, name_or_id),
             Me => me(api, format),
         }
     }
@@ -209,7 +209,7 @@ fn create(
 fn modify(
     api: lrzcc::Api,
     format: Format,
-    id: u32,
+    name_or_id: &str,
     name: Option<String>,
     openstack_id: Option<String>,
     project: Option<u32>,
@@ -217,6 +217,7 @@ fn modify(
     staff: Option<bool>,
     active: Option<bool>,
 ) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     let mut request = api.user.modify(id);
     if let Some(name) = name {
         request.name(name);
@@ -239,9 +240,10 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
-    Ok(api.user.delete(*id)?)
+    Ok(api.user.delete(id)?)
 }
 
 fn me(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
