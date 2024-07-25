@@ -143,6 +143,24 @@ fn list(
     print_object_list(request.send()?, format)
 }
 
+fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, Box<dyn Error>> {
+    if let Ok(id) = name_or_id.parse::<u32>() {
+        return Ok(id);
+    }
+    // TODO get only visible users
+    let users = api.user.list().all().send()?;
+    if let Some(user) = users
+        .into_iter()
+        .find(|u| u.openstack_id == name_or_id || u.name == name_or_id)
+    {
+        return Ok(user.id);
+    }
+    Err(
+        format!("Could not find user with name or openstack ID: {name_or_id}")
+            .into(),
+    )
+}
+
 fn get(
     api: lrzcc::Api,
     format: Format,
