@@ -2,6 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
+use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -116,4 +117,26 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor_group.delete(*id)?)
+}
+
+pub(crate) fn find_id(
+    api: &lrzcc::Api,
+    name_or_id: &str,
+) -> Result<u32, anyhow::Error> {
+    if let Ok(id) = name_or_id.parse::<u32>() {
+        return Ok(id);
+    }
+    // TODO cache me across arguments
+    let me = api.user.me().context("Failed to get own user")?;
+    let mut request = api.flavor_group.list();
+    if me.is_staff {
+        request.all();
+    }
+    let projects = request.send()?;
+    if let Some(project) = projects.into_iter().find(|f| f.name == name_or_id) {
+        return Ok(project.id);
+    }
+    Err(anyhow!(
+        "Could not find flavor group with name: {name_or_id}"
+    ))
 }
