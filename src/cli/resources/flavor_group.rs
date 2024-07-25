@@ -21,8 +21,8 @@ pub(crate) enum FlavorGroupCommand {
         filter: FlavorGroupListFilter,
     },
 
-    #[clap(about = "Show flavor group with given ID")]
-    Get { id: u32 },
+    #[clap(about = "Show flavor group with given name or ID")]
+    Get { name_or_id: String },
 
     #[clap(about = "Create a new flavor group")]
     Create {
@@ -32,8 +32,8 @@ pub(crate) enum FlavorGroupCommand {
 
     #[clap(about = "Modify a flavor group")]
     Modify {
-        #[clap(help = "ID of the flavor group")]
-        id: u32,
+        #[clap(help = "Name or ID of the flavor group")]
+        name_or_id: String,
 
         #[clap(long, short, help = "Name of the flavor group")]
         name: Option<String>,
@@ -46,8 +46,8 @@ pub(crate) enum FlavorGroupCommand {
         project: Option<u32>,
     },
 
-    #[clap(about = "Delete flavor group with given ID")]
-    Delete { id: u32 },
+    #[clap(about = "Delete flavor group with given name or ID")]
+    Delete { name_or_id: String },
 }
 pub(crate) use FlavorGroupCommand::*;
 
@@ -59,12 +59,20 @@ impl Execute for FlavorGroupCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            Get { name_or_id } => get(api, format, name_or_id),
             Create { name } => create(api, format, name.to_owned()),
-            Modify { id, name, project } => {
-                modify(api, format, *id, name.to_owned(), project.to_owned())
-            }
-            Delete { id } => delete(api, id),
+            Modify {
+                name_or_id,
+                name,
+                project,
+            } => modify(
+                api,
+                format,
+                name_or_id,
+                name.to_owned(),
+                project.to_owned(),
+            ),
+            Delete { name_or_id } => delete(api, name_or_id),
         }
     }
 }
@@ -84,9 +92,10 @@ fn list(
 fn get(
     api: lrzcc::Api,
     format: Format,
-    id: &u32,
+    name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.flavor_group.get(*id)?, format)
+    let id = find_id(&api, name_or_id)?;
+    print_single_object(api.flavor_group.get(id)?, format)
 }
 
 fn create(
@@ -100,10 +109,11 @@ fn create(
 fn modify(
     api: lrzcc::Api,
     format: Format,
-    id: u32,
+    name_or_id: &str,
     name: Option<String>,
     project: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     let mut request = api.flavor_group.modify(id);
     if let Some(name) = name {
         request.name(name);
@@ -114,9 +124,10 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
-    Ok(api.flavor_group.delete(*id)?)
+    Ok(api.flavor_group.delete(id)?)
 }
 
 pub(crate) fn find_id(
