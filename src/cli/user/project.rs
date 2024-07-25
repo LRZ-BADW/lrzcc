@@ -25,8 +25,8 @@ pub(crate) enum ProjectCommand {
         filter: ProjectListFilter,
     },
 
-    #[clap(about = "Show project with given ID")]
-    Get { id: u32 },
+    #[clap(about = "Show project with given name, ID, or openstack ID")]
+    Get { name_or_id: String },
 
     #[clap(about = "Create a new project")]
     Create {
@@ -47,8 +47,9 @@ pub(crate) enum ProjectCommand {
 
     #[clap(about = "Modify a project")]
     Modify {
-        #[clap(help = "ID of the project")]
-        id: u32,
+        // TODO use name OpenStack consistently
+        #[clap(help = "Name, ID, or openstack ID of the project")]
+        name_or_id: String,
 
         #[clap(long, short, help = "Name of the project")]
         name: Option<String>,
@@ -65,8 +66,8 @@ pub(crate) enum ProjectCommand {
         user_class: Option<u32>,
     },
 
-    #[clap(about = "Delete project with given ID")]
-    Delete { id: u32 },
+    #[clap(about = "Delete project with given name, ID or OpenStack ID")]
+    Delete { name_or_id: String },
 }
 pub(crate) use ProjectCommand::*;
 
@@ -78,7 +79,7 @@ impl Execute for ProjectCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            Get { name_or_id } => get(api, format, name_or_id),
             Create {
                 name,
                 openstack_id,
@@ -91,19 +92,19 @@ impl Execute for ProjectCommand {
                 *user_class,
             ),
             Modify {
-                id,
+                name_or_id,
                 name,
                 openstack_id,
                 user_class,
             } => modify(
                 api,
                 format,
-                *id,
+                name_or_id,
                 name.to_owned(),
                 openstack_id.to_owned(),
                 *user_class,
             ),
-            Delete { id } => delete(api, id),
+            Delete { name_or_id } => delete(api, name_or_id),
         }
     }
 }
@@ -125,9 +126,10 @@ fn list(
 fn get(
     api: lrzcc::Api,
     format: Format,
-    id: &u32,
+    name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.project.get(*id)?, format)
+    let id = find_id(&api, name_or_id)?;
+    print_single_object(api.project.get(id)?, format)
 }
 
 // TODO something here doesn't work ... no idea why so far
@@ -149,11 +151,12 @@ fn create(
 fn modify(
     api: lrzcc::Api,
     format: Format,
-    id: u32,
+    name_or_id: &str,
     name: Option<String>,
     openstack_id: Option<String>,
     user_class: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     let mut request = api.project.modify(id);
     if let Some(name) = name {
         request.name(name);
@@ -167,9 +170,10 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
-    Ok(api.project.delete(*id)?)
+    Ok(api.project.delete(id)?)
 }
 
 fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, anyhow::Error> {
