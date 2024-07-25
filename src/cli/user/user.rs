@@ -24,8 +24,8 @@ pub(crate) enum UserCommand {
         filter: UserListFilter,
     },
 
-    #[clap(about = "Show user with given ID")]
-    Get { id: u32 },
+    #[clap(about = "Show user with given name, ID or openstack ID")]
+    Get { name_or_id: String },
 
     #[clap(about = "Create a new user")]
     Create {
@@ -87,7 +87,7 @@ impl Execute for UserCommand {
     ) -> Result<(), Box<dyn Error>> {
         match self {
             List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            Get { name_or_id } => get(api, format, name_or_id),
             Create {
                 name,
                 openstack_id,
@@ -164,10 +164,15 @@ fn find_id(api: &lrzcc::Api, name_or_id: &str) -> Result<u32, Box<dyn Error>> {
 fn get(
     api: lrzcc::Api,
     format: Format,
-    id: &u32,
+    name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.user.get(*id)?, format)
+    let id = find_id(&api, name_or_id)?;
+    print_single_object(api.user.get(id)?, format)
 }
+
+// TODO add user me call and command
+// TODO use me to obtain user visible items
+// TODO cache me across arguments
 
 #[allow(clippy::too_many_arguments)]
 fn create(
