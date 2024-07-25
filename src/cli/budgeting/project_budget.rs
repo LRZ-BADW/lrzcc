@@ -14,6 +14,7 @@ pub(crate) struct ProjectBudgetListFilter {
         help = "Display project budgets of user with given ID"
     )]
     // TODO validate that this is a valid user ID
+    // TODO use find_id
     user: Option<u32>,
 
     #[clap(
@@ -22,6 +23,7 @@ pub(crate) struct ProjectBudgetListFilter {
         help = "Display project budgets of project with given ID"
     )]
     // TODO validate that this is a valid project ID
+    // TODO use find_id
     project: Option<u32>,
 
     #[clap(short, long, help = "Display all project budgets", action)]
@@ -46,6 +48,7 @@ pub(crate) enum ProjectBudgetCommand {
     #[clap(about = "Create a new project budget")]
     Create {
         #[clap(help = "Id of the project of the budget")]
+        // TODO use find_id
         project: u32,
 
         #[clap(

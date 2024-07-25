@@ -56,6 +56,7 @@ pub(crate) enum ServerStateCommand {
         instance_name: String,
 
         // TODO validate this
+        // TODO use find_id
         #[clap(help = "ID of the flavor")]
         flavor: u32,
 
@@ -64,6 +65,7 @@ pub(crate) enum ServerStateCommand {
         status: String,
 
         // TODO validate this
+        // TODO use find_id
         #[clap(help = "ID of the user")]
         user: u32,
 
@@ -101,6 +103,7 @@ pub(crate) enum ServerStateCommand {
             short,
             help = "Current flavor of the instance the server state belongs to"
         )]
+        // TODO use find_id
         flavor: Option<u32>,
 
         // TODO we need some enum here
@@ -116,6 +119,7 @@ pub(crate) enum ServerStateCommand {
             short,
             help = "ID of the user the instance of the state belongs to"
         )]
+        // TODO use find_id
         user: Option<u32>,
     },
 

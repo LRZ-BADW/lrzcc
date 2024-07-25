@@ -17,6 +17,7 @@ pub(crate) enum FlavorPriceCommand {
     #[clap(about = "Create a new flavor price")]
     Create {
         #[clap(help = "ID of the flavor of the price")]
+        // TODO use find_id
         flavor: u32,
 
         #[clap(help = "User class of the price (1-6)")]
@@ -35,6 +36,7 @@ pub(crate) enum FlavorPriceCommand {
         id: u32,
 
         #[clap(long, short, help = "Flavor the price belongs to")]
+        // TODO use find_id
         flavor: Option<u32>,
 
         #[clap(long, short, help = "User class of the price (1-6)")]

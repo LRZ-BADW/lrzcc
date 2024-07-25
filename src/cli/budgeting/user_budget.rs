@@ -42,6 +42,7 @@ pub(crate) enum UserBudgetCommand {
     #[clap(about = "Create a new user budget")]
     Create {
         #[clap(help = "Id of the user of the budget")]
+        // TODO use find_id
         user: u32,
 
         #[clap(

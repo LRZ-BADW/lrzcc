@@ -17,10 +17,12 @@ pub(crate) struct FlavorQuotaListFilter {
         help = "Display flavor quotas of flavor group with given ID"
     )]
     // TODO validate that this is a valid group ID
+    // TODO use find_id
     group: Option<u32>,
 
     #[clap(short, long, help = "Display flavor quotas of user with given ID")]
     // TODO validate that this is a valid user ID
+    // TODO use find_id
     user: Option<u32>,
 }
 
@@ -38,9 +40,11 @@ pub(crate) enum FlavorQuotaCommand {
     #[clap(about = "Create a new flavor quota")]
     Create {
         #[clap(help = "ID of the flavor group")]
+        // TODO use find_id
         flavor_group: u32,
 
         #[clap(help = "ID of the user")]
+        // TODO use find_id
         user: u32,
 
         #[clap(long, short, help = "Amount of the quota")]
@@ -53,6 +57,7 @@ pub(crate) enum FlavorQuotaCommand {
         id: u32,
 
         #[clap(long, short, help = "User the quota is for")]
+        // TODO use find_id
         user: Option<u32>,
 
         #[clap(long, short, help = "Quota amount")]
@@ -63,6 +68,7 @@ pub(crate) enum FlavorQuotaCommand {
             short,
             help = "ID of the flavor group that should be limited"
         )]
+        // TODO use find_id
         flavor_group: Option<u32>,
     },
 
