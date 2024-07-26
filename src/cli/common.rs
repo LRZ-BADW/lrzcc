@@ -199,5 +199,9 @@ pub(crate) fn find_id(
     if let Ok(id) = name_or_id.parse::<u32>() {
         return Ok(id);
     }
-    Err(anyhow!("Could not find item with name: {name_or_id}"))
+    Err(anyhow!(
+        "This is not a valid integer ID: {name_or_id}. Name or OpenStack \
+        UUIDv4 lookup is unavailable as the respective module is disabled \
+        in this client."
+    ))
 }
