@@ -6,6 +6,11 @@ use chrono::{DateTime, Utc};
 use clap::Subcommand;
 use std::error::Error;
 
+#[cfg(not(feature = "resources"))]
+use crate::common::find_id as flavor_find_id;
+#[cfg(feature = "resources")]
+use crate::resources::flavor::find_id as flavor_find_id;
+
 #[derive(Subcommand, Debug)]
 pub(crate) enum FlavorPriceCommand {
     #[clap(about = "List users")]
@@ -16,9 +21,10 @@ pub(crate) enum FlavorPriceCommand {
 
     #[clap(about = "Create a new flavor price")]
     Create {
-        #[clap(help = "ID of the flavor of the price")]
-        // TODO use find_id
-        flavor: u32,
+        #[clap(
+            help = "Name, ID, or OpenStack UUIDv4 of the flavor of the price"
+        )]
+        flavor: String,
 
         #[clap(help = "User class of the price (1-6)")]
         user_class: u32,
@@ -35,9 +41,12 @@ pub(crate) enum FlavorPriceCommand {
         #[clap(help = "ID of the flavor price")]
         id: u32,
 
-        #[clap(long, short, help = "Flavor the price belongs to")]
-        // TODO use find_id
-        flavor: Option<u32>,
+        #[clap(
+            long,
+            short,
+            help = "Name, ID, or OpenStack UUIDv4 Flavor the price belongs to"
+        )]
+        flavor: Option<String>,
 
         #[clap(long, short, help = "User class of the price (1-6)")]
         user_class: Option<u32>,
@@ -68,7 +77,7 @@ impl Execute for FlavorPriceCommand {
                 user_class,
                 price,
                 start_time,
-            } => create(api, format, *flavor, *user_class, *price, *start_time),
+            } => create(api, format, flavor, *user_class, *price, *start_time),
             Modify {
                 id,
                 flavor,
@@ -79,7 +88,7 @@ impl Execute for FlavorPriceCommand {
                 api,
                 format,
                 *id,
-                *flavor,
+                flavor.to_owned(),
                 *user_class,
                 *price,
                 *start_time,
@@ -105,12 +114,13 @@ fn get(
 fn create(
     api: lrzcc::Api,
     format: Format,
-    flavor: u32,
+    flavor: &str,
     user_class: u32,
     price: Option<f64>,
     start_time: Option<DateTime<Utc>>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut request = api.flavor_price.create(flavor, user_class);
+    let flavor_id = flavor_find_id(&api, flavor)?;
+    let mut request = api.flavor_price.create(flavor_id, user_class);
     if let Some(price) = price {
         request.price(price);
     }
@@ -124,14 +134,15 @@ fn modify(
     api: lrzcc::Api,
     format: Format,
     id: u32,
-    flavor: Option<u32>,
+    flavor: Option<String>,
     user_class: Option<u32>,
     unit_price: Option<f64>,
     start_time: Option<DateTime<Utc>>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_price.modify(id);
     if let Some(flavor) = flavor {
-        request.flavor(flavor);
+        let flavor_id = flavor_find_id(&api, &flavor)?;
+        request.flavor(flavor_id);
     }
     if let Some(user_class) = user_class {
         request.user_class(user_class);
