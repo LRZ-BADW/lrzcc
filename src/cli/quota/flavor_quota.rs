@@ -5,6 +5,11 @@ use crate::common::{
 use clap::{Args, Subcommand};
 use std::error::Error;
 
+#[cfg(not(feature = "user"))]
+use crate::common::find_id as user_find_id;
+#[cfg(feature = "user")]
+use crate::user::user::find_id as user_find_id;
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct FlavorQuotaListFilter {
@@ -20,10 +25,12 @@ pub(crate) struct FlavorQuotaListFilter {
     // TODO use find_id
     group: Option<u32>,
 
-    #[clap(short, long, help = "Display flavor quotas of user with given ID")]
-    // TODO validate that this is a valid user ID
-    // TODO use find_id
-    user: Option<u32>,
+    #[clap(
+        short,
+        long,
+        help = "Display flavor quotas of user with given name, ID, or OpenStack UUIDv4"
+    )]
+    user: Option<String>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -43,9 +50,8 @@ pub(crate) enum FlavorQuotaCommand {
         // TODO use find_id
         flavor_group: u32,
 
-        #[clap(help = "ID of the user")]
-        // TODO use find_id
-        user: u32,
+        #[clap(help = "Name, ID, or OpenStack UUIDv4 of the user")]
+        user: String,
 
         #[clap(long, short, help = "Amount of the quota")]
         quota: Option<i64>,
@@ -56,9 +62,12 @@ pub(crate) enum FlavorQuotaCommand {
         #[clap(help = "ID of the flavor quota")]
         id: u32,
 
-        #[clap(long, short, help = "User the quota is for")]
-        // TODO use find_id
-        user: Option<u32>,
+        #[clap(
+            long,
+            short,
+            help = "Name, ID, or OpenStack UUIDv4 the quota is for"
+        )]
+        user: Option<String>,
 
         #[clap(long, short, help = "Quota amount")]
         quota: Option<i64>,
@@ -90,13 +99,15 @@ impl Execute for FlavorQuotaCommand {
                 flavor_group,
                 user,
                 quota,
-            } => create(api, format, *flavor_group, *user, *quota),
+            } => create(api, format, *flavor_group, user, *quota),
             Modify {
                 id,
                 user,
                 quota,
                 flavor_group,
-            } => modify(api, format, *id, *user, *quota, *flavor_group),
+            } => {
+                modify(api, format, *id, user.to_owned(), *quota, *flavor_group)
+            }
             Delete { id } => delete(api, id),
         }
     }
@@ -112,8 +123,9 @@ fn list(
         request.all();
     } else if let Some(group) = filter.group {
         request.group(group);
-    } else if let Some(user) = filter.user {
-        request.user(user);
+    } else if let Some(user) = &filter.user {
+        let user_id = user_find_id(&api, &user)?;
+        request.user(user_id);
     }
     print_object_list(request.send()?, format)
 }
@@ -130,10 +142,11 @@ fn create(
     api: lrzcc::Api,
     format: Format,
     flavor_group: u32,
-    user: u32,
+    user: &str,
     quota: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut request = api.flavor_quota.create(flavor_group, user);
+    let user_id = user_find_id(&api, user)?;
+    let mut request = api.flavor_quota.create(flavor_group, user_id);
     if let Some(quota) = quota {
         request.quota(quota);
     }
@@ -144,13 +157,14 @@ fn modify(
     api: lrzcc::Api,
     format: Format,
     id: u32,
-    user: Option<u32>,
+    user: Option<String>,
     quota: Option<i64>,
     flavor_group: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_quota.modify(id);
     if let Some(user) = user {
-        request.user(user);
+        let user_id = user_find_id(&api, &user)?;
+        request.user(user_id);
     }
     if let Some(quota) = quota {
         request.quota(quota);
