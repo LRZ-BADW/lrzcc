@@ -225,6 +225,22 @@ enum Command {
     },
 }
 
+// TODO: missing commands:
+// - user import
+// - user-budget over
+// - project-budget over
+// - flavor import
+// - flavor usage
+// - flavor-group initialize
+// - flavor-group usage
+// - flavor-price initialize
+// - flavor-quota check
+// - server-state import
+// - server-consumption
+// - server-cost
+// - budget-over-tree
+// - budget-bulk-create
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let token = match cli.credentials.token {
