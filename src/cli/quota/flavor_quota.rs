@@ -10,6 +10,11 @@ use crate::common::find_id as user_find_id;
 #[cfg(feature = "user")]
 use crate::user::user::find_id as user_find_id;
 
+#[cfg(not(feature = "resources"))]
+use crate::common::find_id as flavor_group_find_id;
+#[cfg(feature = "resources")]
+use crate::resources::flavor_group::find_id as flavor_group_find_id;
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct FlavorQuotaListFilter {
@@ -19,11 +24,9 @@ pub(crate) struct FlavorQuotaListFilter {
     #[clap(
         short,
         long,
-        help = "Display flavor quotas of flavor group with given ID"
+        help = "Display flavor quotas of flavor group with given name or ID"
     )]
-    // TODO validate that this is a valid group ID
-    // TODO use find_id
-    group: Option<u32>,
+    group: Option<String>,
 
     #[clap(
         short,
@@ -46,9 +49,8 @@ pub(crate) enum FlavorQuotaCommand {
 
     #[clap(about = "Create a new flavor quota")]
     Create {
-        #[clap(help = "ID of the flavor group")]
-        // TODO use find_id
-        flavor_group: u32,
+        #[clap(help = "Name or ID of the flavor group")]
+        flavor_group: String,
 
         #[clap(help = "Name, ID, or OpenStack UUIDv4 of the user")]
         user: String,
@@ -75,10 +77,9 @@ pub(crate) enum FlavorQuotaCommand {
         #[clap(
             long,
             short,
-            help = "ID of the flavor group that should be limited"
+            help = "Name or ID of the flavor group that should be limited"
         )]
-        // TODO use find_id
-        flavor_group: Option<u32>,
+        flavor_group: Option<String>,
     },
 
     #[clap(about = "Delete flavor quota with given ID")]
@@ -99,15 +100,20 @@ impl Execute for FlavorQuotaCommand {
                 flavor_group,
                 user,
                 quota,
-            } => create(api, format, *flavor_group, user, *quota),
+            } => create(api, format, flavor_group, user, *quota),
             Modify {
                 id,
                 user,
                 quota,
                 flavor_group,
-            } => {
-                modify(api, format, *id, user.to_owned(), *quota, *flavor_group)
-            }
+            } => modify(
+                api,
+                format,
+                *id,
+                user.to_owned(),
+                *quota,
+                flavor_group.to_owned(),
+            ),
             Delete { id } => delete(api, id),
         }
     }
@@ -121,8 +127,9 @@ fn list(
     let mut request = api.flavor_quota.list();
     if filter.all {
         request.all();
-    } else if let Some(group) = filter.group {
-        request.group(group);
+    } else if let Some(group) = &filter.group {
+        let group_id = flavor_group_find_id(&api, group)?;
+        request.group(group_id);
     } else if let Some(user) = &filter.user {
         let user_id = user_find_id(&api, &user)?;
         request.user(user_id);
@@ -141,12 +148,13 @@ fn get(
 fn create(
     api: lrzcc::Api,
     format: Format,
-    flavor_group: u32,
+    flavor_group: &str,
     user: &str,
     quota: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
+    let flavor_group_id = flavor_group_find_id(&api, flavor_group)?;
     let user_id = user_find_id(&api, user)?;
-    let mut request = api.flavor_quota.create(flavor_group, user_id);
+    let mut request = api.flavor_quota.create(flavor_group_id, user_id);
     if let Some(quota) = quota {
         request.quota(quota);
     }
@@ -159,7 +167,7 @@ fn modify(
     id: u32,
     user: Option<String>,
     quota: Option<i64>,
-    flavor_group: Option<u32>,
+    flavor_group: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_quota.modify(id);
     if let Some(user) = user {
@@ -170,7 +178,8 @@ fn modify(
         request.quota(quota);
     }
     if let Some(flavor_group) = flavor_group {
-        request.flavor_group(flavor_group);
+        let flavor_group_id = flavor_group_find_id(&api, &flavor_group)?;
+        request.flavor_group(flavor_group_id);
     }
     print_single_object(request.send()?, format)
 }
