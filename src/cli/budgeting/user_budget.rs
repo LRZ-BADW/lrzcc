@@ -5,20 +5,29 @@ use crate::common::{
 use clap::{Args, Subcommand};
 use std::error::Error;
 
+#[cfg(not(feature = "user"))]
+use crate::common::{find_id as user_find_id, find_id as project_find_id};
+#[cfg(feature = "user")]
+use crate::user::{
+    project::find_id as project_find_id, user::find_id as user_find_id,
+};
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct UserBudgetListFilter {
-    #[clap(short, long, help = "Display user budgets of user with given ID")]
-    // TODO validate that this is a valid user ID
-    user: Option<u32>,
+    #[clap(
+        short,
+        long,
+        help = "Display user budgets of user with given name, ID, or OpenStack ID"
+    )]
+    user: Option<String>,
 
     #[clap(
         short,
         long,
-        help = "Display user budgets of project with given ID"
+        help = "Display user budgets of project with given name, ID, or OpenStack ID"
     )]
-    // TODO validate that this is a valid project ID
-    project: Option<u32>,
+    project: Option<String>,
 
     #[clap(short, long, help = "Display all user budgets", action)]
     all: bool,
@@ -41,9 +50,8 @@ pub(crate) enum UserBudgetCommand {
 
     #[clap(about = "Create a new user budget")]
     Create {
-        #[clap(help = "Id of the user of the budget")]
-        // TODO use find_id
-        user: u32,
+        #[clap(help = "Name, ID or OpenStack ID of the user of the budget")]
+        user: String,
 
         #[clap(
             long,
@@ -83,7 +91,7 @@ impl Execute for UserBudgetCommand {
             List { filter } => list(api, format, filter),
             Get { id } => get(api, format, id),
             Create { user, year, amount } => {
-                create(api, format, *user, *year, *amount)
+                create(api, format, &user, *year, *amount)
             }
             Modify { id, amount, force } => {
                 modify(api, format, *id, *amount, *force)
@@ -99,10 +107,12 @@ fn list(
     filter: &UserBudgetListFilter,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.user_budget.list();
-    if let Some(user) = filter.user {
-        request.user(user);
-    } else if let Some(project) = filter.project {
-        request.project(project);
+    if let Some(user) = &filter.user {
+        let user_id = user_find_id(&api, &user)?;
+        request.user(user_id);
+    } else if let Some(project) = &filter.project {
+        let project_id = project_find_id(&api, &project)?;
+        request.project(project_id);
     } else if filter.all {
         request.all();
     }
@@ -123,11 +133,12 @@ fn get(
 fn create(
     api: lrzcc::Api,
     format: Format,
-    user: u32,
+    user: &str,
     year: Option<u32>,
     amount: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut request = api.user_budget.create(user);
+    let user_id = user_find_id(&api, user)?;
+    let mut request = api.user_budget.create(user_id);
     if let Some(year) = year {
         request.year(year);
     }
