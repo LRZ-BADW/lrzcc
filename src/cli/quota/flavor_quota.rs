@@ -131,7 +131,7 @@ fn list(
         let group_id = flavor_group_find_id(&api, group)?;
         request.group(group_id);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, &user)?;
+        let user_id = user_find_id(&api, user)?;
         request.user(user_id);
     }
     print_object_list(request.send()?, format)
