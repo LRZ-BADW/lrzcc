@@ -228,7 +228,6 @@ enum Command {
 // TODO: missing commands:
 // - user-budget over
 // - project-budget over
-// - flavor import
 // - flavor usage
 // - flavor-group initialize
 // - flavor-group usage
