@@ -78,6 +78,17 @@ pub(crate) enum FlavorCommand {
 
     #[clap(about = "Delete flavor with given name, ID or OpenStack UUIDv4")]
     Delete { name_or_id: String },
+
+    #[clap(about = "Import new flavors")]
+    Import {
+        #[clap(
+            long,
+            short,
+            action,
+            help = "Suppress output if nothing is imported"
+        )]
+        quiet: bool,
+    },
 }
 pub(crate) use FlavorCommand::*;
 
@@ -119,6 +130,7 @@ impl Execute for FlavorCommand {
                 *no_group,
             ),
             Delete { name_or_id } => delete(api, name_or_id),
+            Import { quiet } => import(api, format, *quiet),
         }
     }
 }
@@ -197,6 +209,18 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
     Ok(api.flavor.delete(id)?)
+}
+
+fn import(
+    api: lrzcc::Api,
+    format: Format,
+    quiet: bool,
+) -> Result<(), Box<dyn Error>> {
+    let result = api.flavor.import()?;
+    if !quiet || result.new_flavor_count > 0 {
+        return print_single_object(result, format);
+    }
+    Ok(())
 }
 
 // TODO the find id functions can be condensed into a macro
