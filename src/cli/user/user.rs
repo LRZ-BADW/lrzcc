@@ -91,6 +91,17 @@ pub(crate) enum UserCommand {
 
     #[clap(about = "Show own user")]
     Me,
+
+    #[clap(about = "Import new users and projects")]
+    Import {
+        #[clap(
+            long,
+            short,
+            action,
+            help = "Suppress output if nothing is imported"
+        )]
+        quiet: bool,
+    },
 }
 pub(crate) use UserCommand::*;
 
@@ -141,6 +152,7 @@ impl Execute for UserCommand {
             ),
             Delete { name_or_id } => delete(api, name_or_id),
             Me => me(api, format),
+            Import { quiet } => import(api, format, *quiet),
         }
     }
 }
@@ -238,6 +250,18 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
 
 fn me(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.user.me()?, format)
+}
+
+fn import(
+    api: lrzcc::Api,
+    format: Format,
+    quiet: bool,
+) -> Result<(), Box<dyn Error>> {
+    let result = api.user.import()?;
+    if !quiet || result.new_project_count > 0 || result.new_user_count > 0 {
+        return print_single_object(result, format);
+    }
+    Ok(())
 }
 
 pub(crate) fn find_id(
