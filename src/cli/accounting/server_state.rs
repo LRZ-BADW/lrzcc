@@ -134,6 +134,17 @@ pub(crate) enum ServerStateCommand {
 
     #[clap(about = "Delete server state with given ID")]
     Delete { id: u32 },
+
+    #[clap(about = "Import new and end old server states")]
+    Import {
+        #[clap(
+            long,
+            short,
+            action,
+            help = "Suppress output if nothing is imported"
+        )]
+        quiet: bool,
+    },
 }
 pub(crate) use ServerStateCommand::*;
 
@@ -187,6 +198,7 @@ impl Execute for ServerStateCommand {
                 user.to_owned(),
             ),
             Delete { id } => delete(api, id),
+            Import { quiet } => import(api, format, *quiet),
         }
     }
 }
@@ -292,4 +304,16 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.server_state.delete(*id)?)
+}
+
+fn import(
+    api: lrzcc::Api,
+    format: Format,
+    quiet: bool,
+) -> Result<(), Box<dyn Error>> {
+    let result = api.server_state.import()?;
+    if !quiet || result.new_state_count > 0 || result.end_state_count > 0 {
+        return print_single_object(result, format);
+    }
+    Ok(())
 }
