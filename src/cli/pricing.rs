@@ -60,6 +60,9 @@ pub(crate) enum FlavorPriceCommand {
 
     #[clap(about = "Delete flavor price with given ID")]
     Delete { id: u32 },
+
+    #[clap(about = "Initialize first flavor prices")]
+    Initialize,
 }
 pub(crate) use FlavorPriceCommand::*;
 
@@ -94,6 +97,7 @@ impl Execute for FlavorPriceCommand {
                 *start_time,
             ),
             Delete { id } => delete(api, id),
+            Initialize => initialize(api, format),
         }
     }
 }
@@ -159,4 +163,9 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor_price.delete(*id)?)
+}
+
+fn initialize(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    let result = api.flavor_price.initialize()?;
+    print_single_object(result, format)
 }

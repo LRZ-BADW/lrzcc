@@ -230,7 +230,6 @@ enum Command {
 // - project-budget over
 // - flavor usage
 // - flavor-group usage
-// - flavor-price initialize
 // - flavor-quota check
 // - server-consumption
 // - server-cost
