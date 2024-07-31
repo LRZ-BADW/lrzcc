@@ -6,6 +6,18 @@ use chrono::{DateTime, Utc};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
+#[cfg(not(feature = "user"))]
+use crate::common::{find_id as user_find_id, find_id as project_find_id};
+#[cfg(feature = "user")]
+use crate::user::{
+    project::find_id as project_find_id, user::find_id as user_find_id,
+};
+
+#[cfg(not(feature = "resources"))]
+use crate::common::find_id as flavor_find_id;
+#[cfg(feature = "resources")]
+use crate::resources::flavor::find_id as flavor_find_id;
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct ServerStateListFilter {
@@ -17,17 +29,19 @@ pub(crate) struct ServerStateListFilter {
     // TODO validate that this is a valid server UUIDv4
     server: Option<String>,
 
-    #[clap(short, long, help = "Display server states of user with given ID")]
-    // TODO validate that this is a valid user ID
-    user: Option<u32>,
+    #[clap(
+        short,
+        long,
+        help = "Display server states of user with given name, ID, or OpenStack ID"
+    )]
+    user: Option<String>,
 
     #[clap(
         short,
         long,
-        help = "Display server states of project with given ID"
+        help = "Display server states of project with given name, ID, or OpenStack ID"
     )]
-    // TODO validate that this is a valid project ID
-    project: Option<u32>,
+    project: Option<String>,
 
     #[clap(short, long, help = "Display all server states", action)]
     all: bool,
@@ -55,19 +69,15 @@ pub(crate) enum ServerStateCommand {
         #[clap(help = "Name of the instance")]
         instance_name: String,
 
-        // TODO validate this
-        // TODO use find_id
-        #[clap(help = "ID of the flavor")]
-        flavor: u32,
+        #[clap(help = "Name, ID, or OpenStack UUIDv4 of the flavor")]
+        flavor: String,
 
         // TODO need some enum of choices here
         #[clap(help = "Status of the instance")]
         status: String,
 
-        // TODO validate this
-        // TODO use find_id
-        #[clap(help = "ID of the user")]
-        user: u32,
+        #[clap(help = "Name, ID, or OpenStack ID of the user")]
+        user: String,
 
         #[clap(help = "End of the server state")]
         end: Option<DateTime<Utc>>,
@@ -87,8 +97,9 @@ pub(crate) enum ServerStateCommand {
         #[clap(
             long,
             short,
-            help = "ID of the instance the server state belongs to"
+            help = "OpenStack UUIDv4 of the instance the server state belongs to"
         )]
+        // validate that this is a valid UUIDv4
         instance_id: Option<String>,
 
         #[clap(
@@ -101,10 +112,9 @@ pub(crate) enum ServerStateCommand {
         #[clap(
             long,
             short,
-            help = "Current flavor of the instance the server state belongs to"
+            help = "Current flavor of the instance the server state belongs to, given by name, ID, or OpenStack UUIDv4"
         )]
-        // TODO use find_id
-        flavor: Option<u32>,
+        flavor: Option<String>,
 
         // TODO we need some enum here
         #[clap(
@@ -117,10 +127,9 @@ pub(crate) enum ServerStateCommand {
         #[clap(
             long,
             short,
-            help = "ID of the user the instance of the state belongs to"
+            help = "Name, ID, or OpenStack ID of the user the instance of the state belongs to"
         )]
-        // TODO use find_id
-        user: Option<u32>,
+        user: Option<String>,
     },
 
     #[clap(about = "Delete server state with given ID")]
@@ -152,9 +161,9 @@ impl Execute for ServerStateCommand {
                 *end,
                 instance_id.clone(),
                 instance_name.clone(),
-                *flavor,
+                flavor,
                 status.clone(),
-                *user,
+                user,
             ),
             Modify {
                 id,
@@ -173,9 +182,9 @@ impl Execute for ServerStateCommand {
                 *end,
                 instance_id.clone(),
                 instance_name.clone(),
-                *flavor,
+                flavor.to_owned(),
                 status.clone(),
-                *user,
+                user.to_owned(),
             ),
             Delete { id } => delete(api, id),
         }
@@ -190,10 +199,12 @@ fn list(
     let mut request = api.server_state.list();
     if let Some(server) = &filter.server {
         request.server(server);
-    } else if let Some(user) = filter.user {
-        request.user(user);
-    } else if let Some(project) = filter.project {
-        request.project(project);
+    } else if let Some(user) = &filter.user {
+        let user_id = user_find_id(&api, &user)?;
+        request.user(user_id);
+    } else if let Some(project) = &filter.project {
+        let project_id = project_find_id(&api, &project)?;
+        request.project(project_id);
     } else if filter.all {
         request.all();
     }
@@ -216,18 +227,20 @@ fn create(
     end: Option<DateTime<Utc>>,
     instance_id: String, // UUIDv4
     instance_name: String,
-    flavor: u32,
+    flavor: &str,
     status: String,
-    user: u32,
+    user: &str,
 ) -> Result<(), Box<dyn Error>> {
+    let flavor_id = flavor_find_id(&api, flavor)?;
+    let user_id = user_find_id(&api, user)?;
     ask_for_confirmation()?;
     let mut request = api.server_state.create(
         begin,
         instance_id,
         instance_name,
-        flavor,
+        flavor_id,
         status,
-        user,
+        user_id,
     );
     if let Some(end) = end {
         request.end(end);
@@ -244,9 +257,9 @@ fn modify(
     end: Option<DateTime<Utc>>,
     instance_id: Option<String>,
     instance_name: Option<String>,
-    flavor: Option<u32>,
+    flavor: Option<String>,
     status: Option<String>,
-    user: Option<u32>,
+    user: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     let mut request = api.server_state.modify(id);
@@ -263,13 +276,15 @@ fn modify(
         request.instance_name(instance_name);
     }
     if let Some(flavor) = flavor {
-        request.flavor(flavor);
+        let flavor_id = flavor_find_id(&api, &flavor)?;
+        request.flavor(flavor_id);
     }
     if let Some(status) = status {
         request.status(status);
     }
     if let Some(user) = user {
-        request.user(user);
+        let user_id = user_find_id(&api, &user)?;
+        request.user(user_id);
     }
     print_single_object(request.send()?, format)
 }
