@@ -229,7 +229,6 @@ enum Command {
 // - user-budget over
 // - project-budget over
 // - flavor usage
-// - flavor-group initialize
 // - flavor-group usage
 // - flavor-price initialize
 // - flavor-quota check

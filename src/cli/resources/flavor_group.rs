@@ -53,6 +53,9 @@ pub(crate) enum FlavorGroupCommand {
 
     #[clap(about = "Delete flavor group with given name or ID")]
     Delete { name_or_id: String },
+
+    #[clap(about = "Initialize default flavor groups and flavors")]
+    Initialize,
 }
 pub(crate) use FlavorGroupCommand::*;
 
@@ -78,6 +81,7 @@ impl Execute for FlavorGroupCommand {
                 project.to_owned(),
             ),
             Delete { name_or_id } => delete(api, name_or_id),
+            Initialize => initialize(api, format),
         }
     }
 }
@@ -134,6 +138,11 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
     Ok(api.flavor_group.delete(id)?)
+}
+
+fn initialize(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    let result = api.flavor_group.initialize()?;
+    print_single_object(result, format)
 }
 
 pub(crate) fn find_id(
