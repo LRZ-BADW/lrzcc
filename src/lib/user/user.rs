@@ -68,6 +68,12 @@ pub struct UserCreated {
     pub is_active: bool,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserImport {
+    pub new_project_count: u32,
+    pub new_user_count: u32,
+}
+
 pub struct UserApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -354,6 +360,24 @@ impl UserApi {
         // TODO use Url.join
         let url = format!(
             "{}/me",
+            self.url
+                .rfind('/')
+                .map(|i| &self.url[..i])
+                .unwrap_or(&self.url)
+        );
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn import(&self) -> Result<UserImport, ApiError> {
+        // TODO use Url.join
+        let url = format!(
+            "{}/import",
             self.url
                 .rfind('/')
                 .map(|i| &self.url[..i])
