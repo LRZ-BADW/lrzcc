@@ -59,6 +59,11 @@ impl Display for FlavorDetailed {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorImport {
+    pub new_flavor_count: u32,
+}
+
 pub struct FlavorApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -310,5 +315,17 @@ impl FlavorApi {
             StatusCode::NO_CONTENT,
         )?;
         Ok(())
+    }
+
+    pub fn import(&self) -> Result<FlavorImport, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/import/", self.url);
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
