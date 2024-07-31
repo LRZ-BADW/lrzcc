@@ -31,6 +31,12 @@ impl Display for ServerState {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct ServerStateImport {
+    pub new_state_count: u32,
+    pub end_state_count: u32,
+}
+
 pub struct ServerStateApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -351,5 +357,17 @@ impl ServerStateApi {
             StatusCode::NO_CONTENT,
         )?;
         Ok(())
+    }
+
+    pub fn import(&self) -> Result<ServerStateImport, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/import/", self.url);
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
