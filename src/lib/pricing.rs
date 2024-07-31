@@ -29,6 +29,11 @@ impl Display for FlavorPrice {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorPriceInitialize {
+    pub new_flavor_price_count: u32,
+}
+
 pub struct FlavorPriceApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -254,5 +259,17 @@ impl FlavorPriceApi {
             StatusCode::NO_CONTENT,
         )?;
         Ok(())
+    }
+
+    pub fn initialize(&self) -> Result<FlavorPriceInitialize, ApiError> {
+        // TODO use Url.join
+        let url = format!("{}/initialize/", self.url);
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
