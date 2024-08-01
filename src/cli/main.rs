@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
+use common::current_year;
 use lrzcc::Api;
 use std::process::ExitCode;
 use std::str::FromStr;
@@ -238,6 +239,18 @@ enum Command {
         )]
         end: Option<DateTime<Utc>>,
     },
+
+    #[cfg(feature = "budgeting")]
+    #[clap(about = "Budget bulk create command")]
+    BudgetBulkCreate {
+        #[clap(
+            short,
+            long,
+            default_value_t = current_year(),
+            help = "Year for which to bulk create budgets (default: current year)"
+        )]
+        year: i32,
+    },
 }
 
 // TODO: missing commands:
@@ -247,7 +260,6 @@ enum Command {
 // - flavor-group usage
 // - server-consumption
 // - server-cost
-// - budget-bulk-create
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
@@ -328,6 +340,10 @@ fn main() -> ExitCode {
         #[cfg(feature = "budgeting")]
         Command::BudgetOverTree { filter, end } => {
             budgeting::budget_over_tree(api, filter, end)
+        }
+        #[cfg(feature = "budgeting")]
+        Command::BudgetBulkCreate { year } => {
+            budgeting::budget_bulk_create(api, cli.format, year)
         }
     } {
         Ok(_) => {}
