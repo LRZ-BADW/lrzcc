@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Context};
+use chrono::Datelike;
 use clap::{builder::PossibleValue, ValueEnum};
 use serde::Serialize;
 use std::borrow::Cow;
@@ -204,4 +205,8 @@ pub(crate) fn find_id(
         UUIDv4 lookup is unavailable as the respective module is disabled \
         in this client."
     ))
+}
+
+pub(crate) fn current_year() -> i32 {
+    chrono::Utc::now().year()
 }
