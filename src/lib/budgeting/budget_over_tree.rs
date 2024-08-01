@@ -7,6 +7,7 @@ use reqwest::{Method, StatusCode, Url};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BudgetOverTreeServer {
     pub total: f64,
