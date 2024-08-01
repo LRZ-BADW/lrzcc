@@ -26,6 +26,8 @@ use error::ApiError;
 #[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
 #[cfg(feature = "budgeting")]
+use budgeting::BudgetOverTreeApi;
+#[cfg(feature = "budgeting")]
 use budgeting::ProjectBudgetApi;
 #[cfg(feature = "budgeting")]
 use budgeting::UserBudgetApi;
@@ -72,6 +74,8 @@ pub struct Api {
     pub project_budget: ProjectBudgetApi,
     #[cfg(feature = "budgeting")]
     pub user_budget: UserBudgetApi,
+    #[cfg(feature = "budgeting")]
+    pub budget_over_tree: BudgetOverTreeApi,
 }
 
 impl Api {
@@ -124,6 +128,8 @@ impl Api {
             project_budget: ProjectBudgetApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
             user_budget: UserBudgetApi::new(&url, &client),
+            #[cfg(feature = "budgeting")]
+            budget_over_tree: BudgetOverTreeApi::new(&url, &client),
         })
     }
 }
