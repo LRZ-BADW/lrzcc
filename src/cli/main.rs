@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use lrzcc::Api;
@@ -223,6 +224,20 @@ enum Command {
         #[clap(subcommand)]
         command: budgeting::UserBudgetCommand,
     },
+
+    #[cfg(feature = "budgeting")]
+    #[clap(about = "Budget over tree command")]
+    BudgetOverTree {
+        #[clap(flatten)]
+        filter: budgeting::BudgetOverTreeFilter,
+
+        #[clap(
+            short,
+            long,
+            help = "End up to which to calculate the budget over tree (default: current time)"
+        )]
+        end: Option<DateTime<Utc>>,
+    },
 }
 
 // TODO: missing commands:
@@ -232,7 +247,6 @@ enum Command {
 // - flavor-group usage
 // - server-consumption
 // - server-cost
-// - budget-over-tree
 // - budget-bulk-create
 
 fn main() -> ExitCode {
@@ -311,6 +325,10 @@ fn main() -> ExitCode {
         }
         #[cfg(feature = "budgeting")]
         Command::UserBudget { ref command } => command.execute(api, cli.format),
+        #[cfg(feature = "budgeting")]
+        Command::BudgetOverTree { filter, end } => {
+            budgeting::budget_over_tree(api, filter, end)
+        }
     } {
         Ok(_) => {}
         Err(error) => {
