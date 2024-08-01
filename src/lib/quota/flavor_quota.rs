@@ -28,6 +28,11 @@ impl Display for FlavorQuota {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorQuotaCheck {
+    pub underquota: bool,
+}
+
 pub struct FlavorQuotaApi {
     pub url: String,
     pub client: Rc<Client>,
@@ -217,6 +222,55 @@ impl FlavorQuotaModifyRequest {
     }
 }
 
+pub struct FlavorQuotaCheckRequest {
+    url: String,
+    client: Rc<Client>,
+
+    user: u32,
+    flavor: u32,
+    count: Option<u32>,
+}
+
+impl FlavorQuotaCheckRequest {
+    pub fn new(url: &str, client: &Rc<Client>, user: u32, flavor: u32) -> Self {
+        Self {
+            url: format!("{}/check/", url),
+            client: Rc::clone(client),
+
+            user,
+            flavor,
+            count: None,
+        }
+    }
+
+    pub fn count(&mut self, count: u32) -> &mut Self {
+        self.count = Some(count);
+        self
+    }
+
+    fn params(&self) -> Vec<(&str, String)> {
+        let mut params = Vec::new();
+        params.push(("user", self.user.to_string()));
+        params.push(("flavor", self.flavor.to_string()));
+        if let Some(count) = self.count {
+            params.push(("flavorcount", count.to_string()));
+        }
+        params
+    }
+
+    pub fn send(&self) -> Result<FlavorQuotaCheck, ApiError> {
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            &url.to_string(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorQuotaApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorQuotaApi {
         FlavorQuotaApi {
@@ -273,5 +327,9 @@ impl FlavorQuotaApi {
             StatusCode::NO_CONTENT,
         )?;
         Ok(())
+    }
+
+    pub fn check(&self, user: u32, flavor: u32) -> FlavorQuotaCheckRequest {
+        FlavorQuotaCheckRequest::new(&self.url, &self.client, user, flavor)
     }
 }
