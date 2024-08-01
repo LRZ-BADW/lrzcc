@@ -11,9 +11,14 @@ use crate::common::find_id as user_find_id;
 use crate::user::user::find_id as user_find_id;
 
 #[cfg(not(feature = "resources"))]
-use crate::common::find_id as flavor_group_find_id;
+use crate::common::{
+    find_id as flavor_group_find_id, find_id as flavor_find_id,
+};
 #[cfg(feature = "resources")]
-use crate::resources::flavor_group::find_id as flavor_group_find_id;
+use crate::resources::{
+    flavor::find_id as flavor_find_id,
+    flavor_group::find_id as flavor_group_find_id,
+};
 
 #[derive(Args, Debug)]
 #[group(multiple = false)]
@@ -84,6 +89,18 @@ pub(crate) enum FlavorQuotaCommand {
 
     #[clap(about = "Delete flavor quota with given ID")]
     Delete { id: u32 },
+
+    #[clap(about = "Check that a user can start the given number of a flavor")]
+    Check {
+        #[clap(help = "Name, ID, or OpenStack ID of the user")]
+        user: String,
+
+        #[clap(help = "Name, ID, or OpenStack UUIDv4 of the flavor")]
+        flavor: String,
+
+        #[clap(long, short, help = "Amount of the instances of said flavor")]
+        count: Option<u32>,
+    },
 }
 pub(crate) use FlavorQuotaCommand::*;
 
@@ -115,6 +132,11 @@ impl Execute for FlavorQuotaCommand {
                 flavor_group.to_owned(),
             ),
             Delete { id } => delete(api, id),
+            Check {
+                user,
+                flavor,
+                count,
+            } => check(api, format, user, flavor, *count),
         }
     }
 }
@@ -187,4 +209,20 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor_quota.delete(*id)?)
+}
+
+fn check(
+    api: lrzcc::Api,
+    format: Format,
+    user: &str,
+    flavor: &str,
+    count: Option<u32>,
+) -> Result<(), Box<dyn Error>> {
+    let user_id = user_find_id(&api, user)?;
+    let flavor_id = flavor_find_id(&api, flavor)?;
+    let mut request = api.flavor_quota.check(user_id, flavor_id);
+    if let Some(count) = count {
+        request.count(count);
+    }
+    print_single_object(request.send()?, format)
 }
