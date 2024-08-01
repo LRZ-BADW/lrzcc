@@ -30,14 +30,17 @@ pub struct BudgetOverTreeProject {
     pub budget: u64,
     pub over: bool,
     pub users: HashMap<String, BudgetOverTreeUser>,
-    pub flavors: HashMap<String, f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flavors: Option<HashMap<String, f64>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct BudgetOverTree {
-    pub cost: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cost: Option<f64>,
     pub projects: HashMap<String, BudgetOverTreeProject>,
-    pub flavors: HashMap<String, f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flavors: Option<HashMap<String, f64>>,
 }
 
 pub struct BudgetOverTreeApi {
