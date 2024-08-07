@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset, Utc};
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
@@ -214,7 +214,21 @@ enum Command {
 
     #[cfg(feature = "accounting")]
     #[clap(about = "Server cost command")]
-    ServerCost,
+    ServerCost {
+        #[clap(
+            long,
+            short,
+            help = "Begin of the period to calculate the cost for (default: beginning of the running year)"
+        )]
+        begin: Option<DateTime<FixedOffset>>,
+
+        #[clap(
+            long,
+            short,
+            help = "End of the period to calculate the cost for (default: now)"
+        )]
+        end: Option<DateTime<FixedOffset>>,
+    },
 
     #[cfg(feature = "budgeting")]
     #[clap(about = "Project budget command")]
@@ -337,7 +351,9 @@ fn main() -> ExitCode {
             command.execute(api, cli.format)
         }
         #[cfg(feature = "accounting")]
-        Command::ServerCost => accounting::server_cost(api, cli.format),
+        Command::ServerCost { begin, end } => {
+            accounting::server_cost(api, cli.format, begin, end)
+        }
         #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)
