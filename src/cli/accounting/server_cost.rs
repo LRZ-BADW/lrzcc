@@ -16,7 +16,7 @@ pub(crate) struct ServerCostFilter {
     #[clap(
         short,
         long,
-        help = "Display server cost of server with given UUID"
+        help = "Calculate server cost for server with given UUID"
     )]
     // TODO validate that this is a valid server UUIDv4
     server: Option<String>,
@@ -24,18 +24,23 @@ pub(crate) struct ServerCostFilter {
     #[clap(
         short,
         long,
-        help = "Display server cost of user with given name, ID, or OpenStack ID"
+        help = "Calculate server cost for user with given name, ID, or OpenStack ID"
     )]
     user: Option<String>,
 
     #[clap(
         short,
         long,
-        help = "Display server cost of project with given name, ID, or OpenStack ID"
+        help = "Calculate server cost for project with given name, ID, or OpenStack ID"
     )]
     project: Option<String>,
 
-    #[clap(short, long, help = "Display server cost of entire cloud", action)]
+    #[clap(
+        short,
+        long,
+        help = "Calculate server cost for entire cloud",
+        action
+    )]
     all: bool,
 }
 
