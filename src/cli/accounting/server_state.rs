@@ -212,10 +212,10 @@ fn list(
     if let Some(server) = &filter.server {
         request.server(server);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, &user)?;
+        let user_id = user_find_id(&api, user)?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, &project)?;
+        let project_id = project_find_id(&api, project)?;
         request.project(project_id);
     } else if filter.all {
         request.all();

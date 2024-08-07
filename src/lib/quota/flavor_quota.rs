@@ -264,7 +264,7 @@ impl FlavorQuotaCheckRequest {
         request(
             &self.client,
             Method::GET,
-            &url.to_string(),
+            url.as_ref(),
             SerializableNone!(),
             StatusCode::OK,
         )

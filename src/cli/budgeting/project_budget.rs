@@ -96,7 +96,7 @@ impl Execute for ProjectBudgetCommand {
                 project,
                 year,
                 amount,
-            } => create(api, format, &project, *year, *amount),
+            } => create(api, format, project, *year, *amount),
             Modify { id, amount, force } => {
                 modify(api, format, *id, *amount, *force)
             }
@@ -112,10 +112,10 @@ fn list(
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.project_budget.list();
     if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, &user)?;
+        let user_id = user_find_id(&api, user)?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, &project)?;
+        let project_id = project_find_id(&api, project)?;
         request.project(project_id);
     } else if filter.all {
         request.all();
