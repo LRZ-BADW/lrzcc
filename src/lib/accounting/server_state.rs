@@ -1,7 +1,7 @@
 use crate::common::{display_option, request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
@@ -13,9 +13,9 @@ use tabled::Tabled;
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct ServerState {
     pub id: u32,
-    pub begin: DateTime<Utc>,
+    pub begin: DateTime<FixedOffset>,
     #[tabled(display_with = "display_option")]
-    pub end: Option<DateTime<Utc>>,
+    pub end: Option<DateTime<FixedOffset>>,
     pub instance_id: String, // UUIDv4
     pub instance_name: String,
     pub flavor: u32,
@@ -114,9 +114,9 @@ impl ServerStateListRequest {
 
 #[derive(Clone, Debug, Serialize)]
 struct ServerStateCreateData {
-    begin: DateTime<Utc>,
+    begin: DateTime<FixedOffset>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<DateTime<Utc>>,
+    end: Option<DateTime<FixedOffset>>,
     instance_id: String, // UUIDv4
     instance_name: String,
     flavor: u32,
@@ -127,7 +127,7 @@ struct ServerStateCreateData {
 
 impl ServerStateCreateData {
     fn new(
-        begin: DateTime<Utc>,
+        begin: DateTime<FixedOffset>,
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
@@ -158,7 +158,7 @@ impl ServerStateCreateRequest {
     pub fn new(
         url: &str,
         client: &Rc<Client>,
-        begin: DateTime<Utc>,
+        begin: DateTime<FixedOffset>,
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
@@ -179,7 +179,7 @@ impl ServerStateCreateRequest {
         }
     }
 
-    pub fn end(&mut self, end: DateTime<Utc>) -> &mut Self {
+    pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
         self.data.end = Some(end);
         self
     }
@@ -200,9 +200,9 @@ struct ServerStateModifyData {
     id: u32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    begin: Option<DateTime<Utc>>,
+    begin: Option<DateTime<FixedOffset>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    end: Option<DateTime<Utc>>,
+    end: Option<DateTime<FixedOffset>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     instance_id: Option<String>, // UUIDv4
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -247,12 +247,12 @@ impl ServerStateModifyRequest {
         }
     }
 
-    pub fn begin(&mut self, begin: DateTime<Utc>) -> &mut Self {
+    pub fn begin(&mut self, begin: DateTime<FixedOffset>) -> &mut Self {
         self.data.begin = Some(begin);
         self
     }
 
-    pub fn end(&mut self, end: DateTime<Utc>) -> &mut Self {
+    pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
         self.data.end = Some(end);
         self
     }
@@ -319,7 +319,7 @@ impl ServerStateApi {
 
     pub fn create(
         &self,
-        begin: DateTime<Utc>,
+        begin: DateTime<FixedOffset>,
         instance_id: String, // UUIDv4
         instance_name: String,
         flavor: u32,
@@ -342,7 +342,7 @@ impl ServerStateApi {
 
     pub fn modify(&self, id: u32) -> ServerStateModifyRequest {
         // TODO use Url.join
-        let url = format!("{}/{}/", self.url, id);
+        let url = format!("{}/{}", self.url, id);
         ServerStateModifyRequest::new(url.as_ref(), &self.client, id)
     }
 

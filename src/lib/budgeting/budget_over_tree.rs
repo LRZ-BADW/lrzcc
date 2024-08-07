@@ -1,7 +1,7 @@
 use crate::common::{request, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode, Url};
 use serde::{Deserialize, Serialize};
@@ -57,7 +57,7 @@ pub struct BudgetOverTreeRequest {
     all: bool,
     project: Option<u32>,
     user: Option<u32>,
-    end: Option<DateTime<Utc>>,
+    end: Option<DateTime<FixedOffset>>,
 }
 
 impl BudgetOverTreeRequest {
@@ -109,7 +109,7 @@ impl BudgetOverTreeRequest {
         self
     }
 
-    pub fn end(&mut self, end: DateTime<Utc>) -> &mut Self {
+    pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
         self.end = Some(end);
         self
     }

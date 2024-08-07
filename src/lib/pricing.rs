@@ -1,7 +1,7 @@
 use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
@@ -17,7 +17,7 @@ pub struct FlavorPrice {
     pub flavor_name: String,
     pub user_class: u32,
     pub unit_price: f64,
-    pub start_time: DateTime<Utc>,
+    pub start_time: DateTime<FixedOffset>,
 }
 
 impl Display for FlavorPrice {
@@ -74,7 +74,7 @@ struct FlavorPriceCreateData {
     #[serde(skip_serializing_if = "Option::is_none")]
     price: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    start_time: Option<DateTime<Utc>>,
+    start_time: Option<DateTime<FixedOffset>>,
 }
 
 impl FlavorPriceCreateData {
@@ -114,7 +114,10 @@ impl FlavorPriceCreateRequest {
         self
     }
 
-    pub fn start_time(&mut self, start_time: DateTime<Utc>) -> &mut Self {
+    pub fn start_time(
+        &mut self,
+        start_time: DateTime<FixedOffset>,
+    ) -> &mut Self {
         self.data.start_time = Some(start_time);
         self
     }
@@ -141,7 +144,7 @@ struct FlavorPriceModifyData {
     #[serde(skip_serializing_if = "Option::is_none")]
     unit_price: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    start_time: Option<DateTime<Utc>>,
+    start_time: Option<DateTime<FixedOffset>>,
 }
 
 impl FlavorPriceModifyData {
@@ -187,7 +190,10 @@ impl FlavorPriceModifyRequest {
         self
     }
 
-    pub fn start_time(&mut self, start_time: DateTime<Utc>) -> &mut Self {
+    pub fn start_time(
+        &mut self,
+        start_time: DateTime<FixedOffset>,
+    ) -> &mut Self {
         self.data.start_time = Some(start_time);
         self
     }
