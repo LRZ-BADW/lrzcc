@@ -212,6 +212,10 @@ enum Command {
         command: accounting::ServerStateCommand,
     },
 
+    #[cfg(feature = "accounting")]
+    #[clap(about = "Server cost command")]
+    ServerCost,
+
     #[cfg(feature = "budgeting")]
     #[clap(about = "Project budget command")]
     ProjectBudget {
@@ -259,6 +263,7 @@ enum Command {
 // - flavor usage
 // - flavor-group usage
 // - server-consumption
+// In progress:
 // - server-cost
 
 fn main() -> ExitCode {
@@ -331,6 +336,8 @@ fn main() -> ExitCode {
         Command::ServerState { ref command } => {
             command.execute(api, cli.format)
         }
+        #[cfg(feature = "accounting")]
+        Command::ServerCost => accounting::server_cost(api, cli.format),
         #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)
