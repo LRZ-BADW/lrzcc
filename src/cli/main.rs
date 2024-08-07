@@ -228,6 +228,9 @@ enum Command {
             help = "End of the period to calculate the cost for (default: now)"
         )]
         end: Option<DateTime<FixedOffset>>,
+
+        #[clap(flatten)]
+        filter: accounting::ServerCostFilter,
     },
 
     #[cfg(feature = "budgeting")]
@@ -351,8 +354,8 @@ fn main() -> ExitCode {
             command.execute(api, cli.format)
         }
         #[cfg(feature = "accounting")]
-        Command::ServerCost { begin, end } => {
-            accounting::server_cost(api, cli.format, begin, end)
+        Command::ServerCost { begin, end, filter } => {
+            accounting::server_cost(api, cli.format, begin, end, filter)
         }
         #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
