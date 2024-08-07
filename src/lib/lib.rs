@@ -24,6 +24,8 @@ mod user;
 use error::ApiError;
 
 #[cfg(feature = "accounting")]
+use accounting::ServerCostApi;
+#[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
 #[cfg(feature = "budgeting")]
 use budgeting::BudgetBulkCreateApi;
@@ -72,6 +74,8 @@ pub struct Api {
     pub flavor_quota: FlavorQuotaApi,
     #[cfg(feature = "accounting")]
     pub server_state: ServerStateApi,
+    #[cfg(feature = "accounting")]
+    pub server_cost: ServerCostApi,
     #[cfg(feature = "budgeting")]
     pub project_budget: ProjectBudgetApi,
     #[cfg(feature = "budgeting")]
@@ -128,6 +132,8 @@ impl Api {
             flavor_quota: FlavorQuotaApi::new(&url, &client),
             #[cfg(feature = "accounting")]
             server_state: ServerStateApi::new(&url, &client),
+            #[cfg(feature = "accounting")]
+            server_cost: ServerCostApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
             project_budget: ProjectBudgetApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
