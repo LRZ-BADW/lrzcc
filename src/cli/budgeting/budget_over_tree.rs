@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use clap::Args;
 use std::error::Error;
 
@@ -33,7 +33,7 @@ pub(crate) struct BudgetOverTreeFilter {
 pub(crate) fn budget_over_tree(
     api: lrzcc::Api,
     filter: BudgetOverTreeFilter,
-    end: Option<DateTime<Utc>>,
+    end: Option<DateTime<FixedOffset>>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.budget_over_tree.get();
     if filter.all {

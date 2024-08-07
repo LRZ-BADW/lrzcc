@@ -2,7 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use clap::Subcommand;
 use std::error::Error;
 
@@ -33,7 +33,7 @@ pub(crate) enum FlavorPriceCommand {
         price: Option<f64>,
 
         #[clap(long, short, help = "Start time of the price, default: now")]
-        start_time: Option<DateTime<Utc>>,
+        start_time: Option<DateTime<FixedOffset>>,
     },
 
     #[clap(about = "Modify a flavor price")]
@@ -55,7 +55,7 @@ pub(crate) enum FlavorPriceCommand {
         price: Option<f64>,
 
         #[clap(long, short, help = "Start time of the flavor price")]
-        start_time: Option<DateTime<Utc>>,
+        start_time: Option<DateTime<FixedOffset>>,
     },
 
     #[clap(about = "Delete flavor price with given ID")]
@@ -121,7 +121,7 @@ fn create(
     flavor: &str,
     user_class: u32,
     price: Option<f64>,
-    start_time: Option<DateTime<Utc>>,
+    start_time: Option<DateTime<FixedOffset>>,
 ) -> Result<(), Box<dyn Error>> {
     let flavor_id = flavor_find_id(&api, flavor)?;
     let mut request = api.flavor_price.create(flavor_id, user_class);
@@ -141,7 +141,7 @@ fn modify(
     flavor: Option<String>,
     user_class: Option<u32>,
     unit_price: Option<f64>,
-    start_time: Option<DateTime<Utc>>,
+    start_time: Option<DateTime<FixedOffset>>,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_price.modify(id);
     if let Some(flavor) = flavor {

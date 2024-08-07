@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, FixedOffset};
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
@@ -255,7 +255,7 @@ enum Command {
             long,
             help = "End up to which to calculate the budget over tree (default: current time)"
         )]
-        end: Option<DateTime<Utc>>,
+        end: Option<DateTime<FixedOffset>>,
     },
 
     #[cfg(feature = "budgeting")]

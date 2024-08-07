@@ -2,7 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -61,7 +61,7 @@ pub(crate) enum ServerStateCommand {
     #[clap(about = "Create a new server state")]
     Create {
         #[clap(help = "Begin of the server state")]
-        begin: DateTime<Utc>,
+        begin: DateTime<FixedOffset>,
 
         #[clap(help = "UUIDv4 of the instance")]
         instance_id: String, // UUIDv4
@@ -80,7 +80,7 @@ pub(crate) enum ServerStateCommand {
         user: String,
 
         #[clap(help = "End of the server state")]
-        end: Option<DateTime<Utc>>,
+        end: Option<DateTime<FixedOffset>>,
     },
 
     #[clap(about = "Modify a server state")]
@@ -89,10 +89,10 @@ pub(crate) enum ServerStateCommand {
         id: u32,
 
         #[clap(long, short, help = "Begin of the server state")]
-        begin: Option<DateTime<Utc>>,
+        begin: Option<DateTime<FixedOffset>>,
 
         #[clap(long, short, help = "End of the server state")]
-        end: Option<DateTime<Utc>>,
+        end: Option<DateTime<FixedOffset>>,
 
         #[clap(
             long,
@@ -235,8 +235,8 @@ fn get(
 fn create(
     api: lrzcc::Api,
     format: Format,
-    begin: DateTime<Utc>,
-    end: Option<DateTime<Utc>>,
+    begin: DateTime<FixedOffset>,
+    end: Option<DateTime<FixedOffset>>,
     instance_id: String, // UUIDv4
     instance_name: String,
     flavor: &str,
@@ -265,8 +265,8 @@ fn modify(
     api: lrzcc::Api,
     format: Format,
     id: u32,
-    begin: Option<DateTime<Utc>>,
-    end: Option<DateTime<Utc>>,
+    begin: Option<DateTime<FixedOffset>>,
+    end: Option<DateTime<FixedOffset>>,
     instance_id: Option<String>,
     instance_name: Option<String>,
     flavor: Option<String>,
