@@ -5,12 +5,41 @@ use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode, Url};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::fmt::Debug;
 use std::rc::Rc;
 use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ServerCost {
+pub struct ServerCostSimple {
     pub total: f64,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ServerCostServer {
+    pub total: f64,
+    pub flavors: HashMap<String, f64>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ServerCostUser {
+    pub total: f64,
+    pub flavors: HashMap<String, f64>,
+    pub servers: HashMap<String, ServerCostServer>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ServerCostProject {
+    pub total: f64,
+    pub flavors: HashMap<String, f64>,
+    pub users: HashMap<String, ServerCostUser>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ServerCostAll {
+    pub total: f64,
+    pub flavors: HashMap<String, f64>,
+    pub projects: HashMap<String, ServerCostProject>,
 }
 
 #[derive(Debug)]
@@ -24,6 +53,7 @@ pub struct ServerCostRequest {
     user: Option<u32>,
     project: Option<u32>,
     all: bool,
+    detail: bool,
 }
 
 impl ServerCostRequest {
@@ -38,6 +68,7 @@ impl ServerCostRequest {
             user: None,
             project: None,
             all: false,
+            detail: false,
         }
     }
 
@@ -58,6 +89,9 @@ impl ServerCostRequest {
         } else if self.all {
             params.push(("all", "1".to_string()));
         }
+        if self.detail {
+            params.push(("detail", "1".to_string()));
+        }
         params
     }
 
@@ -71,27 +105,147 @@ impl ServerCostRequest {
         self
     }
 
-    pub fn server(&mut self, server: &str) -> &mut Self {
+    pub fn server(
+        &mut self,
+        server: &str,
+    ) -> Result<ServerCostSimple, ApiError> {
         self.server = Some(server.to_string());
-        self
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
-    pub fn user(&mut self, user: u32) -> &mut Self {
+    pub fn server_detail(
+        &mut self,
+        server: &str,
+    ) -> Result<ServerCostServer, ApiError> {
+        self.server = Some(server.to_string());
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn user(&mut self, user: u32) -> Result<ServerCostSimple, ApiError> {
         self.user = Some(user);
-        self
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
-    pub fn project(&mut self, project: u32) -> &mut Self {
+    pub fn user_detail(
+        &mut self,
+        user: u32,
+    ) -> Result<ServerCostUser, ApiError> {
+        self.user = Some(user);
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn project(
+        &mut self,
+        project: u32,
+    ) -> Result<ServerCostSimple, ApiError> {
         self.project = Some(project);
-        self
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
-    pub fn all(&mut self) -> &mut Self {
+    pub fn project_detail(
+        &mut self,
+        project: u32,
+    ) -> Result<ServerCostProject, ApiError> {
+        self.project = Some(project);
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn all(&mut self) -> Result<ServerCostSimple, ApiError> {
         self.all = true;
-        self
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 
-    pub fn send(&self) -> Result<ServerCost, ApiError> {
+    pub fn all_detail(&mut self) -> Result<ServerCostAll, ApiError> {
+        self.all = true;
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn mine(&mut self) -> Result<ServerCostSimple, ApiError> {
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn mine_detail(&mut self) -> Result<ServerCostUser, ApiError> {
+        self.detail = true;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
         request(
