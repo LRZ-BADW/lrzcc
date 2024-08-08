@@ -45,6 +45,15 @@ pub(crate) fn apply_table_style(table: &mut Table, format: TableFormat) {
 }
 
 #[allow(dead_code)]
+pub(crate) fn print_json<T>(object: T) -> Result<(), Box<dyn std::error::Error>>
+where
+    T: Serialize,
+{
+    println!("{}", serde_json::to_string(&object)?);
+    Ok(())
+}
+
+#[allow(dead_code)]
 pub(crate) fn print_single_object<T>(
     object: T,
     format: Format,
