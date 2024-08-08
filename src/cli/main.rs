@@ -231,6 +231,9 @@ enum Command {
 
         #[clap(flatten)]
         filter: accounting::ServerCostFilter,
+
+        #[clap(long, short, help = "Show detailed cost breakdown")]
+        detail: bool,
     },
 
     #[cfg(feature = "budgeting")]
@@ -280,8 +283,6 @@ enum Command {
 // - flavor usage
 // - flavor-group usage
 // - server-consumption
-// In progress:
-// - server-cost
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
@@ -354,8 +355,13 @@ fn main() -> ExitCode {
             command.execute(api, cli.format)
         }
         #[cfg(feature = "accounting")]
-        Command::ServerCost { begin, end, filter } => {
-            accounting::server_cost(api, cli.format, begin, end, filter)
+        Command::ServerCost {
+            begin,
+            end,
+            filter,
+            detail,
+        } => {
+            accounting::server_cost(api, cli.format, begin, end, filter, detail)
         }
         #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
