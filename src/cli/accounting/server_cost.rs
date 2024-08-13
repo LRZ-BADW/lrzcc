@@ -74,6 +74,7 @@ pub(crate) fn server_cost(
             print_json(request.mine_detail()?)
         }
     } else {
+        #[allow(clippy::collapsible_else_if)]
         if let Some(server) = filter.server {
             print_single_object(request.server(&server)?, format)
         } else if let Some(user) = filter.user {
