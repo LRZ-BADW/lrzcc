@@ -123,8 +123,7 @@ pub(crate) enum FlavorCommand {
         quiet: bool,
     },
 
-    #[cfg(feature = "accounting")]
-    #[clap(about = "Server cost command")]
+    #[clap(about = "Flavor usage command")]
     Usage {
         #[clap(flatten)]
         filter: FlavorUsageFilter,
