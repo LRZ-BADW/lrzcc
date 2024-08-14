@@ -222,6 +222,188 @@ impl FlavorGroupModifyRequest {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorGroupUsage {
+    pub user_id: u32,
+    pub user_name: String,
+    pub flavorgroup_id: u32,
+    pub flavorgroup_name: String,
+    pub usage: u32,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct FlavorGroupUsageAggregate {
+    pub flavorgroup_id: u32,
+    pub flavorgroup_name: String,
+    pub usage: u32,
+}
+
+pub struct FlavorGroupUsageRequest {
+    url: String,
+    client: Rc<Client>,
+
+    user: Option<u32>,
+    project: Option<u32>,
+    all: bool,
+    aggregate: bool,
+}
+
+impl FlavorGroupUsageRequest {
+    pub fn new(url: &str, client: &Rc<Client>) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+
+            user: None,
+            project: None,
+            all: false,
+            aggregate: false,
+        }
+    }
+
+    pub fn params(&self) -> Vec<(&str, String)> {
+        let mut params = Vec::new();
+        if let Some(user) = self.user {
+            params.push(("user", user.to_string()));
+        } else if let Some(project) = self.project {
+            params.push(("project", project.to_string()));
+        } else if self.all {
+            params.push(("all", "1".to_string()));
+        }
+        if self.aggregate {
+            params.push(("aggregate", "1".to_string()));
+        }
+        params
+    }
+
+    pub fn user(
+        &mut self,
+        user: u32,
+    ) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+        self.user = Some(user);
+        self.aggregate = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn user_aggregate(
+        &mut self,
+        user: u32,
+    ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
+        self.user = Some(user);
+        self.aggregate = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn project(
+        &mut self,
+        project: u32,
+    ) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+        self.project = Some(project);
+        self.aggregate = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn project_aggregate(
+        &mut self,
+        project: u32,
+    ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
+        self.project = Some(project);
+        self.aggregate = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn all(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+        self.all = true;
+        self.aggregate = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn all_aggregate(
+        &mut self,
+    ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
+        self.all = true;
+        self.aggregate = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn mine(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+        self.aggregate = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn mine_aggregate(
+        &mut self,
+    ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
+        // TODO use Url.join
+        self.aggregate = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl FlavorGroupApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorGroupApi {
         FlavorGroupApi {
@@ -281,5 +463,10 @@ impl FlavorGroupApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+    }
+
+    pub fn usage(&self) -> FlavorGroupUsageRequest {
+        let url = format!("{}/usage/", self.url);
+        FlavorGroupUsageRequest::new(url.as_ref(), &self.client)
     }
 }
