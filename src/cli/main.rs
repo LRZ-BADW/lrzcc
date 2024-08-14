@@ -236,6 +236,30 @@ enum Command {
         detail: bool,
     },
 
+    #[cfg(feature = "accounting")]
+    #[clap(about = "Server consumption command")]
+    ServerConsumption {
+        #[clap(
+            long,
+            short,
+            help = "Begin of the period to calculate the consumption for (default: beginning of the running year)"
+        )]
+        begin: Option<DateTime<FixedOffset>>,
+
+        #[clap(
+            long,
+            short,
+            help = "End of the period to calculate the consumption for (default: now)"
+        )]
+        end: Option<DateTime<FixedOffset>>,
+
+        #[clap(flatten)]
+        filter: accounting::ServerConsumptionFilter,
+
+        #[clap(long, short, help = "Show detailed consumption breakdown")]
+        detail: bool,
+    },
+
     #[cfg(feature = "budgeting")]
     #[clap(about = "Project budget command")]
     ProjectBudget {
@@ -282,6 +306,7 @@ enum Command {
 // - project-budget over
 // - flavor usage
 // - flavor-group usage
+// in progress:
 // - server-consumption
 
 fn main() -> ExitCode {
@@ -363,6 +388,15 @@ fn main() -> ExitCode {
         } => {
             accounting::server_cost(api, cli.format, begin, end, filter, detail)
         }
+        #[cfg(feature = "accounting")]
+        Command::ServerConsumption {
+            begin,
+            end,
+            filter,
+            detail,
+        } => accounting::server_consumption(
+            api, cli.format, begin, end, filter, detail,
+        ),
         #[cfg(feature = "budgeting")]
         Command::ProjectBudget { ref command } => {
             command.execute(api, cli.format)

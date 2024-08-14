@@ -3,8 +3,10 @@ use chrono::Datelike;
 use clap::{builder::PossibleValue, ValueEnum};
 use serde::Serialize;
 use std::borrow::Cow;
+use std::fmt::Display;
 use std::io::{stdin, stdout, Write};
 use tabled::builder::Builder;
+use tabled::grid::records::vec_records::Text;
 use tabled::settings::Style;
 use tabled::{Table, Tabled};
 
@@ -94,6 +96,34 @@ where
         Format::Json => println!("{}", serde_json::to_string(&objects)?),
         Format::Table(format) => {
             let mut table = Table::new(objects);
+            apply_table_style(&mut table, format);
+            let output = table.to_string();
+            println!("{output}");
+        }
+    }
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub(crate) fn print_hashmap<K, V>(
+    hashmap: std::collections::HashMap<K, V>,
+    key_name: &str,
+    value_name: &str,
+    format: Format,
+) -> Result<(), Box<dyn std::error::Error>>
+where
+    K: Serialize + Display,
+    V: Serialize + Display,
+    (K, V): Tabled,
+{
+    match format {
+        Format::Json => println!("{}", serde_json::to_string(&hashmap)?),
+        Format::Table(format) => {
+            let mut table = Table::new(hashmap);
+            table.get_records_mut()[0] = vec![
+                Text::new(key_name.to_owned()),
+                Text::new(value_name.to_owned()),
+            ];
             apply_table_style(&mut table, format);
             let output = table.to_string();
             println!("{output}");
