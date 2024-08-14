@@ -306,8 +306,6 @@ enum Command {
 // - project-budget over
 // - flavor usage
 // - flavor-group usage
-// in progress:
-// - server-consumption
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
