@@ -24,6 +24,8 @@ mod user;
 use error::ApiError;
 
 #[cfg(feature = "accounting")]
+use accounting::ServerConsumptionApi;
+#[cfg(feature = "accounting")]
 use accounting::ServerCostApi;
 #[cfg(feature = "accounting")]
 use accounting::ServerStateApi;
@@ -76,6 +78,8 @@ pub struct Api {
     pub server_state: ServerStateApi,
     #[cfg(feature = "accounting")]
     pub server_cost: ServerCostApi,
+    #[cfg(feature = "accounting")]
+    pub server_consumption: ServerConsumptionApi,
     #[cfg(feature = "budgeting")]
     pub project_budget: ProjectBudgetApi,
     #[cfg(feature = "budgeting")]
@@ -134,6 +138,8 @@ impl Api {
             server_state: ServerStateApi::new(&url, &client),
             #[cfg(feature = "accounting")]
             server_cost: ServerCostApi::new(&url, &client),
+            #[cfg(feature = "accounting")]
+            server_consumption: ServerConsumptionApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
             project_budget: ProjectBudgetApi::new(&url, &client),
             #[cfg(feature = "budgeting")]
