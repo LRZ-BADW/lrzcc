@@ -305,7 +305,6 @@ enum Command {
 // TODO: missing commands:
 // - user-budget over
 // - project-budget over
-// - flavor-group usage
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
