@@ -7,6 +7,13 @@ use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
+#[cfg(not(feature = "user"))]
+use crate::common::{find_id as project_find_id, find_id as user_find_id};
+#[cfg(feature = "user")]
+use crate::user::{
+    project::find_id as project_find_id, user::find_id as user_find_id,
+};
+
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct FlavorListFilter {
@@ -19,6 +26,32 @@ pub(crate) struct FlavorListFilter {
         help = "Display flavors of group with given name or ID"
     )]
     group: Option<String>,
+}
+
+#[derive(Args, Debug)]
+#[group(multiple = false)]
+pub(crate) struct FlavorUsageFilter {
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor usage for user with given name, ID, or OpenStack ID"
+    )]
+    user: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor usage for project with given name, ID, or OpenStack ID"
+    )]
+    project: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor usage for entire cloud",
+        action
+    )]
+    all: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -89,6 +122,16 @@ pub(crate) enum FlavorCommand {
         )]
         quiet: bool,
     },
+
+    #[cfg(feature = "accounting")]
+    #[clap(about = "Server cost command")]
+    Usage {
+        #[clap(flatten)]
+        filter: FlavorUsageFilter,
+
+        #[clap(long, short = 'A', help = "Show aggregated flavor usage")]
+        aggregate: bool,
+    },
 }
 pub(crate) use FlavorCommand::*;
 
@@ -131,6 +174,9 @@ impl Execute for FlavorCommand {
             ),
             Delete { name_or_id } => delete(api, name_or_id),
             Import { quiet } => import(api, format, *quiet),
+            Usage { filter, aggregate } => {
+                usage(api, format, filter, *aggregate)
+            }
         }
     }
 }
@@ -221,6 +267,47 @@ fn import(
         return print_single_object(result, format);
     }
     Ok(())
+}
+
+fn usage(
+    api: lrzcc::Api,
+    format: Format,
+    filter: &FlavorUsageFilter,
+    aggregate: bool,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor.usage();
+    if aggregate {
+        print_object_list(
+            if let Some(user) = filter.user.to_owned() {
+                let user_id = user_find_id(&api, &user)?;
+                request.user_aggregate(user_id)?
+            } else if let Some(project) = filter.project.to_owned() {
+                let project_id = project_find_id(&api, &project)?;
+                request.project_aggregate(project_id)?
+            } else if filter.all {
+                request.all_aggregate()?
+            } else {
+                // TODO this causes a http 500 error
+                request.mine_aggregate()?
+            },
+            format,
+        )
+    } else {
+        print_object_list(
+            if let Some(user) = filter.user.to_owned() {
+                let user_id = user_find_id(&api, &user)?;
+                request.user(user_id)?
+            } else if let Some(project) = filter.project.to_owned() {
+                let project_id = project_find_id(&api, &project)?;
+                request.project(project_id)?
+            } else if filter.all {
+                request.all()?
+            } else {
+                request.mine()?
+            },
+            format,
+        )
+    }
 }
 
 // TODO the find id functions can be condensed into a macro
