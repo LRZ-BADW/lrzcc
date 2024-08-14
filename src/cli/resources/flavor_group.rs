@@ -7,14 +7,42 @@ use clap::{Args, Subcommand};
 use std::error::Error;
 
 #[cfg(not(feature = "user"))]
-use crate::common::find_id as project_find_id;
+use crate::common::{find_id as project_find_id, find_id as user_find_id};
 #[cfg(feature = "user")]
-use crate::user::project::find_id as project_find_id;
+use crate::user::{
+    project::find_id as project_find_id, user::find_id as user_find_id,
+};
 
 #[derive(Args, Debug)]
 #[group(multiple = false)]
 pub(crate) struct FlavorGroupListFilter {
     #[clap(short, long, help = "Display all flavors", action)]
+    all: bool,
+}
+
+#[derive(Args, Debug)]
+#[group(multiple = false)]
+pub(crate) struct FlavorGroupUsageFilter {
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor group usage for user with given name, ID, or OpenStack ID"
+    )]
+    user: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor group usage for project with given name, ID, or OpenStack ID"
+    )]
+    project: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Calculate flavor group usage for entire cloud",
+        action
+    )]
     all: bool,
 }
 
@@ -56,6 +84,15 @@ pub(crate) enum FlavorGroupCommand {
 
     #[clap(about = "Initialize default flavor groups and flavors")]
     Initialize,
+
+    #[clap(about = "Server cost command")]
+    Usage {
+        #[clap(flatten)]
+        filter: FlavorGroupUsageFilter,
+
+        #[clap(long, short = 'A', help = "Show aggregated flavor group usage")]
+        aggregate: bool,
+    },
 }
 pub(crate) use FlavorGroupCommand::*;
 
@@ -82,6 +119,9 @@ impl Execute for FlavorGroupCommand {
             ),
             Delete { name_or_id } => delete(api, name_or_id),
             Initialize => initialize(api, format),
+            Usage { filter, aggregate } => {
+                usage(api, format, filter, *aggregate)
+            }
         }
     }
 }
@@ -143,6 +183,47 @@ fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
 fn initialize(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let result = api.flavor_group.initialize()?;
     print_single_object(result, format)
+}
+
+fn usage(
+    api: lrzcc::Api,
+    format: Format,
+    filter: &FlavorGroupUsageFilter,
+    aggregate: bool,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.flavor_group.usage();
+    if aggregate {
+        print_object_list(
+            if let Some(user) = filter.user.to_owned() {
+                let user_id = user_find_id(&api, &user)?;
+                request.user_aggregate(user_id)?
+            } else if let Some(project) = filter.project.to_owned() {
+                let project_id = project_find_id(&api, &project)?;
+                request.project_aggregate(project_id)?
+            } else if filter.all {
+                request.all_aggregate()?
+            } else {
+                // TODO this causes a http 500 error
+                request.mine_aggregate()?
+            },
+            format,
+        )
+    } else {
+        print_object_list(
+            if let Some(user) = filter.user.to_owned() {
+                let user_id = user_find_id(&api, &user)?;
+                request.user(user_id)?
+            } else if let Some(project) = filter.project.to_owned() {
+                let project_id = project_find_id(&api, &project)?;
+                request.project(project_id)?
+            } else if filter.all {
+                request.all()?
+            } else {
+                request.mine()?
+            },
+            format,
+        )
+    }
 }
 
 pub(crate) fn find_id(
