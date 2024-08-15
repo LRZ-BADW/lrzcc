@@ -308,7 +308,6 @@ enum Command {
     },
 }
 
-// TODO: timeout option
 // TODO: missing commands:
 // - user-budget over
 // - project-budget over
