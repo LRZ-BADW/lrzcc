@@ -1,7 +1,7 @@
 use anyhow::Context;
 use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
-use std::rc::Rc;
+use std::{rc::Rc, time::Duration};
 
 mod common;
 pub mod error;
@@ -95,6 +95,7 @@ impl Api {
         url: String,
         token: String,
         impersonate: Option<u32>,
+        timeout: Option<u64>,
     ) -> Result<Api, ApiError> {
         let mut headers = HeaderMap::new();
         headers
@@ -111,9 +112,13 @@ impl Api {
                     .context("Failed to create impersonate header value")?,
             );
         }
+        let mut client_builder = ClientBuilder::new().default_headers(headers);
+        if let Some(timeout) = timeout {
+            client_builder =
+                client_builder.timeout(Duration::from_secs(timeout));
+        }
         let client = Rc::new(
-            ClientBuilder::new()
-                .default_headers(headers)
+            client_builder
                 .build()
                 .context("Failed to build http client")?,
         );
