@@ -411,6 +411,7 @@ fn main() -> ExitCode {
     } {
         Ok(_) => {}
         Err(error) => {
+            // TODO it could be useful to use Debug here to see the error chain
             eprintln!("{}: {}", "error".bold().red(), error);
             return ExitCode::FAILURE;
         }
