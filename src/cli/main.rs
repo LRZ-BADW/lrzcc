@@ -308,10 +308,6 @@ enum Command {
     },
 }
 
-// TODO: missing commands:
-// - user-budget over
-// - project-budget over
-
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let token = match cli.credentials.token {
