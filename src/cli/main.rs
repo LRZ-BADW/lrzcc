@@ -138,6 +138,13 @@ struct Cli {
     impersonate: Option<u32>,
 
     #[clap(
+        short = 'T',
+        long,
+        help = format!("Timeout for requests in seconds [default: {}]", lrzcc::DEFAULT_TIMEOUT),
+    )]
+    timeout: Option<u64>,
+
+    #[clap(
         value_enum,
         short,
         long,
@@ -333,14 +340,18 @@ fn main() -> ExitCode {
             }
         }
     };
-    let api =
-        match Api::new(cli.url, token.as_ref().to_string(), cli.impersonate) {
-            Ok(api) => api,
-            Err(error) => {
-                eprintln!("{}: {}", "error".bold().red(), error);
-                return ExitCode::FAILURE;
-            }
-        };
+    let api = match Api::new(
+        cli.url,
+        token.as_ref().to_string(),
+        cli.impersonate,
+        cli.timeout,
+    ) {
+        Ok(api) => api,
+        Err(error) => {
+            eprintln!("{}: {}", "error".bold().red(), error);
+            return ExitCode::FAILURE;
+        }
+    };
     #[cfg(any(
         feature = "accounting",
         feature = "budgeting",
