@@ -1,6 +1,7 @@
 use crate::common::{is_false, request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
+use chrono::{DateTime, FixedOffset};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
@@ -214,6 +215,199 @@ impl UserBudgetModifyRequest {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserBudgetOver {
+    pub budget_id: u32,
+    pub user_id: u32,
+    pub user_name: String,
+    pub over: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserBudgetCombined {
+    pub budget_id: u32,
+    pub user_id: u32,
+    pub user_name: String,
+    pub project_budget_id: u32,
+    pub project_id: u32,
+    pub project_name: String,
+    pub over: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserBudgetDetail {
+    pub budget_id: u32,
+    pub user_id: u32,
+    pub user_name: String,
+    pub over: bool,
+    pub cost: f64,
+    pub budget: u32,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+pub struct UserBudgetCombinedDetail {
+    pub budget_id: u32,
+    pub user_id: u32,
+    pub user_name: String,
+    pub project_budget_id: u32,
+    pub project_id: u32,
+    pub project_name: String,
+    pub over: bool,
+    pub project_cost: f64,
+    pub project_budget: u32,
+    pub user_cost: f64,
+    pub user_budget: u32,
+}
+
+#[derive(Debug)]
+pub struct UserBudgetOverRequest {
+    url: String,
+    client: Rc<Client>,
+
+    end: Option<DateTime<FixedOffset>>,
+    budget: Option<u32>,
+    user: Option<u32>,
+    project: Option<u32>,
+    all: bool,
+    combined: bool,
+    detail: bool,
+}
+
+impl UserBudgetOverRequest {
+    pub fn new(url: &str, client: &Rc<Client>) -> Self {
+        Self {
+            url: url.to_string(),
+            client: Rc::clone(client),
+
+            end: None,
+            budget: None,
+            user: None,
+            project: None,
+            all: false,
+            combined: false,
+            detail: false,
+        }
+    }
+
+    fn params(&self) -> Vec<(&str, String)> {
+        let mut params = Vec::new();
+        if let Some(end) = self.end {
+            params.push(("end", end.to_rfc3339()));
+        }
+        if let Some(budget) = self.budget {
+            params.push(("budget", budget.to_string()));
+        } else if let Some(user) = self.user {
+            params.push(("user", user.to_string()));
+        } else if let Some(project) = self.project {
+            params.push(("project", project.to_string()));
+        } else if self.all {
+            params.push(("all", "1".to_string()));
+        }
+        if self.combined {
+            params.push(("combined", "1".to_string()));
+        }
+        if self.detail {
+            params.push(("detail", "1".to_string()));
+        }
+        params
+    }
+
+    pub fn send(&self) -> Result<Vec<UserBudgetOver>, ApiError> {
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
+        self.end = Some(end);
+        self
+    }
+
+    pub fn budget(&mut self, budget: u32) -> &mut Self {
+        self.budget = Some(budget);
+        self
+    }
+
+    pub fn user(&mut self, user: u32) -> &mut Self {
+        self.user = Some(user);
+        self
+    }
+
+    pub fn project(&mut self, project: u32) -> &mut Self {
+        self.project = Some(project);
+        self
+    }
+
+    pub fn all(&mut self) -> &mut Self {
+        self.all = true;
+        self
+    }
+
+    pub fn normal(&mut self) -> Result<Vec<UserBudgetOver>, ApiError> {
+        self.combined = false;
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn combined(&mut self) -> Result<Vec<UserBudgetCombined>, ApiError> {
+        self.combined = true;
+        self.detail = false;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn detail(&mut self) -> Result<Vec<UserBudgetDetail>, ApiError> {
+        self.combined = false;
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
+    pub fn combined_detail(
+        &mut self,
+    ) -> Result<Vec<UserBudgetCombinedDetail>, ApiError> {
+        self.combined = true;
+        self.detail = true;
+        let url = Url::parse_with_params(self.url.as_str(), self.params())
+            .context("Could not parse URL GET parameters.")?;
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+}
+
 impl UserBudgetApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserBudgetApi {
         UserBudgetApi {
@@ -261,5 +455,10 @@ impl UserBudgetApi {
             StatusCode::NO_CONTENT,
         )?;
         Ok(())
+    }
+
+    pub fn over(&self) -> UserBudgetOverRequest {
+        let url = format!("{}/over/", self.url);
+        UserBudgetOverRequest::new(url.as_ref(), &self.client)
     }
 }
