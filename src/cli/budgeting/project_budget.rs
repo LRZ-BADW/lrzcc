@@ -2,6 +2,7 @@ use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
+use chrono::{DateTime, FixedOffset};
 use clap::{Args, Subcommand};
 use std::error::Error;
 
@@ -35,6 +36,28 @@ pub(crate) struct ProjectBudgetListFilter {
     #[clap(short, long, help = "Display project budgets of the given year")]
     // TODO validate that this is a valid year
     year: Option<u32>,
+}
+
+#[derive(Args, Debug)]
+#[group(multiple = false)]
+pub(crate) struct ProjectBudgetOverFilter {
+    #[clap(short, long, help = "Filter project budget with given ID")]
+    budget: Option<u32>,
+
+    #[clap(
+        short,
+        long,
+        help = "Filter for project budget of project with given name, ID, or OpenStack ID"
+    )]
+    project: Option<String>,
+
+    #[clap(
+        short,
+        long,
+        help = "Get information for all project budgets",
+        action
+    )]
+    all: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -80,6 +103,27 @@ pub(crate) enum ProjectBudgetCommand {
 
     #[clap(about = "Delete project budget with given ID")]
     Delete { id: u32 },
+
+    #[clap(about = "List over status of project budgets")]
+    Over {
+        #[clap(flatten)]
+        filter: ProjectBudgetOverFilter,
+
+        #[clap(
+            short,
+            long,
+            help = "Calculate over status up to this time [default: current time]"
+        )]
+        end: Option<DateTime<FixedOffset>>,
+
+        #[clap(
+            short,
+            long,
+            help = "Show detailed information about over status",
+            action
+        )]
+        detail: bool,
+    },
 }
 pub(crate) use ProjectBudgetCommand::*;
 
@@ -101,6 +145,11 @@ impl Execute for ProjectBudgetCommand {
                 modify(api, format, *id, *amount, *force)
             }
             Delete { id } => delete(api, id),
+            Over {
+                filter,
+                end,
+                detail,
+            } => over(api, format, filter, *end, *detail),
         }
     }
 }
@@ -173,4 +222,30 @@ fn modify(
 fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.project_budget.delete(*id)?)
+}
+
+fn over(
+    api: lrzcc::Api,
+    format: Format,
+    filter: &ProjectBudgetOverFilter,
+    end: Option<DateTime<FixedOffset>>,
+    detail: bool,
+) -> Result<(), Box<dyn Error>> {
+    let mut request = api.project_budget.over();
+    if let Some(budget) = filter.budget {
+        request.budget(budget);
+    } else if let Some(project) = &filter.project {
+        let project_id = project_find_id(&api, project)?;
+        request.project(project_id);
+    } else if filter.all {
+        request.all();
+    }
+    if let Some(end) = end {
+        request.end(end);
+    }
+    if detail {
+        print_object_list(request.detail()?, format)
+    } else {
+        print_object_list(request.normal()?, format)
+    }
 }
