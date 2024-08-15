@@ -225,14 +225,14 @@ enum Command {
         #[clap(
             long,
             short,
-            help = "Begin of the period to calculate the cost for (default: beginning of the running year)"
+            help = "Begin of the period to calculate the cost for [default: beginning of the running year]"
         )]
         begin: Option<DateTime<FixedOffset>>,
 
         #[clap(
             long,
             short,
-            help = "End of the period to calculate the cost for (default: now)"
+            help = "End of the period to calculate the cost for [default: now]"
         )]
         end: Option<DateTime<FixedOffset>>,
 
@@ -249,14 +249,14 @@ enum Command {
         #[clap(
             long,
             short,
-            help = "Begin of the period to calculate the consumption for (default: beginning of the running year)"
+            help = "Begin of the period to calculate the consumption for [default: beginning of the running year]"
         )]
         begin: Option<DateTime<FixedOffset>>,
 
         #[clap(
             long,
             short,
-            help = "End of the period to calculate the consumption for (default: now)"
+            help = "End of the period to calculate the consumption for [default: now]"
         )]
         end: Option<DateTime<FixedOffset>>,
 
@@ -290,7 +290,7 @@ enum Command {
         #[clap(
             short,
             long,
-            help = "End up to which to calculate the budget over tree (default: current time)"
+            help = "End up to which to calculate the budget over tree [default: current time]"
         )]
         end: Option<DateTime<FixedOffset>>,
     },
@@ -302,7 +302,7 @@ enum Command {
             short,
             long,
             default_value_t = current_year(),
-            help = "Year for which to bulk create budgets (default: current year)"
+            help = "Year for which to bulk create budgets [default: current year]"
         )]
         year: i32,
     },
