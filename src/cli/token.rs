@@ -52,6 +52,7 @@ impl Token {
                 }
             }
         };
+        // TODO better error handling
         let response = client
             .post(url.as_str())
             .body(data.to_string())
