@@ -32,7 +32,14 @@ where
             format!("Could not serialize json request body from {:?}", data),
         )?);
     }
-    let response = request.send().context("Could not send request.")?;
+    let response = match request.send().context("") {
+        Ok(response) => response,
+        Err(err) => {
+            let detail =
+                format!("Could not complete request: {}", err.root_cause());
+            return Err(ApiError::ResponseError(detail));
+        }
+    };
     let status = response.status();
     if status != expected_status {
         let text = response.text().context(format!(
