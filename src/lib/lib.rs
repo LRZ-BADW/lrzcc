@@ -54,6 +54,8 @@ use user::ProjectApi;
 #[cfg(feature = "user")]
 use user::UserApi;
 
+pub const DEFAULT_TIMEOUT: u64 = 300;
+
 pub struct Api {
     // url: Rc<str>,
     // token: String,
@@ -112,13 +114,14 @@ impl Api {
                     .context("Failed to create impersonate header value")?,
             );
         }
-        let mut client_builder = ClientBuilder::new().default_headers(headers);
-        if let Some(timeout) = timeout {
-            client_builder =
-                client_builder.timeout(Duration::from_secs(timeout));
-        }
+        let timeout = match timeout {
+            Some(timeout) => timeout,
+            None => DEFAULT_TIMEOUT,
+        };
         let client = Rc::new(
-            client_builder
+            ClientBuilder::new()
+                .default_headers(headers)
+                .timeout(Duration::from_secs(timeout))
                 .build()
                 .context("Failed to build http client")?,
         );
