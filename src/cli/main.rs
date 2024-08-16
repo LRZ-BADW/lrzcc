@@ -112,12 +112,7 @@ struct CredentialArgs {
 }
 
 #[derive(Parser, Debug)]
-#[command(name = "lrzcc")]
-#[command(author = "Sandro-Alessio Gierens <sandro@gierens.de>")]
-#[command(version = "1.0.0")]
-#[command(
-    about = "CLI client for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
-)]
+#[command(author, version, about)]
 struct Cli {
     #[clap(
         short,
