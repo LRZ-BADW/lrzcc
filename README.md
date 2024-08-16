@@ -107,3 +107,25 @@ lrzcc project-budget modify <project_budget_id> -a <amount>
 ```
 Note: you cannot set a budget below the already acrued costs or modify the
 budget of a past year.
+
+## Library
+To use the library add the following to your `Cargo.toml` under `[dependencies]`:
+```toml
+lrzcc = 1
+```
+After that you create a `Token` and `Api` object to interact with the API:
+```rust
+use lrzcc::{Token, Api};
+
+// let token = Token::from_str("abcdefg...").unwrap();
+let token = Token::new(
+                auth_url.as_str(),
+                username.as_str(),
+                password.as_str(),
+                project_name.as_str(),
+                user_domain_name.as_str(),
+                project_domain_id.as_str(),
+            ).unwrap();
+let api = Api::new("https://cc.lrz.de:8000/api", token, None, None).unwrap();
+println!("{:?}", api.user.me());
+```
