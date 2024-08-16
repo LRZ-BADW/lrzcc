@@ -108,7 +108,7 @@ impl Api {
             .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert(
             "X-Auth-Token",
-            HeaderValue::from_str(&token.as_ref())
+            HeaderValue::from_str(token.as_ref())
                 .context("Failed to create token header value")?,
         );
         if let Some(impersonate) = impersonate {
