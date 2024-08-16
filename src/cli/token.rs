@@ -10,6 +10,7 @@ struct TokenInner {
     client: Client,
 }
 
+// TODO move this to lib and use generic request method
 pub(crate) struct Token {
     token: String,
     inner: Option<TokenInner>,
