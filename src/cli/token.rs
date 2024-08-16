@@ -53,19 +53,25 @@ impl Token {
                 }
             }
         };
-        // TODO better error handling
         let response = client
             .post(url.as_str())
             .body(data.to_string())
             .send()
             .unwrap();
-        let token = response
-            .headers()
-            .get("X-Subject-Token")
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
+        if !response.status().is_success() {
+            return Err(anyhow::anyhow!(
+                "Failed to authenticate, returned code {}",
+                response.status().as_u16()
+            ));
+        }
+        let token = match response.headers().get("X-Subject-Token") {
+            Some(token) => token.to_str().unwrap().to_string(),
+            None => {
+                return Err(anyhow::anyhow!(
+                    "No token in authentication response header"
+                ))
+            }
+        };
         Ok(Self {
             token,
             inner: Some(TokenInner { client, url }),
