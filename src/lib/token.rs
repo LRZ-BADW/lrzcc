@@ -1,3 +1,4 @@
+use anyhow::Context;
 use jzon::object;
 use reqwest::blocking::{Client, ClientBuilder};
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
@@ -10,14 +11,14 @@ struct TokenInner {
     client: Client,
 }
 
-// TODO move this to lib and use generic request method
-pub(crate) struct Token {
+pub struct Token {
     token: String,
     inner: Option<TokenInner>,
 }
 
 impl Token {
-    pub(crate) fn new(
+    // TODO maybe use generic request method in here
+    pub fn new(
         auth_url: &str,
         username: &str,
         password: &str,
@@ -53,11 +54,20 @@ impl Token {
                 }
             }
         };
-        let response = client
+        let response = match client
             .post(url.as_str())
             .body(data.to_string())
             .send()
-            .unwrap();
+            .context("")
+        {
+            Ok(response) => response,
+            Err(error) => {
+                return Err(anyhow::anyhow!(
+                    "Could not complete authentication request: {}",
+                    error.root_cause()
+                ));
+            }
+        };
         if !response.status().is_success() {
             return Err(anyhow::anyhow!(
                 "Failed to authenticate, returned code {}",
@@ -71,7 +81,9 @@ impl Token {
                     "No token in authentication response header"
                 ))
             }
-        };
+        }
+        .trim()
+        .to_string();
         Ok(Self {
             token,
             inner: Some(TokenInner { client, url }),
@@ -80,11 +92,12 @@ impl Token {
 }
 
 impl FromStr for Token {
-    type Err = String;
+    type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self {
-            token: s.to_string(),
+            // TODO validate that string has correct format
+            token: s.trim().to_string(),
             inner: None,
         })
     }

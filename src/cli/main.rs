@@ -2,12 +2,11 @@ use chrono::{DateTime, FixedOffset};
 use clap::{Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
-use lrzcc::Api;
+use lrzcc::{Api, Token};
 use std::process::ExitCode;
 use std::str::FromStr;
 
 mod common;
-mod token;
 
 #[cfg(feature = "accounting")]
 mod accounting;
@@ -25,7 +24,6 @@ mod resources;
 mod user;
 
 use common::{Execute, Format, TableFormat};
-use token::Token;
 
 #[derive(Args, Debug)]
 #[group(required = true, multiple = true)]
@@ -310,8 +308,9 @@ enum Command {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    let token = match cli.credentials.token {
-        Some(token) => Token::from_str(token.as_str()).unwrap(),
+    let token = match match cli.credentials.token {
+        // TODO handle error when Token cannot be created due to wrong format
+        Some(token) => Token::from_str(token.as_str()),
         None => {
             let auth_url = cli.credentials.auth_url.unwrap();
             let username = cli.credentials.username.unwrap();
@@ -319,28 +318,23 @@ fn main() -> ExitCode {
             let project_name = cli.credentials.project_name.unwrap();
             let user_domain_name = cli.credentials.user_domain_name.unwrap();
             let project_domain_id = cli.credentials.project_domain_id.unwrap();
-            match Token::new(
+            Token::new(
                 auth_url.as_str(),
                 username.as_str(),
                 password.as_str(),
                 project_name.as_str(),
                 user_domain_name.as_str(),
                 project_domain_id.as_str(),
-            ) {
-                Ok(token) => token,
-                Err(error) => {
-                    eprintln!("{}: {}", "error".bold().red(), error);
-                    std::process::exit(1);
-                }
-            }
+            )
+        }
+    } {
+        Ok(token) => token,
+        Err(error) => {
+            eprintln!("{}: {}", "error".bold().red(), error);
+            std::process::exit(1);
         }
     };
-    let api = match Api::new(
-        cli.url,
-        token.as_ref().to_string(),
-        cli.impersonate,
-        cli.timeout,
-    ) {
+    let api = match Api::new(cli.url, token, cli.impersonate, cli.timeout) {
         Ok(api) => api,
         Err(error) => {
             eprintln!("{}: {}", "error".bold().red(), error);

@@ -5,6 +5,10 @@ use std::{rc::Rc, time::Duration};
 
 mod common;
 pub mod error;
+use error::ApiError;
+
+mod token;
+pub use token::Token;
 
 #[cfg(feature = "accounting")]
 mod accounting;
@@ -20,8 +24,6 @@ mod quota;
 mod resources;
 #[cfg(feature = "user")]
 mod user;
-
-use error::ApiError;
 
 #[cfg(feature = "accounting")]
 use accounting::ServerConsumptionApi;
@@ -58,7 +60,8 @@ pub const DEFAULT_TIMEOUT: u64 = 300;
 
 pub struct Api {
     // url: Rc<str>,
-    // token: String,
+    #[allow(unused)]
+    token: Token,
     // client: Rc<Client>,
     #[cfg(feature = "hello")]
     pub hello: HelloApi,
@@ -94,8 +97,9 @@ pub struct Api {
 
 impl Api {
     pub fn new(
+        // TODO this should be a url::Url
         url: String,
-        token: String,
+        token: Token,
         impersonate: Option<u32>,
         timeout: Option<u64>,
     ) -> Result<Api, ApiError> {
@@ -104,7 +108,7 @@ impl Api {
             .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers.insert(
             "X-Auth-Token",
-            HeaderValue::from_str(token.trim())
+            HeaderValue::from_str(&token.as_ref())
                 .context("Failed to create token header value")?,
         );
         if let Some(impersonate) = impersonate {
@@ -126,6 +130,7 @@ impl Api {
                 .context("Failed to build http client")?,
         );
         Ok(Api {
+            token,
             #[cfg(feature = "hello")]
             hello: HelloApi::new(&url, &client),
             #[cfg(feature = "user")]
