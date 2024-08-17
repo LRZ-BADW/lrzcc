@@ -126,6 +126,6 @@ let token = Token::new(
                 user_domain_name.as_str(),
                 project_domain_id.as_str(),
             ).unwrap();
-let api = Api::new("https://cc.lrz.de:8000/api", token, None, None).unwrap();
+let api = Api::new("https://cc.lrz.de:1337/api", token, None, None).unwrap();
 println!("{:?}", api.user.me());
 ```
