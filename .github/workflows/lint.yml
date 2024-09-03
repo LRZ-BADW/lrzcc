@@ -41,7 +41,7 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - name: linting
-        run: cargo clippy --features cli -- -D warnings
+        run: cargo clippy -- -D warnings
 
   spellcheck:
     name: spellcheck
