@@ -1,0 +1,67 @@
+name: test
+
+on:
+  push:
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - '**/src/**/*'
+      - '**/tests/**/*'
+      - 'Cargo.toml'
+      - '**/Cargo.toml'
+      - 'Cargo.lock'
+      - '**/Cargo.lock'
+      - '.rustfmt.toml'
+      - 'docker-compose.yml'
+      - '.github/workflows/lint.yml'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Enforce formatting
+        run: cargo fmt --check
+
+  clippy:
+    name: clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: linting
+        run: cargo clippy --features cli -- -D warnings
+
+  spellcheck:
+    name: spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Install the Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install libclang-dev and hunspell
+        run: sudo apt update && sudo apt install libclang-dev hunspell -y
+      - name: Install cargo-spellcheck
+        run: cargo install cargo-spellcheck
+      - name: Check spelling
+        run: cargo spellcheck --cfg=spellcheck.toml rft.md
+
+  machete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Machete
+        uses: bnjbvr/cargo-machete@main
