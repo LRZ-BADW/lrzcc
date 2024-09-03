@@ -658,18 +658,7 @@ dependencies = [
 name = "lrzcc-api"
 version = "1.0.0"
 dependencies = [
- "anyhow",
  "cargo-husky",
- "chrono",
- "clap",
- "colored",
- "jzon",
- "lrzcc",
- "reqwest",
- "serde",
- "serde_json",
- "tabled",
- "thiserror",
 ]
 
 [[package]]
