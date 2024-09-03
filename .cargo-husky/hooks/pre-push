@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+echo '+cargo check --all'
+cargo check --all
+
+echo '+cargo fmt --all -- --check'
+cargo fmt --all -- --check
+
+echo '+cargo spellcheck --cfg=.spellcheck.toml'
+cargo spellcheck --cfg=.spellcheck.toml
+
+echo '+cargo clippy --all -- -D warnings'
+cargo clippy --all -- -D warnings
+
+echo '+cargo machete'
+cargo machete
+
+echo '+cargo deny check all'
+cargo deny check all
+
+echo '+cargo test --all'
+cargo test --all
+
+# echo '+cargo tarpaulin'
+# cargo tarpaulin
