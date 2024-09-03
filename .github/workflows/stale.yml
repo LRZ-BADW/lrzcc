@@ -14,13 +14,13 @@ jobs:
     - uses: actions/stale@v9
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        
+
         days-before-pr-stale: 30
         days-before-pr-close: 14
         stale-pr-message: 'This pull request is stale because it has been open for 30 days with no activity.'
         close-pr-message: 'This pull request was closed because it has been inactive for 14 days since being marked as stale.'
         stale-pr-label: 'stale › pr'
-        
+
         days-before-issue-stale: 30
         days-before-issue-close: 14
         stale-issue-message: 'This issue is stale because it has been open for 30 days with no activity.'
