@@ -1,26 +1,18 @@
-name: testing
+name: test
 
 on:
   push:
-    branches:
-      - 'main'
-    paths:
-      - 'src/**/*'
-      - 'tests/**/*'
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
-      - 'docker-compose.yml'
-      - '.github/workflows/testing.yml'
   pull_request:
     branches:
       - 'main'
     paths:
-      - 'src/**/*'
-      - 'tests/**/*'
+      - '**/src/**/*'
+      - '**/tests/**/*'
+      - 'Cargo.toml'
       - '**/Cargo.toml'
+      - 'Cargo.lock'
       - '**/Cargo.lock'
-      - 'docker-compose.yml'
-      - '.github/workflows/testing.yml'
+      - '.github/workflows/test.yml'
 
 env:
   CARGO_TERM_COLOR: always
@@ -56,4 +48,4 @@ jobs:
   #       uses: actions-rs/tarpaulin@v0.1
   #       with:
   #         version: '0.15.0'
-  #         args: '--workspace --fail-under 5 --exclude-files src/cli/* --exclude-files tests/*'
+  #         args: '--workspace --fail-under 5 --exclude-files **/src/cli/* --exclude-files **/tests/*'
