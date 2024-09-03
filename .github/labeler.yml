@@ -1,18 +1,24 @@
+api:
+- changed-files:
+  - any-glob-to-any-file: api/*
+
 lib:
 - changed-files:
-  - any-glob-to-any-file: src/lib/*
+  - any-glob-to-any-file: lib/*
 
 cli:
-- changed-files: 
-  - any-glob-to-any-file: src/cli/*
+- changed-files:
+  - any-glob-to-any-file: cli/*
 
 tests:
 - changed-files:
-  - any-glob-to-any-file: tests/*
+  - any-glob-to-any-file: **/tests/*
 
-dependency:
+deps:
 - changed-files:
-  - any-glob-to-any-file: Cargo.*
+  - any-glob-to-any-file:
+    - Cargo.*
+    - **/Cargo.*
 
 ci:
 - changed-files:
