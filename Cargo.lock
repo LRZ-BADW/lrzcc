@@ -670,13 +670,10 @@ dependencies = [
  "chrono",
  "clap",
  "colored",
- "jzon",
  "lrzcc",
- "reqwest",
  "serde",
  "serde_json",
  "tabled",
- "thiserror",
 ]
 
 [[package]]
