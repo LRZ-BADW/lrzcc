@@ -18,6 +18,7 @@ name = "lrzcc"
 path = "src/main.rs"
 
 [features]
+default = ["all"]
 vendored-tls = ["reqwest/native-tls-vendored"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
 accounting = []
