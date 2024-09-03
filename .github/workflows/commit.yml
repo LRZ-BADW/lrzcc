@@ -1,0 +1,18 @@
+name: commit
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  conventional:
+    name: conventional
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: webiny/action-conventional-commits@v1.3.0
+        # optional, required for private repos
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
