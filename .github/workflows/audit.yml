@@ -1,17 +1,49 @@
 name: audit
+
 on:
   schedule:
     - cron: '0 0 * * *'
   push:
+  pull_request:
     paths:
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
       - '.github/workflows/audit.yml'
+      - 'deny.toml'
+      - 'Cargo.toml'
+      - '**/Cargo.toml'
+      - 'Cargo.lock'
+      - '**/Cargo.lock'
+    branches: [ main ]
+
 jobs:
-  advisory:
+
+  advisories:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-deny
+      - name: check advisories
+        run: cargo deny check advisories
+
+  bans:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@cargo-deny
       - name: Scan for vulnerabilities
-        run: cargo deny check advisories
+        run: cargo deny check bans
+
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-deny
+      - name: check licenses
+        run: cargo deny check licenses
+
+  sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@cargo-deny
+      - name: check sources
+        run: cargo deny check sources
