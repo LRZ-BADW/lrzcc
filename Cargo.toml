@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    # "api",
+    "api",
     "lib",
     "cli"
 ]
