@@ -19,6 +19,7 @@ crate-type = ["cdylib", "rlib"]
 path = "src/lib.rs"
 
 [features]
+default = ["all"]
 vendored-tls = ["reqwest/native-tls-vendored"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
 accounting = []
