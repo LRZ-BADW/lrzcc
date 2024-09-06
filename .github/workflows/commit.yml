@@ -1,13 +1,12 @@
-name: commits
+name: commit
 
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
+  conventional:
     name: conventional
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,39 @@
+[package]
+name = "lrzcc-api"
+description = "Rust API server for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
+authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
+categories = ["web-programming"]
+edition = "2021"
+homepage = "https://github.com/LRZ-BADW/lrzcc"
+repository = "https://github.com/LRZ-BADW/lrzcc"
+exclude = []
+readme = "README.md"
+license = "MIT"
+version = "1.0.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "lrzcc_api"
+path = "src/lib.rs"
+
+[[bin]]
+name = "lrzcc-api"
+path = "src/main.rs"
+
+[features]
+default = ["all"]
+all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
+accounting = []
+budgeting = []
+hello = []
+pricing = []
+quota = []
+resources = []
+user = []
+
+[dependencies]
+
+[dev-dependencies]
+cargo-husky = { workspace = true }
