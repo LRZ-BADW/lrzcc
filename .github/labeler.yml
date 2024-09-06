@@ -23,3 +23,7 @@ deps:
 ci:
 - changed-files:
   - any-glob-to-any-file: .github/**/*
+
+rust:
+- changed-files:
+  - any-glob-to-any-file: **/*.rs
