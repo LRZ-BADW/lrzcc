@@ -6,6 +6,7 @@ use sqlx::postgres::{PgConnectOptions, PgSslMode};
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
+    pub openstack: OpenStackSettings,
 }
 
 #[derive(Clone, serde::Deserialize)]
@@ -25,6 +26,18 @@ pub struct DatabaseSettings {
     pub host: String,
     pub database_name: String,
     pub require_ssl: bool,
+}
+
+#[derive(Clone, serde::Deserialize)]
+pub struct OpenStackSettings {
+    pub username: String,
+    pub password: String,
+    pub project: String,
+    pub project_id: String,
+    pub domain: String,
+    pub domain_id: String,
+    pub keystone_endpoint: String,
+    pub nova_endpoint: String,
 }
 
 impl DatabaseSettings {
