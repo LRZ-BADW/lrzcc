@@ -10,20 +10,28 @@ cli:
 - changed-files:
   - any-glob-to-any-file: cli/*
 
-tests:
-- changed-files:
-  - any-glob-to-any-file: **/tests/*
-
 deps:
 - changed-files:
   - any-glob-to-any-file:
     - Cargo.*
     - **/Cargo.*
 
-ci:
-- changed-files:
-  - any-glob-to-any-file: .github/**/*
-
 rust:
 - changed-files:
   - any-glob-to-any-file: **/*.rs
+
+tests:
+- changed-files:
+  - any-glob-to-any-file: **/tests/**/*
+
+sql:
+- changed-files:
+  - any-glob-to-any-file: api/migrations/*
+
+scripts:
+- changed-files:
+  - any-glob-to-any-file: scripts/*
+
+ci:
+- changed-files:
+  - any-glob-to-any-file: .github/**/*
