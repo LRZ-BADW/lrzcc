@@ -36,6 +36,25 @@ impl Token {
     }
 }
 
+struct TokenHandler {
+    token: RwLock<Token>,
+}
+
+impl TokenHandler {
+    async fn new(settings: &OpenStackSettings) -> Result<Self, anyhow::Error> {
+        Ok(TokenHandler {
+            token: RwLock::new(Token::new(settings).await?),
+        })
+    }
+
+    async fn get(&self) -> String {
+        if self.token.read().await.is_expired() {
+            self.token.write().await.renew().await.unwrap();
+        }
+        self.token.read().await.get()
+    }
+}
+
 #[tracing::instrument(name = "Issue an OpenStack token", skip(settings))]
 pub async fn issue_token(
     settings: &OpenStackSettings,
