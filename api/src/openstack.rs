@@ -55,6 +55,82 @@ impl TokenHandler {
     }
 }
 
+pub struct OpenStack {
+    settings: OpenStackSettings,
+    token: TokenHandler,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct ProjectMinimal {
+    pub id: String,
+    pub name: String,
+}
+
+impl OpenStack {
+    pub async fn new(
+        settings: OpenStackSettings,
+    ) -> Result<Self, anyhow::Error> {
+        Ok(OpenStack {
+            token: TokenHandler::new(&settings).await?,
+            settings,
+        })
+    }
+
+    async fn client(&self) -> Result<reqwest::Client, anyhow::Error> {
+        let mut headers = HeaderMap::new();
+        headers
+            .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        headers.insert(
+            "X-Auth-Token",
+            HeaderValue::from_str(self.token.get().await.as_str())
+                .context("Could not create token header")?,
+        );
+        ClientBuilder::new()
+            .default_headers(headers)
+            .build()
+            .context("Could not create client")
+    }
+
+    pub async fn validate_user_token(
+        &self,
+        token: &str,
+    ) -> Result<ProjectMinimal, anyhow::Error> {
+        #[derive(Debug, serde::Deserialize)]
+        struct ValidateResponseToken {
+            project: ProjectMinimal,
+        }
+        #[derive(Debug, serde::Deserialize)]
+        struct ValidateResponse {
+            token: ValidateResponseToken,
+        }
+
+        let client = self.client().await?;
+        let url =
+            format!("{}/v3/auth/tokens/", self.settings.keystone_endpoint);
+        let response = client
+            .get(url.as_str())
+            .header("X-Subject-Token", token)
+            .send()
+            .await
+            .context("Could not validate user token")?;
+        if !response.status().is_success() {
+            return Err(anyhow::anyhow!(
+                "Failed to validate user token, returned code {}",
+                response.status().as_u16()
+            ));
+        }
+        let project: ValidateResponse = serde_json::from_str(
+            response
+                .text()
+                .await
+                .context("Could not read response text")?
+                .as_str(),
+        )
+        .context("Could not parse response")?;
+        Ok(project.token.project)
+    }
+}
+
 #[tracing::instrument(name = "Issue an OpenStack token", skip(settings))]
 pub async fn issue_token(
     settings: &OpenStackSettings,
