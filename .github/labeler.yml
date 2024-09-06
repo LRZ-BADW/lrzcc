@@ -1,25 +1,39 @@
 api:
 - changed-files:
-  - any-glob-to-any-file: api/*
+  - any-glob-to-any-file: "api/*"
 
 lib:
 - changed-files:
-  - any-glob-to-any-file: lib/*
+  - any-glob-to-any-file: "lib/*"
 
 cli:
 - changed-files:
-  - any-glob-to-any-file: cli/*
+  - any-glob-to-any-file: "cli/*"
 
-tests:
-- changed-files:
-  - any-glob-to-any-file: **/tests/*
-
-deps:
+dep:
 - changed-files:
   - any-glob-to-any-file:
-    - Cargo.*
-    - **/Cargo.*
+    - "Cargo.*"
+    - "**/Cargo.*"
+
+src:
+- changed-files:
+  - any-glob-to-any-file: "**/src/**/*"
+
+test:
+- changed-files:
+  - any-glob-to-any-file:
+    - "tests/**/*"
+    - "**/tests/**/*"
+
+db:
+- changed-files:
+  - any-glob-to-any-file: "api/migrations/*"
+
+sh:
+- changed-files:
+  - any-glob-to-any-file: "scripts/*"
 
 ci:
 - changed-files:
-  - any-glob-to-any-file: .github/**/*
+  - any-glob-to-any-file: ".github/**/*"
