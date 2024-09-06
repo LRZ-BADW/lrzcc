@@ -17,22 +17,41 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  SQLX_VERSION: 0.7.3
+  SQLX_FEATURES: "rustls,postgres"
 
 jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    # container:
-    #   image: xd009642/tarpaulin
-    #   options: --security-opt seccomp=unconfined
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
     steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: install rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-      - name: install rust cache
+      - name: Rust Cache Action
         uses: Swatinem/rust-cache@v2
-      - name: run tests
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --features ${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
+      - name: Install postgresql-client and mold
+        run: sudo apt update && sudo apt install postgresql-client mold -y
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
+      - name: Check sqlx offline data is up to date
+        run: cargo sqlx prepare --workspace --check
+      - name: Run tests
         run: cargo test
 
   # coverage:
