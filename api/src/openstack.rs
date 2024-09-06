@@ -6,6 +6,36 @@ use reqwest::ClientBuilder;
 use std::time::Instant;
 use tokio::sync::RwLock;
 
+struct Token {
+    settings: OpenStackSettings,
+    token: String,
+    renewed_at: Instant,
+}
+
+impl Token {
+    async fn new(settings: &OpenStackSettings) -> Result<Self, anyhow::Error> {
+        Ok(Self {
+            settings: settings.clone(),
+            token: issue_token(settings).await?,
+            renewed_at: Instant::now(),
+        })
+    }
+
+    async fn renew(&mut self) -> Result<(), anyhow::Error> {
+        self.token = issue_token(&self.settings).await?;
+        self.renewed_at = Instant::now();
+        Ok(())
+    }
+
+    fn is_expired(&self) -> bool {
+        self.renewed_at.elapsed().as_secs() > 3600
+    }
+
+    fn get(&self) -> String {
+        self.token.clone()
+    }
+}
+
 #[tracing::instrument(name = "Issue an OpenStack token", skip(settings))]
 pub async fn issue_token(
     settings: &OpenStackSettings,
