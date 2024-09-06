@@ -105,8 +105,7 @@ impl OpenStack {
         }
 
         let client = self.client().await?;
-        let url =
-            format!("{}/v3/auth/tokens/", self.settings.keystone_endpoint);
+        let url = format!("{}/auth/tokens/", self.settings.keystone_endpoint);
         let response = client
             .get(url.as_str())
             .header("X-Subject-Token", token)
@@ -141,7 +140,7 @@ pub async fn issue_token(
         .default_headers(headers)
         .build()
         .unwrap();
-    let url = format!("{}/v3/auth/tokens/", settings.keystone_endpoint);
+    let url = format!("{}/auth/tokens/", settings.keystone_endpoint);
     let data = object! {
         "auth": {
             "identity": {
