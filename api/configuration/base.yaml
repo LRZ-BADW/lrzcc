@@ -14,5 +14,5 @@ openstack:
   project_id: "PROJECT_ID"
   domain: "DOMAIN"
   domain_id: "DOMAIN_ID"
-  keystone_endpoint: "https://cc.lrz.de:5000"
+  keystone_endpoint: "https://cc.lrz.de:5000/v3"
   nova_endpoint: "https://cc.lrz.de:8774"
