@@ -2,8 +2,11 @@ use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use once_cell::sync::Lazy;
+use serde_json::json;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
+use wiremock::matchers::{header, method, path};
+use wiremock::{Mock, MockServer, ResponseTemplate};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
@@ -30,21 +33,60 @@ pub struct TestApp {
     pub _port: u16,
     pub _db_pool: sqlx::PgPool,
     pub _api_client: reqwest::Client,
+    pub keystone_server: MockServer,
+    pub keystone_token: String,
 }
 
-impl TestApp {}
+impl TestApp {
+    pub fn mock_keystone_auth(
+        &self,
+        token: &str,
+        project_id: &str,
+        project_name: &str,
+    ) -> Mock {
+        Mock::given(method("GET"))
+            .and(path("/auth/tokens/"))
+            .and(header("X-Subject-Token", token))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .append_header("X-Subject-Token", &self.keystone_token)
+                    .set_body_json(json!({
+                        "token": {
+                            "project": {
+                                "id": project_id,
+                                "name": project_name,
+                            }
+                        }
+                    })),
+            )
+    }
+}
 
 pub async fn spawn_app() -> TestApp {
     Lazy::force(&TRACING);
+
+    let keystone_server = MockServer::start().await;
+    let keystone_token = Uuid::new_v4().to_string();
 
     let configuration = {
         let mut c = get_configuration().expect("Failed to read configuration.");
         c.database.database_name = Uuid::new_v4().to_string();
         c.application.port = 0;
+        c.openstack.keystone_endpoint = keystone_server.uri();
         c
     };
 
     configure_database(&configuration.database).await;
+
+    Mock::given(method("POST"))
+        .and(path("/auth/tokens/"))
+        .respond_with(
+            ResponseTemplate::new(201)
+                .append_header("X-Subject-Token", &keystone_token),
+        )
+        .mount(&keystone_server)
+        .await;
+    // TODO check data sent to keystone
 
     let application = Application::build(configuration.clone())
         .await
@@ -62,6 +104,8 @@ pub async fn spawn_app() -> TestApp {
         _port: application_port,
         _db_pool: get_connection_pool(&configuration.database),
         _api_client: client,
+        keystone_server,
+        keystone_token,
     };
     test_app
 }

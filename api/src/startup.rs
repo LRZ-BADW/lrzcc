@@ -1,6 +1,7 @@
-use crate::authentication::reject_anonymous_users;
+use crate::authentication::require_valid_token;
 use crate::configuration::{DatabaseSettings, Settings};
-use crate::routes::health_check;
+use crate::openstack::OpenStack;
+use crate::routes::{health_check, hello};
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
@@ -23,11 +24,13 @@ impl Application {
         );
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
+        let openstack = OpenStack::new(configuration.openstack).await?;
 
         let server = run(
             listener,
             connection_pool,
             configuration.application.base_url,
+            openstack,
         )
         .await?;
 
@@ -49,21 +52,25 @@ async fn run(
     listener: TcpListener,
     db_pool: PgPool,
     base_url: String,
+    openstack: OpenStack,
 ) -> Result<Server, anyhow::Error> {
     let db_pool = Data::new(db_pool);
     let base_url = Data::new(ApplicationBaseUrl(base_url));
+    let openstack = Data::new(openstack);
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
-            .route("/health_check", web::get().to(health_check))
-            .service(
-                web::scope("").wrap(from_fn(reject_anonymous_users)).route(
-                    "/secured_health_check",
-                    web::get().to(health_check),
-                ),
-            )
             .app_data(db_pool.clone())
             .app_data(base_url.clone())
+            .app_data(openstack.clone())
+            .route("/health_check", web::get().to(health_check))
+            .service(
+                web::scope("")
+                    .wrap(from_fn(require_valid_token))
+                    .route("/secured_health_check", web::get().to(health_check))
+                    .route("/hello", web::get().to(hello)),
+            )
+        // )
     })
     .listen(listener)?
     .run();

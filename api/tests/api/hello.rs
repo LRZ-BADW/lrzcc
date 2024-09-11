@@ -3,25 +3,7 @@ use uuid::Uuid;
 use crate::helpers::spawn_app;
 
 #[tokio::test]
-async fn health_check_works() {
-    // arrange
-    let app = spawn_app().await;
-    let client = reqwest::Client::new();
-
-    // act
-    let response = client
-        .get(&format!("{}/health_check", &app.address))
-        .send()
-        .await
-        .expect("Failed to execute request.");
-
-    // assert
-    assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
-}
-
-#[tokio::test]
-async fn secured_health_check_returns_unauthorized_for_missing_token() {
+async fn hello_returns_unauthorized_for_missing_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -32,7 +14,7 @@ async fn secured_health_check_returns_unauthorized_for_missing_token() {
 
     // act
     let response = client
-        .get(&format!("{}/secured_health_check", &app.address))
+        .get(&format!("{}/hello", &app.address))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -42,7 +24,7 @@ async fn secured_health_check_returns_unauthorized_for_missing_token() {
 }
 
 #[tokio::test]
-async fn secured_health_check_returns_unauthorized_for_wrong_token() {
+async fn hello_returns_unauthorized_for_wrong_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -54,7 +36,7 @@ async fn secured_health_check_returns_unauthorized_for_wrong_token() {
     // act
     let wrong_token = Uuid::new_v4().to_string();
     let response = client
-        .get(&format!("{}/secured_health_check", &app.address))
+        .get(&format!("{}/hello", &app.address))
         .header("X-Auth-Token", wrong_token)
         .send()
         .await
@@ -65,7 +47,7 @@ async fn secured_health_check_returns_unauthorized_for_wrong_token() {
 }
 
 #[tokio::test]
-async fn secured_health_check_works_with_valid_token() {
+async fn hello_works_with_valid_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -76,7 +58,7 @@ async fn secured_health_check_works_with_valid_token() {
 
     // act
     let response = client
-        .get(&format!("{}/secured_health_check", &app.address))
+        .get(&format!("{}/hello", &app.address))
         .header("X-Auth-Token", token)
         .send()
         .await
