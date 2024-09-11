@@ -2,9 +2,10 @@ use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use once_cell::sync::Lazy;
+use serde_json::json;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
-use wiremock::matchers::{method, path};
+use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
@@ -36,7 +37,30 @@ pub struct TestApp {
     pub keystone_token: String,
 }
 
-impl TestApp {}
+impl TestApp {
+    pub fn mock_keystone_auth(
+        &self,
+        token: &str,
+        project_id: &str,
+        project_name: &str,
+    ) -> Mock {
+        Mock::given(method("GET"))
+            .and(path("/auth/tokens/"))
+            .and(header("X-Subject-Token", token))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .append_header("X-Subject-Token", &self.keystone_token)
+                    .set_body_json(json!({
+                        "token": {
+                            "project": {
+                                "id": project_id,
+                                "name": project_name,
+                            }
+                        }
+                    })),
+            )
+    }
+}
 
 pub async fn spawn_app() -> TestApp {
     Lazy::force(&TRACING);
