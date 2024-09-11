@@ -6,4 +6,13 @@ pub async fn hello() -> Result<HttpResponse, actix_web::Error> {
     Ok(HttpResponse::Ok().finish())
 }
 
-// TODO tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn hello_works() {
+        let response = hello().await.unwrap();
+        assert!(response.status().is_success())
+    }
+}
