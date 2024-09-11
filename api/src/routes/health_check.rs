@@ -6,7 +6,7 @@ pub async fn health_check() -> HttpResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::health_check;
+    use super::*;
 
     #[tokio::test]
     async fn health_check_succeeds() {
