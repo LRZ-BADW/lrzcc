@@ -1,9 +1,4 @@
-use serde_json::json;
 use uuid::Uuid;
-use wiremock::{
-    matchers::{header, method, path},
-    Mock, ResponseTemplate,
-};
 
 use crate::helpers::spawn_app;
 
@@ -30,24 +25,8 @@ async fn secured_health_check_returns_unauthorized_for_missing_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
-
     let token = Uuid::new_v4().to_string();
-    Mock::given(method("GET"))
-        .and(path("/auth/tokens/"))
-        .and(header("X-Subject-Token", &token))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .append_header("X-Subject-Token", &app.keystone_token)
-                // TODO use id and name from app variable
-                .set_body_json(json!({
-                    "token": {
-                        "project": {
-                            "id": "project_id",
-                            "name": "project_name",
-                        }
-                    }
-                })),
-        )
+    app.mock_keystone_auth(&token, "project_id", "project_name")
         .mount(&app.keystone_server)
         .await;
 
@@ -67,24 +46,8 @@ async fn secured_health_check_returns_unauthorized_for_wrong_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
-
     let token = Uuid::new_v4().to_string();
-    Mock::given(method("GET"))
-        .and(path("/auth/tokens/"))
-        .and(header("X-Subject-Token", &token))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .append_header("X-Subject-Token", &app.keystone_token)
-                // TODO use id and name from app variable
-                .set_body_json(json!({
-                    "token": {
-                        "project": {
-                            "id": "project_id",
-                            "name": "project_name",
-                        }
-                    }
-                })),
-        )
+    app.mock_keystone_auth(&token, "project_id", "project_name")
         .mount(&app.keystone_server)
         .await;
 
@@ -106,24 +69,8 @@ async fn secured_health_check_works_with_valid_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
-
     let token = Uuid::new_v4().to_string();
-    Mock::given(method("GET"))
-        .and(path("/auth/tokens/"))
-        .and(header("X-Subject-Token", &token))
-        .respond_with(
-            ResponseTemplate::new(200)
-                .append_header("X-Subject-Token", &app.keystone_token)
-                // TODO use id and name from app variable
-                .set_body_json(json!({
-                    "token": {
-                        "project": {
-                            "id": "project_id",
-                            "name": "project_name",
-                        }
-                    }
-                })),
-        )
+    app.mock_keystone_auth(&token, "project_id", "project_name")
         .mount(&app.keystone_server)
         .await;
 
