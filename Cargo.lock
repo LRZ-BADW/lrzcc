@@ -1582,7 +1582,6 @@ dependencies = [
  "cargo-husky",
  "serde",
  "tabled",
- "uuid",
 ]
 
 [[package]]
