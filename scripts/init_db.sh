@@ -2,8 +2,8 @@
 set -x
 set -eo pipefail
 
-if ! [ -x "$(command -v psql)" ]; then
-    echo >&2 "Error: psql is not installed."
+if ! [ -x "$(command -v mariadb)" ]; then
+    echo >&2 "Error: mariadb-client is not installed."
     exit 1
 fi
 
@@ -15,32 +15,30 @@ if ! [ -x "$(command -v sqlx)" ]; then
     exit 1
 fi
 
-DB_USER=${POSTGRES_USER:=postgres}
-DB_PASSWORD="${POSTGRES_PASSWORD:=password}"
-DB_NAME="${POSTGRES_DB:=lrzcc}"
-DB_PORT="${POSTGRES_PORT:=5432}"
+DB_HOST="${MARIADB_HOST:=127.0.0.1}"
+DB_USER=${MARIADB_USER:=root}
+DB_PASSWORD="${MARIADB_PASSWORD:=password}"
+DB_NAME="${MARIADB_DB:=lrzcc}"
+DB_PORT="${MARIADB_PORT:=3306}"
 
 if [[ -z "${SKIP_DOCKER}" ]]
 then
     docker run \
-        -e POSTGRES_USER="${DB_USER}" \
-        -e POSTGRES_PASSWORD="${DB_PASSWORD}" \
-        -e POSTGRES_DB="${DB_NAME}" \
-        -p "${DB_PORT}":5432 \
-        -d postgres \
-        postgres -N 1000
+        -e MARIADB_ROOT_PASSWORD="${DB_PASSWORD}" \
+        -e MARIADB_DB="${DB_NAME}" \
+        -p "${DB_PORT}":3306 \
+        -d mariadb:latest
 fi
 
-export PGPASSWORD="${DB_PASSWORD}"
-until psql -h "localhost" -U "${DB_USER}" -p "${DB_PORT}" -c '\q'; do
-    >&2 echo "Postgres is still unavailable - sleeping"
+until mariadb -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASSWORD}" -D "" -e "QUIT"; do
+    >&2 echo "MariaDB is still unavailable - sleeping"
     sleep 1
 done
 
->&2 echo "Postgres is up and running on port ${DB_PORT}!"
+>&2 echo "MariaDB is up and running on ${DB_HOST} on port ${DB_PORT}!"
 
-export DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}
+export DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 sqlx database create
 sqlx migrate run
 
->&2 echo "Postgres has been migrated, ready to go!"
+>&2 echo "MariaDB has been migrated, ready to go!"
