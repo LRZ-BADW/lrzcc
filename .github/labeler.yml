@@ -1,3 +1,7 @@
+wire:
+- changed-files:
+  - any-glob-to-any-file: "wire/*"
+
 api:
 - changed-files:
   - any-glob-to-any-file: "api/*"
