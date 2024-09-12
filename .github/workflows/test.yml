@@ -20,22 +20,17 @@ on:
 env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: 0.7.3
-  SQLX_FEATURES: "rustls,postgres"
+  SQLX_FEATURES: "rustls,mysql"
 
 jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
     steps:
+      - uses: getong/mariadb-action@v1.11
+        with:
+          mysql database: 'lrzcc'
+          mysql root password: 'password'
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Rust Cache Action
@@ -49,8 +44,8 @@ jobs:
           --features ${{ env.SQLX_FEATURES }}
           --no-default-features
           --locked
-      - name: Install postgresql-client and mold
-        run: sudo apt update && sudo apt install postgresql-client mold -y
+      - name: Install mariadb-client and mold
+        run: sudo apt update && sudo apt install mariadb-client mold -y
       - name: Migrate database
         run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Check sqlx offline data is up to date
