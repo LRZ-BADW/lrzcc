@@ -5,7 +5,6 @@ use reqwest::blocking::{Client, Response};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
-use std::borrow::Borrow;
 use std::fmt::Debug;
 
 #[derive(serde::Serialize, Debug)]
@@ -75,12 +74,4 @@ where
     let u: U = serde_json::from_str(text.as_str())
         .context(format!("Could not parse response text: {}", text))?;
     Ok(u)
-}
-
-pub(crate) fn is_true(b: impl Borrow<bool>) -> bool {
-    *b.borrow()
-}
-
-pub(crate) fn is_false(b: impl Borrow<bool>) -> bool {
-    !b.borrow()
 }

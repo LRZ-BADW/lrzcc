@@ -1,9 +1,8 @@
-use crate::common::{
-    is_false, is_true, request, request_bare, SerializableNone,
-};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use crate::user::ProjectMinimal;
 use anyhow::Context;
+use lrzcc_wire::common::{is_false, is_true};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
