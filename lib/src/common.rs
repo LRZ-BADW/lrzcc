@@ -1,5 +1,6 @@
-use crate::error::{ApiError, ErrorResponse};
+use crate::error::ApiError;
 use anyhow::Context;
+use lrzcc_wire::error::ErrorResponse;
 use reqwest::blocking::{Client, Response};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
