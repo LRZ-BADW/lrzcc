@@ -1,25 +1,13 @@
 use crate::common::request;
 use crate::error::ApiError;
+use lrzcc_wire::budgeting::{BudgetBulkCreate, BudgetBulkCreateData};
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
 use std::rc::Rc;
-use tabled::Tabled;
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct BudgetBulkCreate {
-    pub new_user_budget_count: u32,
-    pub new_project_budget_count: u32,
-}
 
 pub struct BudgetBulkCreateApi {
     pub url: String,
     pub client: Rc<Client>,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct BudgetBulkCreateData {
-    pub year: i32,
 }
 
 impl BudgetBulkCreateApi {

@@ -1,10 +1,4 @@
-use serde::Deserialize;
 use std::fmt::Debug;
-
-#[derive(Deserialize)]
-pub(crate) struct ErrorResponse {
-    pub(crate) detail: String,
-}
 
 #[derive(thiserror::Error)]
 pub enum ApiError {

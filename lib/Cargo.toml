@@ -1,5 +1,5 @@
 [package]
-name = "lrzcc-lib"
+name = "lrzcc"
 description = "Rust client library for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["api-bindings"]
@@ -22,13 +22,13 @@ path = "src/lib.rs"
 default = ["all"]
 vendored-tls = ["reqwest/native-tls-vendored"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = []
-budgeting = []
-hello = []
-pricing = []
-quota = []
-resources = []
-user = []
+accounting = ["lrzcc-wire/accounting"]
+budgeting = ["lrzcc-wire/budgeting"]
+hello = ["lrzcc-wire/hello"]
+pricing = ["lrzcc-wire/pricing"]
+quota = ["lrzcc-wire/quota"]
+resources = ["lrzcc-wire/resources"]
+user = ["lrzcc-wire/user"]
 
 [dependencies]
 reqwest = { version = "0.12", features = ["json", "blocking"] }
@@ -36,9 +36,9 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "1"
 anyhow = "1"
-tabled = "0.16"
 chrono = { version = "0.4", features = ["serde"] }
 jzon = "0.12"
+lrzcc-wire = { version = "1.0", path = "../wire" }
 
 [dev-dependencies]
 cargo-husky = { workspace = true }

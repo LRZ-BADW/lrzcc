@@ -3,7 +3,8 @@ resolver = "2"
 members = [
     "api",
     "lib",
-    "cli"
+    "cli",
+    "wire",
 ]
 
 [workspace.dependencies.cargo-husky]

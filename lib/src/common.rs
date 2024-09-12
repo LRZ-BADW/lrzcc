@@ -1,11 +1,11 @@
-use crate::error::{ApiError, ErrorResponse};
+use crate::error::ApiError;
 use anyhow::Context;
+use lrzcc_wire::error::ErrorResponse;
 use reqwest::blocking::{Client, Response};
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
-use std::borrow::Borrow;
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 
 #[derive(serde::Serialize, Debug)]
 pub(crate) struct SerializableFoo {}
@@ -74,20 +74,4 @@ where
     let u: U = serde_json::from_str(text.as_str())
         .context(format!("Could not parse response text: {}", text))?;
     Ok(u)
-}
-
-#[allow(dead_code)]
-pub(crate) fn display_option<T: Display>(option: &Option<T>) -> String {
-    match option {
-        Some(value) => value.to_string(),
-        None => "".to_string(),
-    }
-}
-
-pub(crate) fn is_true(b: impl Borrow<bool>) -> bool {
-    *b.borrow()
-}
-
-pub(crate) fn is_false(b: impl Borrow<bool>) -> bool {
-    !b.borrow()
 }

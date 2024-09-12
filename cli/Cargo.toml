@@ -20,16 +20,16 @@ path = "src/main.rs"
 [features]
 default = ["all"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = []
-budgeting = []
-hello = []
-pricing = []
-quota = []
-resources = []
-user = []
+accounting = ["lrzcc/accounting"]
+budgeting = ["lrzcc/budgeting"]
+hello = ["lrzcc/hello"]
+pricing = ["lrzcc/pricing"]
+quota = ["lrzcc/quota"]
+resources = ["lrzcc/resources"]
+user = ["lrzcc/user"]
 
 [dependencies]
-lrzcc = "1.0"
+lrzcc = { version = "1.0", path = "../lib" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 anyhow = "1"
