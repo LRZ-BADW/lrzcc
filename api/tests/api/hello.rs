@@ -76,3 +76,20 @@ async fn hello_works_with_valid_token() {
         serde_json::from_str::<Hello>(&response.text().await.unwrap()).unwrap();
     assert_eq!(hello.message, format!("Hello, user {}!", project_name));
 }
+
+#[tokio::test]
+async fn database_insert_works() {
+    // arrange
+    let app = spawn_app().await;
+
+    // act and assert
+    sqlx::query!(
+        "INSERT INTO project (name, openstack_id, user_class) VALUES (?, ?, ?)",
+        "test",
+        "some-uuid",
+        4,
+    )
+    .execute(&app.db_pool)
+    .await
+    .expect("Failed to insert user.");
+}
