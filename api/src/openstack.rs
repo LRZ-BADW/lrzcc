@@ -60,7 +60,7 @@ pub struct OpenStack {
     token: TokenHandler,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Clone, Debug, serde::Deserialize)]
 pub struct ProjectMinimal {
     pub id: String,
     pub name: String,
