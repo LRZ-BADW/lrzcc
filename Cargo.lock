@@ -1580,6 +1580,7 @@ name = "lrzcc-wire"
 version = "1.0.0"
 dependencies = [
  "cargo-husky",
+ "chrono",
  "serde",
  "tabled",
 ]
