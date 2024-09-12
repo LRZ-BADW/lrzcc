@@ -3,7 +3,7 @@ use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use once_cell::sync::Lazy;
 use serde_json::json;
-use sqlx::{Connection, Executor, PgConnection, PgPool};
+use sqlx::{Connection, Executor, MySqlConnection, MySqlPool};
 use uuid::Uuid;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -31,7 +31,7 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 pub struct TestApp {
     pub address: String,
     pub _port: u16,
-    pub _db_pool: sqlx::PgPool,
+    pub db_pool: sqlx::MySqlPool,
     pub _api_client: reqwest::Client,
     pub keystone_server: MockServer,
     pub keystone_token: String,
@@ -70,7 +70,7 @@ pub async fn spawn_app() -> TestApp {
 
     let configuration = {
         let mut c = get_configuration().expect("Failed to read configuration.");
-        c.database.database_name = Uuid::new_v4().to_string();
+        c.database.database_name = Uuid::new_v4().simple().to_string();
         c.application.port = 0;
         c.openstack.keystone_endpoint = keystone_server.uri();
         c
@@ -102,7 +102,7 @@ pub async fn spawn_app() -> TestApp {
     let test_app = TestApp {
         address: format!("http://127.0.0.1:{}", application_port),
         _port: application_port,
-        _db_pool: get_connection_pool(&configuration.database),
+        db_pool: get_connection_pool(&configuration.database),
         _api_client: client,
         keystone_server,
         keystone_token,
@@ -110,22 +110,26 @@ pub async fn spawn_app() -> TestApp {
     test_app
 }
 
-async fn configure_database(config: &DatabaseSettings) -> PgPool {
+async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
     // Create database
-    let mut connection = PgConnection::connect_with(&config.without_db())
+    let mut connection = MySqlConnection::connect_with(&config.without_db())
         .await
-        .expect("Failed to connect to Postgres.");
+        .expect("Failed to connect to MariaDB.");
     connection
         .execute(
-            format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str(),
+            format!(
+                "CREATE DATABASE IF NOT EXISTS `{}`;",
+                config.database_name
+            )
+            .as_str(),
         )
         .await
         .expect("Failed to create database.");
 
     // Migrate database
-    let connection_pool = PgPool::connect_with(config.with_db())
+    let connection_pool = MySqlPool::connect_with(config.with_db())
         .await
-        .expect("Failed to connect to Postgres.");
+        .expect("Failed to connect to MariaDB.");
     sqlx::migrate!("./migrations")
         .run(&connection_pool)
         .await

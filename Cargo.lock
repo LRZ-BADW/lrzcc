@@ -1542,6 +1542,7 @@ dependencies = [
  "cargo-husky",
  "config",
  "jzon",
+ "lrzcc-wire",
  "once_cell",
  "reqwest",
  "secrecy",

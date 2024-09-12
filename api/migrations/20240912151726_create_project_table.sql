@@ -1,0 +1,6 @@
+CREATE TABLE project (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name TEXT(255) UNIQUE NOT NULL,
+    openstack_id TEXT(255) UNIQUE NOT NULL,
+    user_class SMALLINT UNSIGNED NOT NULL
+);

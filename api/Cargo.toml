@@ -25,13 +25,13 @@ path = "src/main.rs"
 [features]
 default = ["all"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = []
-budgeting = []
-hello = []
-pricing = []
-quota = []
-resources = []
-user = []
+accounting = ["lrzcc-wire/accounting"]
+budgeting = ["lrzcc-wire/budgeting"]
+hello = ["lrzcc-wire/hello"]
+pricing = ["lrzcc-wire/pricing"]
+quota = ["lrzcc-wire/quota"]
+resources = ["lrzcc-wire/resources"]
+user = ["lrzcc-wire/user"]
 
 [dependencies]
 actix-web = "4"
@@ -49,6 +49,7 @@ config = "0.14"
 uuid = { version = "1.10", features = ["v4", "serde"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 jzon = "0.12"
+lrzcc-wire = { version = "1.0", path = "../wire" }
 
 [dependencies.sqlx]
 version = "0.8"
@@ -57,7 +58,7 @@ features = [
     "runtime-tokio",
     "tls-rustls",
     "macros",
-    "postgres",
+    "mysql",
     "uuid",
     "chrono",
     "migrate",
