@@ -1530,7 +1530,6 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
- "tabled",
  "thiserror",
 ]
 
