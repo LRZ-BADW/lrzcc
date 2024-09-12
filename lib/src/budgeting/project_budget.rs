@@ -1,29 +1,15 @@
-use crate::common::{is_false, request, request_bare, SerializableNone};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
+use lrzcc_wire::budgeting::{
+    ProjectBudget, ProjectBudgetCreateData, ProjectBudgetDetail,
+    ProjectBudgetModifyData, ProjectBudgetOver,
+};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use std::rc::Rc;
-use tabled::Tabled;
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ProjectBudget {
-    pub id: u32,
-    pub project: u32,
-    pub project_name: String,
-    pub year: u32,
-    pub amount: u32,
-}
-
-impl Display for ProjectBudget {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("ProjectBudget(id={})", self.id))
-    }
-}
 
 pub struct ProjectBudgetApi {
     pub url: String,
@@ -102,25 +88,6 @@ impl ProjectBudgetListRequest {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
-struct ProjectBudgetCreateData {
-    project: u32,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    year: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    amount: Option<i64>,
-}
-
-impl ProjectBudgetCreateData {
-    fn new(project: u32) -> Self {
-        Self {
-            project,
-            year: None,
-            amount: None,
-        }
-    }
-}
-
 pub struct ProjectBudgetCreateRequest {
     url: String,
     client: Rc<Client>,
@@ -155,26 +122,6 @@ impl ProjectBudgetCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
-struct ProjectBudgetModifyData {
-    id: u32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    amount: Option<u32>,
-    #[serde(skip_serializing_if = "is_false")]
-    force: bool,
-}
-
-impl ProjectBudgetModifyData {
-    fn new(id: u32) -> Self {
-        Self {
-            id,
-            amount: None,
-            force: false,
-        }
     }
 }
 
@@ -213,24 +160,6 @@ impl ProjectBudgetModifyRequest {
             StatusCode::OK,
         )
     }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ProjectBudgetOver {
-    pub budget_id: u32,
-    pub project_id: u32,
-    pub project_name: String,
-    pub over: bool,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ProjectBudgetDetail {
-    pub budget_id: u32,
-    pub project_id: u32,
-    pub project_name: String,
-    pub over: bool,
-    pub cost: f64,
-    pub budget: u32,
 }
 
 #[derive(Debug)]
