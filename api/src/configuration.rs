@@ -1,6 +1,6 @@
 use secrecy::{ExposeSecret, Secret};
 use serde_aux::field_attributes::deserialize_number_from_string;
-use sqlx::postgres::{PgConnectOptions, PgSslMode};
+use sqlx::mysql::{MySqlConnectOptions, MySqlSslMode};
 
 #[derive(Clone, serde::Deserialize)]
 pub struct Settings {
@@ -41,13 +41,13 @@ pub struct OpenStackSettings {
 }
 
 impl DatabaseSettings {
-    pub fn without_db(&self) -> PgConnectOptions {
+    pub fn without_db(&self) -> MySqlConnectOptions {
         let ssl_mode = if self.require_ssl {
-            PgSslMode::Require
+            MySqlSslMode::Required
         } else {
-            PgSslMode::Prefer
+            MySqlSslMode::Preferred
         };
-        PgConnectOptions::new()
+        MySqlConnectOptions::new()
             .host(&self.host)
             .port(self.port)
             .ssl_mode(ssl_mode)
@@ -55,7 +55,7 @@ impl DatabaseSettings {
             .password(self.password.expose_secret())
     }
 
-    pub fn with_db(&self) -> PgConnectOptions {
+    pub fn with_db(&self) -> MySqlConnectOptions {
         self.without_db().database(&self.database_name)
     }
 }
