@@ -31,7 +31,7 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 pub struct TestApp {
     pub address: String,
     pub _port: u16,
-    pub _db_pool: sqlx::MySqlPool,
+    pub db_pool: sqlx::MySqlPool,
     pub _api_client: reqwest::Client,
     pub keystone_server: MockServer,
     pub keystone_token: String,
@@ -102,7 +102,7 @@ pub async fn spawn_app() -> TestApp {
     let test_app = TestApp {
         address: format!("http://127.0.0.1:{}", application_port),
         _port: application_port,
-        _db_pool: get_connection_pool(&configuration.database),
+        db_pool: get_connection_pool(&configuration.database),
         _api_client: client,
         keystone_server,
         keystone_token,
