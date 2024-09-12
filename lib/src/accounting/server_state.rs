@@ -1,41 +1,13 @@
-use crate::common::{display_option, request, request_bare, SerializableNone};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
+use lrzcc_wire::accounting::{ServerState, ServerStateImport};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
-use std::fmt::Display;
+use serde::Serialize;
 use std::rc::Rc;
-use tabled::Tabled;
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ServerState {
-    pub id: u32,
-    pub begin: DateTime<FixedOffset>,
-    #[tabled(display_with = "display_option")]
-    pub end: Option<DateTime<FixedOffset>>,
-    pub instance_id: String, // UUIDv4
-    pub instance_name: String,
-    pub flavor: u32,
-    pub flavor_name: String,
-    pub status: String,
-    pub user: u32,
-    pub username: String,
-}
-
-impl Display for ServerState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("ServerState(id={})", self.id))
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ServerStateImport {
-    pub new_state_count: u32,
-    pub end_state_count: u32,
-}
 
 pub struct ServerStateApi {
     pub url: String,
