@@ -2,8 +2,8 @@ application:
   port: 8000
 database:
   host: "127.0.0.1"
-  port: 5432
-  username: "postgres"
+  port: 3306
+  username: "root"
   password: "password"
   database_name: "lrzcc"
 openstack:
