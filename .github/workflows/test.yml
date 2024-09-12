@@ -19,7 +19,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  SQLX_VERSION: latest
   SQLX_FEATURES: "rustls,mysql"
   DATABASE_URL: "mysql://root:password@127.0.0.1:3306/lrzcc"
 
