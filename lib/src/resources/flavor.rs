@@ -1,7 +1,8 @@
-use crate::common::{display_option, request, request_bare, SerializableNone};
+use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use crate::resources::FlavorGroupMinimal;
 use anyhow::Context;
+use lrzcc_wire::common::display_option;
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};

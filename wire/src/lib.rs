@@ -1,3 +1,4 @@
+pub mod common;
 pub mod error;
 
 #[cfg(feature = "accounting")]
