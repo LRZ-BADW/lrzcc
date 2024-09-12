@@ -1,37 +1,13 @@
 use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
+use lrzcc_wire::quota::{
+    FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData, FlavorQuotaModifyData,
+};
 use reqwest::blocking::Client;
 use reqwest::Url;
 use reqwest::{Method, StatusCode};
-use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use std::rc::Rc;
-use tabled::Tabled;
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct FlavorQuota {
-    pub id: u32,
-    pub user: u32,
-    pub username: String,
-    pub quota: i64,
-    pub flavor_group: u32,
-    pub flavor_group_name: String,
-}
-
-impl Display for FlavorQuota {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!(
-            "FlavorQuota(id={}, user={}, flavor_group={})",
-            self.id, self.user, self.flavor_group
-        ))
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct FlavorQuotaCheck {
-    pub underquota: bool,
-}
 
 pub struct FlavorQuotaApi {
     pub url: String,
@@ -102,24 +78,6 @@ impl FlavorQuotaListRequest {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
-struct FlavorQuotaCreateData {
-    flavor_group: u32,
-    user: u32,
-    // TODO: maybe use Option<i64> here
-    quota: i64,
-}
-
-impl FlavorQuotaCreateData {
-    fn new(flavor_group: u32, user: u32) -> Self {
-        Self {
-            flavor_group,
-            user,
-            quota: -1,
-        }
-    }
-}
-
 pub struct FlavorQuotaCreateRequest {
     url: String,
     client: Rc<Client>,
@@ -154,29 +112,6 @@ impl FlavorQuotaCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
-struct FlavorQuotaModifyData {
-    id: u32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    user: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    quota: Option<i64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    flavor_group: Option<u32>,
-}
-
-impl FlavorQuotaModifyData {
-    fn new(id: u32) -> Self {
-        Self {
-            id,
-            user: None,
-            quota: None,
-            flavor_group: None,
-        }
     }
 }
 
