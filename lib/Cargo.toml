@@ -1,5 +1,5 @@
 [package]
-name = "lrzcc-lib"
+name = "lrzcc"
 description = "Rust client library for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["api-bindings"]
