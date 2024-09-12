@@ -1,3 +1,5 @@
+pub mod error;
+
 #[cfg(feature = "accounting")]
 pub mod accounting;
 #[cfg(feature = "budgeting")]
