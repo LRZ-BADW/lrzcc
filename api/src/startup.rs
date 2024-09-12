@@ -5,8 +5,8 @@ use crate::routes::{health_check, hello};
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
-use sqlx::postgres::PgPoolOptions;
-use sqlx::PgPool;
+use sqlx::mysql::MySqlPoolOptions;
+use sqlx::MySqlPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
 
@@ -50,7 +50,7 @@ pub struct ApplicationBaseUrl(pub String);
 
 async fn run(
     listener: TcpListener,
-    db_pool: PgPool,
+    db_pool: MySqlPool,
     base_url: String,
     openstack: OpenStack,
 ) -> Result<Server, anyhow::Error> {
@@ -78,6 +78,6 @@ async fn run(
     Ok(server)
 }
 
-pub fn get_connection_pool(configuration: &DatabaseSettings) -> PgPool {
-    PgPoolOptions::new().connect_lazy_with(configuration.with_db())
+pub fn get_connection_pool(configuration: &DatabaseSettings) -> MySqlPool {
+    MySqlPoolOptions::new().connect_lazy_with(configuration.with_db())
 }
