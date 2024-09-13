@@ -52,9 +52,12 @@ async fn hello_works_with_valid_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
-    let token = random_uuid();
-    let project_name = "project_name";
-    app.mock_keystone_auth(&token, "project_id", project_name)
+
+    let (user, _project, token) = app
+        .setup_test_user_and_project()
+        .await
+        .expect("Failed to setup test user and project.");
+    app.mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&app.keystone_server)
         .await;
 
@@ -74,5 +77,5 @@ async fn hello_works_with_valid_token() {
     );
     let hello =
         serde_json::from_str::<Hello>(&response.text().await.unwrap()).unwrap();
-    assert_eq!(hello.message, format!("Hello, user {}!", project_name));
+    assert_eq!(hello.message, format!("Hello, user {}!", user.name));
 }
