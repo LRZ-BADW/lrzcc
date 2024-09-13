@@ -3,6 +3,8 @@ use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use serde_json::json;
 use sqlx::{
     Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
@@ -190,4 +192,16 @@ pub async fn insert_user_into_db(
         user.is_active,
     );
     transaction.execute(query).await.map(|_| ())
+}
+
+fn random_uuid() -> String {
+    Uuid::new_v4().to_string()
+}
+
+fn random_alphanumeric_string(length: usize) -> String {
+    thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(length)
+        .map(char::from)
+        .collect()
 }
