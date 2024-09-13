@@ -27,6 +27,7 @@ then
         -e MARIADB_ROOT_PASSWORD="${DB_PASSWORD}" \
         -e MARIADB_DB="${DB_NAME}" \
         -p "${DB_PORT}":3306 \
+        --name lrzcc-db \
         -d mariadb:latest
 fi
 

@@ -1,9 +1,15 @@
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
+use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use serde_json::json;
-use sqlx::{Connection, Executor, MySqlConnection, MySqlPool};
+use sqlx::{
+    Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
+};
+use std::ops::Range;
 use uuid::Uuid;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -41,8 +47,8 @@ impl TestApp {
     pub fn mock_keystone_auth(
         &self,
         token: &str,
-        project_id: &str,
-        project_name: &str,
+        os_project_id: &str,
+        os_project_name: &str,
     ) -> Mock {
         Mock::given(method("GET"))
             .and(path("/auth/tokens/"))
@@ -53,12 +59,53 @@ impl TestApp {
                     .set_body_json(json!({
                         "token": {
                             "project": {
-                                "id": project_id,
-                                "name": project_name,
+                                "id": os_project_id,
+                                "name": os_project_name,
                             }
                         }
                     })),
             )
+    }
+
+    pub async fn setup_test_user_and_project(
+        &self,
+    ) -> Result<(User, Project, String), sqlx::Error> {
+        let project = Project {
+            id: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            user_class: random_number(1..6),
+        };
+        let user = User {
+            id: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            project: project.id,
+            project_name: project.name.clone(),
+            is_staff: false,
+            is_active: true,
+            role: 1,
+        };
+
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        insert_project_into_db(&mut transaction, &project)
+            .await
+            .expect("Failed to insert project into database.");
+        insert_user_into_db(&mut transaction, &user)
+            .await
+            .expect("Failed to insert user into database.");
+        transaction
+            .commit()
+            .await
+            .expect("Failed to commit transaction.");
+
+        let token = Uuid::new_v4().to_string();
+
+        Ok((user, project, token))
     }
 }
 
@@ -136,4 +183,67 @@ async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
         .expect("Failed to migrate database.");
 
     connection_pool
+}
+
+pub async fn insert_project_into_db(
+    transaction: &mut Transaction<'static, MySql>,
+    project: &Project,
+) -> Result<(), sqlx::Error> {
+    let query = sqlx::query!(
+        r#"
+            INSERT INTO user_project (
+            name,
+            openstack_id,
+            user_class
+            )
+            VALUES (?, ?, ?)
+        "#,
+        project.name,
+        project.openstack_id,
+        project.user_class,
+    );
+    transaction.execute(query).await.map(|_| ())
+}
+
+pub async fn insert_user_into_db(
+    transaction: &mut Transaction<'static, MySql>,
+    user: &User,
+) -> Result<(), sqlx::Error> {
+    let query = sqlx::query!(
+        r#"
+            INSERT INTO user_user (
+            password,
+            name,
+            openstack_id,
+            project_id,
+            role,
+            is_staff,
+            is_active
+            )
+            VALUES ("", ?, ?, ?, ?, ?, ?)
+        "#,
+        user.name,
+        user.openstack_id,
+        user.project,
+        user.role,
+        user.is_staff,
+        user.is_active,
+    );
+    transaction.execute(query).await.map(|_| ())
+}
+
+pub fn random_uuid() -> String {
+    Uuid::new_v4().to_string()
+}
+
+fn random_alphanumeric_string(length: usize) -> String {
+    thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(length)
+        .map(char::from)
+        .collect()
+}
+
+fn random_number(range: Range<u32>) -> u32 {
+    thread_rng().gen_range(range)
 }
