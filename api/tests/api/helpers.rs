@@ -1,9 +1,12 @@
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
+use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use serde_json::json;
-use sqlx::{Connection, Executor, MySqlConnection, MySqlPool};
+use sqlx::{
+    Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
+};
 use uuid::Uuid;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -136,4 +139,55 @@ async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
         .expect("Failed to migrate database.");
 
     connection_pool
+}
+
+pub async fn insert_project_into_db(
+    transaction: &mut Transaction<'static, MySql>,
+    project: &Project,
+) -> Result<(), sqlx::Error> {
+    let query = sqlx::query!(
+        r#"
+            INSERT INTO user_project (
+            id,
+            name,
+            openstack_id,
+            user_class
+            )
+            VALUES (?, ?, ?, ?)
+        "#,
+        project.id,
+        project.name,
+        project.openstack_id,
+        project.user_class,
+    );
+    transaction.execute(query).await.map(|_| ())
+}
+
+pub async fn insert_user_into_db(
+    transaction: &mut Transaction<'static, MySql>,
+    user: &User,
+) -> Result<(), sqlx::Error> {
+    let query = sqlx::query!(
+        r#"
+            INSERT INTO user_user (
+            id,
+            password,
+            name,
+            openstack_id,
+            project_id,
+            role,
+            is_staff,
+            is_active
+            )
+            VALUES (?, "", ?, ?, ?, ?, ?, ?)
+        "#,
+        user.id,
+        user.name,
+        user.openstack_id,
+        user.project,
+        user.role,
+        user.is_staff,
+        user.is_active,
+    );
+    transaction.execute(query).await.map(|_| ())
 }
