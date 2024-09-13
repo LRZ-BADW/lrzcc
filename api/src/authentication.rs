@@ -87,7 +87,7 @@ pub async fn extract_user_and_project(
         FROM user_user AS user, user_project AS project
         WHERE
             user.project_id = project.id AND
-            user.id = ?
+            user.openstack_id = ?
         "#,
         os_project.id
     )
