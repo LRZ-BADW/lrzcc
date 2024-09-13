@@ -1,6 +1,6 @@
-use uuid::Uuid;
-
 use crate::helpers::spawn_app;
+use lrzcc_wire::user::{Project, User};
+use uuid::Uuid;
 
 #[tokio::test]
 async fn health_check_works() {
@@ -69,8 +69,71 @@ async fn secured_health_check_works_with_valid_token() {
     // arrange
     let app = spawn_app().await;
     let client = reqwest::Client::new();
+
+    let project = Project {
+        id: 1,
+        name: "project_name".to_string(),
+        openstack_id: "os_domain_id".to_string(),
+        user_class: 1,
+    };
+    let user = User {
+        id: 1,
+        name: "user_name".to_string(),
+        openstack_id: "os_project_id".to_string(),
+        project: 1,
+        project_name: "project_name".to_string(),
+        is_staff: false,
+        is_active: true,
+        role: 1,
+    };
+
+    sqlx::query!(
+        r#"
+        INSERT INTO user_project (
+            id,
+            name,
+            openstack_id,
+            user_class
+        )
+        VALUES (?, ?, ?, ?)
+        "#,
+        project.id,
+        project.name,
+        project.openstack_id,
+        project.user_class,
+    )
+    .execute(&app.db_pool)
+    .await
+    .expect("Failed to insert project into database.");
+
+    sqlx::query!(
+        r#"
+        INSERT INTO user_user (
+            id,
+            password,
+            name,
+            openstack_id,
+            project_id,
+            role,
+            is_staff,
+            is_active
+        )
+        VALUES (?, "",?, ?, ?, ?, ?, ?)
+        "#,
+        user.id,
+        user.name,
+        user.openstack_id,
+        user.project,
+        user.role,
+        user.is_staff,
+        user.is_active,
+    )
+    .execute(&app.db_pool)
+    .await
+    .expect("Failed to insert user into database.");
+
     let token = Uuid::new_v4().to_string();
-    app.mock_keystone_auth(&token, "project_id", "project_name")
+    app.mock_keystone_auth(&token, "os_project_id", "os_project_name")
         .mount(&app.keystone_server)
         .await;
 
