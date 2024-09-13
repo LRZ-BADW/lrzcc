@@ -1,4 +1,3 @@
-use std::ops::Range;
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
@@ -10,6 +9,7 @@ use serde_json::json;
 use sqlx::{
     Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
 };
+use std::ops::Range;
 use uuid::Uuid;
 use wiremock::matchers::{header, method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
