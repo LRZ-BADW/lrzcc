@@ -246,3 +246,7 @@ fn random_alphanumeric_string(length: usize) -> String {
         .map(char::from)
         .collect()
 }
+
+fn random_number(range: Range<u32>) -> u32 {
+    thread_rng().gen_range(range)
+}
