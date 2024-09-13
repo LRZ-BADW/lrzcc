@@ -194,7 +194,7 @@ pub async fn insert_user_into_db(
     transaction.execute(query).await.map(|_| ())
 }
 
-fn random_uuid() -> String {
+pub fn random_uuid() -> String {
     Uuid::new_v4().to_string()
 }
 
