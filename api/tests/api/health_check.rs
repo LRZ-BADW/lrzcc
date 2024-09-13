@@ -68,41 +68,11 @@ async fn secured_health_check_works_with_valid_token() {
     let app = spawn_app().await;
     let client = reqwest::Client::new();
 
-    let project = Project {
-        id: 1,
-        name: "project_name".to_string(),
-        openstack_id: "os_domain_id".to_string(),
-        user_class: 1,
-    };
-    let user = User {
-        id: 1,
-        name: "user_name".to_string(),
-        openstack_id: "os_project_id".to_string(),
-        project: 1,
-        project_name: "project_name".to_string(),
-        is_staff: false,
-        is_active: true,
-        role: 1,
-    };
-
-    let mut transaction = app
-        .db_pool
-        .begin()
+    let (user, _project, token) = app
+        .setup_test_user_and_project()
         .await
-        .expect("Failed to begin transaction.");
-    insert_project_into_db(&mut transaction, &project)
-        .await
-        .expect("Failed to insert project into database.");
-    insert_user_into_db(&mut transaction, &user)
-        .await
-        .expect("Failed to insert user into database.");
-    transaction
-        .commit()
-        .await
-        .expect("Failed to commit transaction.");
-
-    let token = Uuid::new_v4().to_string();
-    app.mock_keystone_auth(&token, "os_project_id", "os_project_name")
+        .expect("Failed to setup test user and project.");
+    app.mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&app.keystone_server)
         .await;
 
