@@ -65,6 +65,47 @@ impl TestApp {
                     })),
             )
     }
+
+    pub async fn setup_test_user_and_project(
+        &self,
+    ) -> Result<(User, Project, String), sqlx::Error> {
+        let project = Project {
+            id: 1,
+            name: "project_name".to_string(),
+            openstack_id: "os_domain_id".to_string(),
+            user_class: 1,
+        };
+        let user = User {
+            id: 1,
+            name: "user_name".to_string(),
+            openstack_id: "os_project_id".to_string(),
+            project: 1,
+            project_name: "project_name".to_string(),
+            is_staff: false,
+            is_active: true,
+            role: 1,
+        };
+
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        insert_project_into_db(&mut transaction, &project)
+            .await
+            .expect("Failed to insert project into database.");
+        insert_user_into_db(&mut transaction, &user)
+            .await
+            .expect("Failed to insert user into database.");
+        transaction
+            .commit()
+            .await
+            .expect("Failed to commit transaction.");
+
+        let token = Uuid::new_v4().to_string();
+
+        Ok((user, project, token))
+    }
 }
 
 pub async fn spawn_app() -> TestApp {
