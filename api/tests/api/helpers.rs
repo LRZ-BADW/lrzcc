@@ -191,14 +191,12 @@ pub async fn insert_project_into_db(
     let query = sqlx::query!(
         r#"
             INSERT INTO user_project (
-            id,
             name,
             openstack_id,
             user_class
             )
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?)
         "#,
-        project.id,
         project.name,
         project.openstack_id,
         project.user_class,
@@ -213,7 +211,6 @@ pub async fn insert_user_into_db(
     let query = sqlx::query!(
         r#"
             INSERT INTO user_user (
-            id,
             password,
             name,
             openstack_id,
@@ -222,9 +219,8 @@ pub async fn insert_user_into_db(
             is_staff,
             is_active
             )
-            VALUES (?, "", ?, ?, ?, ?, ?, ?)
+            VALUES ("", ?, ?, ?, ?, ?, ?)
         "#,
-        user.id,
         user.name,
         user.openstack_id,
         user.project,
