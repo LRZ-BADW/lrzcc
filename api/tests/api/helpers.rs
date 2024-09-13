@@ -41,8 +41,8 @@ impl TestApp {
     pub fn mock_keystone_auth(
         &self,
         token: &str,
-        project_id: &str,
-        project_name: &str,
+        os_project_id: &str,
+        os_project_name: &str,
     ) -> Mock {
         Mock::given(method("GET"))
             .and(path("/auth/tokens/"))
@@ -53,8 +53,8 @@ impl TestApp {
                     .set_body_json(json!({
                         "token": {
                             "project": {
-                                "id": project_id,
-                                "name": project_name,
+                                "id": os_project_id,
+                                "name": os_project_name,
                             }
                         }
                     })),
