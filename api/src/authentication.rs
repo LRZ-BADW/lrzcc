@@ -25,11 +25,11 @@ pub async fn require_valid_token(
         let e = anyhow::anyhow!("No OpenStack client in application state");
         return Err(InternalError::from_response(e, response).into());
     };
-    let Ok(project) = openstack.validate_user_token(token).await else {
+    let Ok(os_project) = openstack.validate_user_token(token).await else {
         let response = HttpResponse::Unauthorized().finish();
         let e = anyhow::anyhow!("Failed to validate user token");
         return Err(InternalError::from_response(e, response).into());
     };
-    req.extensions_mut().insert(project);
+    req.extensions_mut().insert(os_project);
     next.call(req).await
 }
