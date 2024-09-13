@@ -1,4 +1,4 @@
-use crate::authentication::require_valid_token;
+use crate::authentication::{extract_user_and_project, require_valid_token};
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::openstack::OpenStack;
 use crate::routes::{health_check, hello};
@@ -66,6 +66,7 @@ async fn run(
             .route("/health_check", web::get().to(health_check))
             .service(
                 web::scope("")
+                    .wrap(from_fn(extract_user_and_project))
                     .wrap(from_fn(require_valid_token))
                     .route("/secured_health_check", web::get().to(health_check))
                     .route("/hello", web::get().to(hello)),
