@@ -1,4 +1,4 @@
-use crate::helpers::spawn_app;
+use crate::helpers::{insert_project_into_db, insert_user_into_db, spawn_app};
 use lrzcc_wire::user::{Project, User};
 use uuid::Uuid;
 
@@ -87,50 +87,21 @@ async fn secured_health_check_works_with_valid_token() {
         role: 1,
     };
 
-    sqlx::query!(
-        r#"
-        INSERT INTO user_project (
-            id,
-            name,
-            openstack_id,
-            user_class
-        )
-        VALUES (?, ?, ?, ?)
-        "#,
-        project.id,
-        project.name,
-        project.openstack_id,
-        project.user_class,
-    )
-    .execute(&app.db_pool)
-    .await
-    .expect("Failed to insert project into database.");
-
-    sqlx::query!(
-        r#"
-        INSERT INTO user_user (
-            id,
-            password,
-            name,
-            openstack_id,
-            project_id,
-            role,
-            is_staff,
-            is_active
-        )
-        VALUES (?, "",?, ?, ?, ?, ?, ?)
-        "#,
-        user.id,
-        user.name,
-        user.openstack_id,
-        user.project,
-        user.role,
-        user.is_staff,
-        user.is_active,
-    )
-    .execute(&app.db_pool)
-    .await
-    .expect("Failed to insert user into database.");
+    let mut transaction = app
+        .db_pool
+        .begin()
+        .await
+        .expect("Failed to begin transaction.");
+    insert_project_into_db(&mut transaction, &project)
+        .await
+        .expect("Failed to insert project into database.");
+    insert_user_into_db(&mut transaction, &user)
+        .await
+        .expect("Failed to insert user into database.");
+    transaction
+        .commit()
+        .await
+        .expect("Failed to commit transaction.");
 
     let token = Uuid::new_v4().to_string();
     app.mock_keystone_auth(&token, "os_project_id", "os_project_name")
