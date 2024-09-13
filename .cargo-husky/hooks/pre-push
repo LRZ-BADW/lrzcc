@@ -5,6 +5,9 @@ set -e
 echo '+cargo check --all'
 cargo check --all
 
+echo '+cargo sqlx prepare --workspace --check'
+cargo sqlx prepare --workspace --check
+
 echo '+cargo fmt --all -- --check'
 cargo fmt --all -- --check
 
