@@ -84,7 +84,7 @@ async fn database_insert_works() {
 
     // act and assert
     sqlx::query!(
-        "INSERT INTO project (name, openstack_id, user_class) VALUES (?, ?, ?)",
+        "INSERT INTO user_project (name, openstack_id, user_class) VALUES (?, ?, ?)",
         "test",
         "some-uuid",
         4,
