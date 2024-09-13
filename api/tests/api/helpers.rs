@@ -1,3 +1,4 @@
+use std::ops::Range;
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
@@ -71,16 +72,16 @@ impl TestApp {
     ) -> Result<(User, Project, String), sqlx::Error> {
         let project = Project {
             id: 1,
-            name: "project_name".to_string(),
-            openstack_id: "os_domain_id".to_string(),
-            user_class: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            user_class: random_number(1..6),
         };
         let user = User {
             id: 1,
-            name: "user_name".to_string(),
-            openstack_id: "os_project_id".to_string(),
-            project: 1,
-            project_name: "project_name".to_string(),
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            project: project.id,
+            project_name: project.name.clone(),
             is_staff: false,
             is_active: true,
             role: 1,
