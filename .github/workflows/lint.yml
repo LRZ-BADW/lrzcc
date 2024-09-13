@@ -21,6 +21,9 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  SQLX_VERSION: "0.8.2"
+  SQLX_FEATURES: "rustls,mysql"
+  DATABASE_URL: "mysql://root:password@127.0.0.1:3306/lrzcc"
 
 jobs:
   fmt:
@@ -38,14 +41,34 @@ jobs:
     name: clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: getong/mariadb-action@v1.11
+        with:
+          mysql database: 'lrzcc'
+          mysql root password: 'password'
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Install the Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: Swatinem/rust-cache@v2
-      - name: Install mold
-        run: sudo apt update && sudo apt install mold -y
-      - name: linting
+      - name: Rust Cache Action
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: sqlx-${{ env.SQLX_VERSION }}
+      - name: Install sqlx-cli
+        run:
+          cargo install sqlx-cli
+          --version=${{ env.SQLX_VERSION }}
+          --features ${{ env.SQLX_FEATURES }}
+          --no-default-features
+          --locked
+      - name: Install mariadb-client and mold
+        run: sudo apt update && sudo apt install mariadb-client mold -y
+      - name: Migrate database
+        run: SKIP_DOCKER=true ./scripts/init_db.sh
+      - name: Check sqlx offline data is up to date
+        run: cargo sqlx prepare --workspace --check
+      - name: Run tests
         run: cargo clippy -- -D warnings
 
   spellcheck:
