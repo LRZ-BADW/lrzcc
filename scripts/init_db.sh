@@ -27,8 +27,8 @@ then
         -e MARIADB_ROOT_PASSWORD="${DB_PASSWORD}" \
         -e MARIADB_DB="${DB_NAME}" \
         -p "${DB_PORT}":3306 \
-        -d mariadb:latest \
-        --name lrzcc-db
+        --name lrzcc-db \
+        -d mariadb:latest
 fi
 
 until mariadb -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASSWORD}" -D "" -e "QUIT"; do
