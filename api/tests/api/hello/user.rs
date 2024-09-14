@@ -54,7 +54,7 @@ async fn hello_works_with_valid_token() {
     let client = reqwest::Client::new();
 
     let (user, project, token) = app
-        .setup_test_user_and_project()
+        .setup_test_user_and_project(false)
         .await
         .expect("Failed to setup test user and project.");
     app.mock_keystone_auth(&token, &user.openstack_id, &user.name)
