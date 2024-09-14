@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use clap::{Args, Parser, Subcommand};
+use clap::{ArgAction::SetFalse, Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
 use lrzcc::{Api, Token};
@@ -122,6 +122,24 @@ struct Cli {
         default_value = "https://cc.lrz.de:1337/api"
     )]
     url: String,
+
+    #[clap(
+        short = 'r',
+        long,
+        help = "Custom LRZ Compute Cloud Rust API base URL",
+        env = "LRZ_CC_API_RUST_URL",
+        default_value = "https://cc.lrz.de:1338/api"
+    )]
+    rust_url: String,
+
+    #[clap(
+        long = "no-rust",
+        short = 'R',
+        action = SetFalse,
+        default_value = "true",
+        help = "Do not use the Rust API for supported commands"
+    )]
+    rust: bool,
 
     #[clap(flatten)]
     credentials: CredentialArgs,
@@ -329,7 +347,17 @@ fn main() -> ExitCode {
             std::process::exit(1);
         }
     };
-    let api = match Api::new(cli.url, token, cli.impersonate, cli.timeout) {
+    let url = match cli.command {
+        Command::Hello { .. } => {
+            if cli.rust {
+                cli.rust_url
+            } else {
+                cli.url
+            }
+        }
+        _ => cli.url,
+    };
+    let api = match Api::new(url, token, cli.impersonate, cli.timeout) {
         Ok(api) => api,
         Err(error) => {
             eprintln!("{}: {}", "error".bold().red(), error);
