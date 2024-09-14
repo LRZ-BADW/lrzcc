@@ -123,3 +123,23 @@ pub async fn extract_user_and_project(
 
     next.call(req).await
 }
+
+pub async fn require_admin_user(
+    req: ServiceRequest,
+    next: Next<impl MessageBody>,
+) -> Result<ServiceResponse<impl MessageBody>, actix_web::Error> {
+    let user = match req.extensions().get::<User>() {
+        Some(user) => user.clone(),
+        None => {
+            let response = HttpResponse::InternalServerError().finish();
+            let e = anyhow::anyhow!("No user in request extensions");
+            return Err(InternalError::from_response(e, response).into());
+        }
+    };
+    if !user.is_staff {
+        let response = HttpResponse::Unauthorized().finish();
+        let e = anyhow::anyhow!("Requesting user is not an admin");
+        return Err(InternalError::from_response(e, response).into());
+    }
+    next.call(req).await
+}
