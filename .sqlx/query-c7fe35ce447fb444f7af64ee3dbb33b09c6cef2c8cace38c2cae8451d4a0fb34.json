@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            user.id AS user_id,\n            user.name AS user_name,\n            user.openstack_id AS user_openstack_id,\n            user.role AS user_role,\n            user.is_staff AS user_is_staff,\n            user.is_active AS user_is_active,\n            project.id AS project_id,\n            project.name AS project_name,\n            project.openstack_id AS project_openstack_id,\n            project.user_class AS project_user_class\n        FROM user_user AS user, user_project AS project\n        WHERE\n            user.project_id = project.id AND\n            user.openstack_id = ?\n        ",
+  "query": "\n        SELECT\n            user.id AS user_id,\n            user.name AS user_name,\n            user.openstack_id AS user_openstack_id,\n            user.role AS user_role,\n            user.is_staff AS user_is_staff,\n            user.is_active AS user_is_active,\n            project.id AS project_id,\n            project.name AS project_name,\n            project.openstack_id AS project_openstack_id,\n            project.user_class AS project_user_class\n        FROM user_user AS user, user_project AS project\n        WHERE\n            user.project_id = project.id AND\n            user.name = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -110,5 +110,5 @@
       false
     ]
   },
-  "hash": "3f496aaf0c175b0ad3f1617368ba8812c3f78250b623350bff6bbb96732ebfe9"
+  "hash": "c7fe35ce447fb444f7af64ee3dbb33b09c6cef2c8cace38c2cae8451d4a0fb34"
 }
