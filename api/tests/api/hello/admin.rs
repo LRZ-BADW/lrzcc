@@ -15,7 +15,7 @@ async fn hello_admin_returns_unauthorized_for_missing_token() {
 
     // act
     let response = client
-        .get(&format!("{}/hello/admin", &app.address))
+        .get(&format!("{}/api/hello/admin", &app.address))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -37,7 +37,7 @@ async fn hello_admin_returns_unauthorized_for_wrong_token() {
     // act
     let wrong_token = random_uuid();
     let response = client
-        .get(&format!("{}/hello/admin", &app.address))
+        .get(&format!("{}/api/hello/admin", &app.address))
         .header("X-Auth-Token", wrong_token)
         .send()
         .await
@@ -63,7 +63,7 @@ async fn hello_admin_denies_access_to_normal_user() {
 
     // act
     let response = client
-        .get(&format!("{}/hello/admin", &app.address))
+        .get(&format!("{}/api/hello/admin", &app.address))
         .header("X-Auth-Token", token)
         .send()
         .await
@@ -89,7 +89,7 @@ async fn hello_admin_works_for_admin_user() {
 
     // act
     let response = client
-        .get(&format!("{}/hello/admin", &app.address))
+        .get(&format!("{}/api/hello/admin", &app.address))
         .header("X-Auth-Token", token)
         .send()
         .await
