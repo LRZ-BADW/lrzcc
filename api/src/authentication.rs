@@ -1,36 +1,35 @@
+use crate::error::{
+    bad_request_error, internal_server_error, unauthorized_error,
+};
 use crate::openstack::{OpenStack, ProjectMinimal as OpenstackProjectMinimal};
 use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::error::InternalError;
 use actix_web::middleware::Next;
 use actix_web::web::Data;
-use actix_web::{HttpMessage, HttpResponse};
+use actix_web::HttpMessage;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+// TODO test error messages as well
+// TODO revise error functions for use with map_err
 
 pub async fn require_valid_token(
     req: ServiceRequest,
     next: Next<impl MessageBody>,
 ) -> Result<ServiceResponse<impl MessageBody>, actix_web::Error> {
     let Some(token) = req.headers().get("X-Auth-Token") else {
-        let response = HttpResponse::Unauthorized().finish();
-        let e = anyhow::anyhow!("No token in request header");
-        return Err(InternalError::from_response(e, response).into());
+        return Err(unauthorized_error("No token in request header"));
     };
     let Ok(token) = token.to_str() else {
-        let response = HttpResponse::BadRequest().finish();
-        let e = anyhow::anyhow!("Token is not a valid string");
-        return Err(InternalError::from_response(e, response).into());
+        return Err(bad_request_error("Token is not a valid string"));
     };
     let Some(openstack) = req.app_data::<Data<OpenStack>>() else {
-        let response = HttpResponse::InternalServerError().finish();
-        let e = anyhow::anyhow!("No OpenStack client in application state");
-        return Err(InternalError::from_response(e, response).into());
+        return Err(internal_server_error(
+            "No OpenStack client in application state",
+        ));
     };
     let Ok(os_project) = openstack.validate_user_token(token).await else {
-        let response = HttpResponse::Unauthorized().finish();
-        let e = anyhow::anyhow!("Failed to validate user token");
-        return Err(InternalError::from_response(e, response).into());
+        return Err(unauthorized_error("Failed to validate user token"));
     };
     req.extensions_mut().insert(os_project);
     next.call(req).await
@@ -43,18 +42,15 @@ pub async fn extract_user_and_project(
     let os_project = match req.extensions().get::<OpenstackProjectMinimal>() {
         Some(os_project) => os_project.clone(),
         None => {
-            let response = HttpResponse::InternalServerError().finish();
-            let e =
-                anyhow::anyhow!("No OpenStack project in request extensions");
-            return Err(InternalError::from_response(e, response).into());
+            return Err(internal_server_error(
+                "No OpenStack project in request extensions",
+            ));
         }
     };
     let Some(db_pool) = req.app_data::<Data<MySqlPool>>() else {
-        let response = HttpResponse::InternalServerError().finish();
-        let e =
-            anyhow::anyhow!("No database connection pool in application state");
-
-        return Err(InternalError::from_response(e, response).into());
+        return Err(internal_server_error(
+            "No database connection pool in application state",
+        ));
     };
 
     struct Row {
@@ -94,11 +90,10 @@ pub async fn extract_user_and_project(
     .fetch_one(db_pool.get_ref())
     .await
     else {
-        let response = HttpResponse::Unauthorized().finish();
-        let e = anyhow::anyhow!(
-            "Failed to retrieve user and project from database"
-        );
-        return Err(InternalError::from_response(e, response).into());
+        // TODO apply context and map_err
+        return Err(unauthorized_error(
+            "Failed to retrieve user and project from database",
+        ));
     };
 
     let user = User {
@@ -131,15 +126,11 @@ pub async fn require_admin_user(
     let user = match req.extensions().get::<User>() {
         Some(user) => user.clone(),
         None => {
-            let response = HttpResponse::InternalServerError().finish();
-            let e = anyhow::anyhow!("No user in request extensions");
-            return Err(InternalError::from_response(e, response).into());
+            return Err(internal_server_error("No user in request extensions"));
         }
     };
     if !user.is_staff {
-        let response = HttpResponse::Unauthorized().finish();
-        let e = anyhow::anyhow!("Requesting user is not an admin");
-        return Err(InternalError::from_response(e, response).into());
+        return Err(unauthorized_error("Requesting user is not an admin"));
     }
     next.call(req).await
 }
