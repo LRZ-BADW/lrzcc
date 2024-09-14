@@ -53,7 +53,7 @@ async fn hello_works_with_valid_token() {
     let app = spawn_app().await;
     let client = reqwest::Client::new();
 
-    let (user, _project, token) = app
+    let (user, project, token) = app
         .setup_test_user_and_project()
         .await
         .expect("Failed to setup test user and project.");
@@ -77,5 +77,11 @@ async fn hello_works_with_valid_token() {
     );
     let hello =
         serde_json::from_str::<Hello>(&response.text().await.unwrap()).unwrap();
-    assert_eq!(hello.message, format!("Hello, user {}!", user.name));
+    assert_eq!(
+        hello.message,
+        format!(
+            "Hello, {} from project {} with user class {}",
+            user.name, project.name, project.user_class
+        )
+    );
 }
