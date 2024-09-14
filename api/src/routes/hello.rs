@@ -1,15 +1,34 @@
-use crate::openstack::ProjectMinimal as OpenstackProjectMinimal;
 use actix_web::web::ReqData;
 use actix_web::HttpResponse;
 use lrzcc_wire::hello::Hello;
+use lrzcc_wire::user::{Project, User};
 
-#[tracing::instrument(name = "hello")]
-pub async fn hello(
-    os_project: ReqData<OpenstackProjectMinimal>,
+#[tracing::instrument(name = "hello_user")]
+pub async fn hello_user(
+    user: ReqData<User>,
+    project: ReqData<Project>,
 ) -> Result<HttpResponse, actix_web::Error> {
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(Hello {
-            message: format!("Hello, user {}!", os_project.name),
+            message: format!(
+                "Hello, {} from project {} with user class {}",
+                user.name, project.name, project.user_class
+            ),
+        }))
+}
+
+#[tracing::instrument(name = "hello_admin")]
+pub async fn hello_admin(
+    user: ReqData<User>,
+    project: ReqData<Project>,
+) -> Result<HttpResponse, actix_web::Error> {
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .json(Hello {
+            message: format!(
+                "Hello, admin {} from project {} with user class {}",
+                user.name, project.name, project.user_class
+            ),
         }))
 }

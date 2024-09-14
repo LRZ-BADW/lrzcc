@@ -1,18 +1,26 @@
 wire:
 - changed-files:
-  - any-glob-to-any-file: "wire/*"
+  - any-glob-to-any-file:
+    - "wire/**/*"
+    - "wire/*"
 
 api:
 - changed-files:
-  - any-glob-to-any-file: "api/*"
+  - any-glob-to-any-file:
+    - "api/**/*"
+    - "api/*"
 
 lib:
 - changed-files:
-  - any-glob-to-any-file: "lib/*"
+  - any-glob-to-any-file:
+    - "lib/**/*"
+    - "lib/*"
 
 cli:
 - changed-files:
-  - any-glob-to-any-file: "cli/*"
+  - any-glob-to-any-file:
+    - "cli/**/*"
+    - "cli/*"
 
 dep:
 - changed-files:

@@ -69,7 +69,7 @@ async fn secured_health_check_works_with_valid_token() {
     let client = reqwest::Client::new();
 
     let (user, _project, token) = app
-        .setup_test_user_and_project()
+        .setup_test_user_and_project(false)
         .await
         .expect("Failed to setup test user and project.");
     app.mock_keystone_auth(&token, &user.openstack_id, &user.name)
