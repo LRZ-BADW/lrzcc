@@ -118,8 +118,8 @@ pub async fn extract_user_and_project(
         user_class: row.project_user_class,
     };
 
-    req.extensions_mut().insert(Data::new(user));
-    req.extensions_mut().insert(Data::new(project));
+    req.extensions_mut().insert(user);
+    req.extensions_mut().insert(project);
 
     next.call(req).await
 }
