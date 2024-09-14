@@ -67,7 +67,7 @@ async fn run(
             .app_data(openstack.clone())
             .route("/health_check", web::get().to(health_check))
             .service(
-                web::scope("")
+                web::scope("/api")
                     .wrap(from_fn(extract_user_and_project))
                     .wrap(from_fn(require_valid_token))
                     .route("/secured_health_check", web::get().to(health_check))
