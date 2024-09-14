@@ -87,9 +87,9 @@ pub async fn extract_user_and_project(
         FROM user_user AS user, user_project AS project
         WHERE
             user.project_id = project.id AND
-            user.openstack_id = ?
+            user.name = ?
         "#,
-        os_project.id
+        os_project.name
     )
     .fetch_one(db_pool.get_ref())
     .await
