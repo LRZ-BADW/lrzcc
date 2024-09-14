@@ -69,6 +69,7 @@ impl TestApp {
 
     pub async fn setup_test_user_and_project(
         &self,
+        admin: bool,
     ) -> Result<(User, Project, String), sqlx::Error> {
         let project = Project {
             id: 1,
@@ -82,7 +83,7 @@ impl TestApp {
             openstack_id: random_uuid(),
             project: project.id,
             project_name: project.name.clone(),
-            is_staff: false,
+            is_staff: admin,
             is_active: true,
             role: 1,
         };
