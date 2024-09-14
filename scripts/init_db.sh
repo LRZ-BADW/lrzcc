@@ -23,6 +23,8 @@ DB_PORT="${MARIADB_PORT:=3306}"
 
 if [[ -z "${SKIP_DOCKER}" ]]
 then
+    docker stop lrzcc-db || true
+    docker rm lrzcc-db || true
     docker run \
         -e MARIADB_ROOT_PASSWORD="${DB_PASSWORD}" \
         -e MARIADB_DB="${DB_NAME}" \
