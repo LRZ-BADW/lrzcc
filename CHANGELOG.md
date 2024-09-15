@@ -1,6 +1,10 @@
 # Changelog
 This is the combined changelog of all contained `lrzcc` crates.
 
+## [lrzcc-cli-v1.1.1] - 2024-09-15
+### Fixes
+- Add aliases `show` to all `get` commands to comply with former Python CLI client.
+
 ## [lrzcc-api-v0.1.0] - 2024-09-15
 Initial release of the `lrzcc-api` crate containing a partial rewrite of the API
 server with authentication, the hello endpoint, proper testing, and basic
