@@ -13,4 +13,3 @@ docker run \
     -e APP_OPENSTACK__DOMAIN_ID="${OS_PROJECT_DOMAIN_ID}" \
     -d \
     lrzcc-api
-
