@@ -62,7 +62,10 @@ pub(crate) enum FlavorCommand {
         filter: FlavorListFilter,
     },
 
-    #[clap(about = "Show flavor with given name, ID or OpenStack UUIDv4")]
+    #[clap(
+        visible_alias = "show",
+        about = "Show flavor with given name, ID or OpenStack UUIDv4"
+    )]
     Get { name_or_id: String },
 
     #[clap(about = "Create a new flavor")]
