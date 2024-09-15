@@ -1,6 +1,11 @@
 # Changelog
 This is the combined changelog of all contained `lrzcc` crates.
 
+## [Unreleased]
+- add test crate for shared test helpers and cross-crate testing
+- move api/tests/helpers to test crate
+- add test/tests with two library e2e tests for hello endpoint
+
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
 
 ### Fixes

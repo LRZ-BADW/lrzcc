@@ -1,4 +1,4 @@
-use crate::helpers::{random_uuid, spawn_app};
+use lrzcc_test::{random_uuid, spawn_app};
 
 #[tokio::test]
 async fn health_check_works() {

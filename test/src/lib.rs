@@ -140,6 +140,7 @@ pub async fn spawn_app() -> TestApp {
         .await
         .expect("Failed to build application.");
     let application_port = application.port();
+    #[allow(clippy::let_underscore_future)]
     let _ = tokio::spawn(application.run_until_stopped());
     let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -147,15 +148,14 @@ pub async fn spawn_app() -> TestApp {
         .build()
         .unwrap();
 
-    let test_app = TestApp {
+    TestApp {
         address: format!("http://127.0.0.1:{}", application_port),
         _port: application_port,
         db_pool: get_connection_pool(&configuration.database),
         _api_client: client,
         keystone_server,
         keystone_token,
-    };
-    test_app
+    }
 }
 
 async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
