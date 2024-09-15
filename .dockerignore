@@ -5,3 +5,4 @@ tests/
 Dockerfile
 scripts/
 migrations/
+rust-toolchain.toml
