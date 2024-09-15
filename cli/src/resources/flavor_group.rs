@@ -54,7 +54,10 @@ pub(crate) enum FlavorGroupCommand {
         filter: FlavorGroupListFilter,
     },
 
-    #[clap(about = "Show flavor group with given name or ID")]
+    #[clap(
+        visible_alias = "show",
+        about = "Show flavor group with given name or ID"
+    )]
     Get { name_or_id: String },
 
     #[clap(about = "Create a new flavor group")]
