@@ -49,7 +49,7 @@ pub(crate) enum FlavorQuotaCommand {
         filter: FlavorQuotaListFilter,
     },
 
-    #[clap(about = "Show flavor quota with given ID")]
+    #[clap(visible_alias = "show", about = "Show flavor quota with given ID")]
     Get { id: u32 },
 
     #[clap(about = "Create a new flavor quota")]
