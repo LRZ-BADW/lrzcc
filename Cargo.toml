@@ -5,6 +5,7 @@ members = [
     "lib",
     "cli",
     "wire",
+    "test",
 ]
 
 [workspace.dependencies.cargo-husky]

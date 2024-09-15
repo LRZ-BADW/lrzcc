@@ -1542,6 +1542,7 @@ dependencies = [
  "cargo-husky",
  "config",
  "jzon",
+ "lrzcc-test",
  "lrzcc-wire",
  "once_cell",
  "rand",
@@ -1557,7 +1558,6 @@ dependencies = [
  "tracing-bunyan-formatter",
  "tracing-log 0.2.0",
  "tracing-subscriber",
- "uuid",
  "wiremock",
 ]
 
@@ -1574,6 +1574,24 @@ dependencies = [
  "serde",
  "serde_json",
  "tabled",
+]
+
+[[package]]
+name = "lrzcc-test"
+version = "0.1.0"
+dependencies = [
+ "cargo-husky",
+ "lrzcc",
+ "lrzcc-api",
+ "lrzcc-wire",
+ "once_cell",
+ "rand",
+ "reqwest",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "uuid",
+ "wiremock",
 ]
 
 [[package]]
