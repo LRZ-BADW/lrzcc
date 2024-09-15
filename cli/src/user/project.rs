@@ -25,7 +25,10 @@ pub(crate) enum ProjectCommand {
         filter: ProjectListFilter,
     },
 
-    #[clap(about = "Show project with given name, ID, or openstack ID")]
+    #[clap(
+        visible_alias = "show",
+        about = "Show project with given name, ID, or openstack ID"
+    )]
     Get { name_or_id: String },
 
     #[clap(about = "Create a new project")]
