@@ -70,7 +70,7 @@ pub(crate) enum UserBudgetCommand {
         filter: UserBudgetListFilter,
     },
 
-    #[clap(about = "Show user budget with given ID")]
+    #[clap(visible_alias = "show", about = "Show user budget with given ID")]
     Get { id: u32 },
 
     #[clap(about = "Create a new user budget")]
