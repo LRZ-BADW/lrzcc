@@ -6,7 +6,7 @@ foremost the budgeting system.
 ## Installation
 Install the tool via cargo:
 ```bash
-cargo install lrzcc
+cargo install lrzcc-cli
 ```
 
 ## Usage
