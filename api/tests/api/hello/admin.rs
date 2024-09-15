@@ -1,7 +1,5 @@
-use crate::helpers::random_uuid;
+use lrzcc_test::{random_uuid, spawn_app};
 use lrzcc_wire::hello::Hello;
-
-use crate::helpers::spawn_app;
 
 #[tokio::test]
 async fn hello_admin_returns_unauthorized_for_missing_token() {
