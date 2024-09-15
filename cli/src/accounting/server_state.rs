@@ -55,7 +55,7 @@ pub(crate) enum ServerStateCommand {
         filter: ServerStateListFilter,
     },
 
-    #[clap(about = "Show server state with given ID")]
+    #[clap(visible_alias = "show", about = "Show server state with given ID")]
     Get { id: u32 },
 
     #[clap(about = "Create a new server state")]
