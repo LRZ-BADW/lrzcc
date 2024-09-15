@@ -16,7 +16,7 @@ pub(crate) enum FlavorPriceCommand {
     #[clap(about = "List users")]
     List,
 
-    #[clap(about = "Show flavor price with given ID")]
+    #[clap(visible_alias = "show", about = "Show flavor price with given ID")]
     Get { id: u32 },
 
     #[clap(about = "Create a new flavor price")]
