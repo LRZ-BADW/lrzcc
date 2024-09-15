@@ -30,7 +30,10 @@ pub(crate) enum UserCommand {
         filter: UserListFilter,
     },
 
-    #[clap(about = "Show user with given name, ID or openstack ID")]
+    #[clap(
+        visible_alias = "show",
+        about = "Show user with given name, ID or openstack ID"
+    )]
     Get { name_or_id: String },
 
     #[clap(about = "Create a new user")]
