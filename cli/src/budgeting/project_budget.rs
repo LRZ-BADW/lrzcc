@@ -68,7 +68,10 @@ pub(crate) enum ProjectBudgetCommand {
         filter: ProjectBudgetListFilter,
     },
 
-    #[clap(about = "Show project budget with given ID")]
+    #[clap(
+        visible_alias = "show",
+        about = "Show project budget with given ID"
+    )]
     Get { id: u32 },
 
     #[clap(about = "Create a new project budget")]
