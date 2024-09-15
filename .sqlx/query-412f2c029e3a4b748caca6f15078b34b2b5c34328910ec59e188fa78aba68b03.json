@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            INSERT INTO user_user (\n            password,\n            name,\n            openstack_id,\n            project_id,\n            role,\n            is_staff,\n            is_active\n            )\n            VALUES (\"\", ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "412f2c029e3a4b748caca6f15078b34b2b5c34328910ec59e188fa78aba68b03"
+}
