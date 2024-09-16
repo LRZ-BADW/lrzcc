@@ -14,6 +14,10 @@ path = "src/lib.rs"
 name = "main"
 path = "tests/main.rs"
 
+[[bench]]
+name = "bench"
+path = "tests/bench.rs"
+
 [dependencies]
 lrzcc = { path = "../lib" }
 lrzcc-api = { path = "../api" }
