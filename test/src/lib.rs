@@ -237,7 +237,7 @@ pub fn random_uuid() -> String {
     Uuid::new_v4().to_string()
 }
 
-fn random_alphanumeric_string(length: usize) -> String {
+pub fn random_alphanumeric_string(length: usize) -> String {
     thread_rng()
         .sample_iter(&Alphanumeric)
         .take(length)
@@ -245,6 +245,6 @@ fn random_alphanumeric_string(length: usize) -> String {
         .collect()
 }
 
-fn random_number(range: Range<u32>) -> u32 {
+pub fn random_number(range: Range<u32>) -> u32 {
     thread_rng().gen_range(range)
 }
