@@ -43,6 +43,43 @@ async fn e2e_lib_hello_user_works() {
 }
 
 #[tokio::test]
+async fn e2e_lib_hello_admin_denies_access_to_normal_user() {
+    // arrange
+    let server = spawn_app().await;
+    let (user, _project, token) = server
+        .setup_test_user_and_project(false)
+        .await
+        .expect("Failed to setup test user and project.");
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let hello = client.hello.admin();
+
+        // assert
+        assert!(hello.is_err());
+        assert_eq!(
+            hello.unwrap_err().to_string(),
+            format!("Requesting user is not an admin")
+        );
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
 async fn e2e_lib_hello_admin_works() {
     // arrange
     let server = spawn_app().await;
