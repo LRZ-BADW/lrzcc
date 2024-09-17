@@ -75,7 +75,7 @@ async fn e2e_lib_project_create_returns_not_found() {
         assert!(create.is_err());
         assert_eq!(
             create.unwrap_err().to_string(),
-            "Not Found 404: This route does not exist."
+            "This route does not exist."
         );
     })
     .await
