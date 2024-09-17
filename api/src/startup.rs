@@ -1,10 +1,8 @@
-use crate::authentication::{
-    extract_user_and_project, require_admin_user, require_valid_token,
-};
+use crate::authentication::{extract_user_and_project, require_valid_token};
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::error::not_found;
 use crate::openstack::OpenStack;
-use crate::routes::{health_check, hello_admin, hello_user};
+use crate::routes::{health_check, hello_scope};
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
@@ -73,12 +71,7 @@ async fn run(
                     .wrap(from_fn(extract_user_and_project))
                     .wrap(from_fn(require_valid_token))
                     .route("/secured_health_check", web::get().to(health_check))
-                    .route("/hello", web::get().to(hello_user))
-                    .service(
-                        web::scope("")
-                            .wrap(from_fn(require_admin_user))
-                            .route("/hello/admin", web::get().to(hello_admin)),
-                    ),
+                    .service(hello_scope()),
             )
             .default_service(web::route().to(not_found))
     })
