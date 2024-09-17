@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT INTO user_project (name, openstack_id, user_class)\n        VALUES (?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "d933ab01cc2126759f754fd732d5dcd4e94b157e9381189b69d4a92bbd721d39"
+}
