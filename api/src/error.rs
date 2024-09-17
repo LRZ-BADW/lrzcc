@@ -42,3 +42,7 @@ pub fn not_found_error() -> actix_web::Error {
     )
     .into()
 }
+
+pub async fn not_found() -> Result<HttpResponse, actix_web::Error> {
+    Err(not_found_error())
+}
