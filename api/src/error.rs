@@ -32,8 +32,7 @@ pub fn bad_request_error(message: &str) -> actix_web::Error {
     .into()
 }
 
-pub fn not_found_error() -> actix_web::Error {
-    let message = "Not Found 404: This route does not exist.";
+pub fn not_found_error(message: &str) -> actix_web::Error {
     InternalError::from_response(
         anyhow::anyhow!(message.to_string()),
         HttpResponse::BadRequest().json(ErrorResponse {
@@ -44,5 +43,5 @@ pub fn not_found_error() -> actix_web::Error {
 }
 
 pub async fn not_found() -> Result<HttpResponse, actix_web::Error> {
-    Err(not_found_error())
+    Err(not_found_error("This route does not exist."))
 }
