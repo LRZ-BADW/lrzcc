@@ -2,6 +2,7 @@ use crate::authentication::{
     extract_user_and_project, require_admin_user, require_valid_token,
 };
 use crate::configuration::{DatabaseSettings, Settings};
+use crate::error::not_found;
 use crate::openstack::OpenStack;
 use crate::routes::{health_check, hello_admin, hello_user};
 use actix_web::{
@@ -79,7 +80,7 @@ async fn run(
                             .route("/hello/admin", web::get().to(hello_admin)),
                     ),
             )
-        // )
+            .default_service(web::route().to(not_found))
     })
     .listen(listener)?
     .run();
