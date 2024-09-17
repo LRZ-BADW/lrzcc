@@ -27,6 +27,13 @@ struct ProjectIdParam {
     project_id: u32,
 }
 
+struct ProjectRow {
+    id: i32,
+    name: String,
+    openstack_id: String,
+    user_class: u32,
+}
+
 // TODO proper query set and permissions
 #[tracing::instrument(name = "project_get")]
 async fn project_get(
@@ -35,15 +42,8 @@ async fn project_get(
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
 ) -> Result<HttpResponse, actix_web::Error> {
-    struct Row {
-        id: i32,
-        name: String,
-        openstack_id: String,
-        user_class: u32,
-    }
-
     let Ok(row) = sqlx::query_as!(
-        Row,
+        ProjectRow,
         r#"
         SELECT
             id,
