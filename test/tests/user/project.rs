@@ -42,7 +42,7 @@ async fn e2e_lib_project_create_denies_access_to_normal_user() {
     .unwrap();
 }
 
-// TODO this is just temporary
+// TODO this is just temporary, a general not found test is better for this
 #[tokio::test]
 async fn e2e_lib_project_create_returns_not_found() {
     // arrange
@@ -73,10 +73,10 @@ async fn e2e_lib_project_create_returns_not_found() {
 
         // assert
         assert!(create.is_err());
-        assert!(create
-            .unwrap_err()
-            .to_string()
-            .starts_with("Unexpected status code 404"));
+        assert_eq!(
+            create.unwrap_err().to_string(),
+            "Not Found 404: This route does not exist."
+        );
     })
     .await
     .unwrap();
