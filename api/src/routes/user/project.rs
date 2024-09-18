@@ -19,7 +19,7 @@ pub fn projects_scope() -> Scope {
     scope("/projects").service(
         scope("")
             .wrap(from_fn(require_admin_user))
-            .route("", post().to(project_create))
+            .route("/", post().to(project_create))
             .route("", get().to(project_list))
             .route("/{project_id}", get().to(project_get))
             // TODO: what about PUT?
