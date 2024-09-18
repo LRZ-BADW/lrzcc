@@ -60,12 +60,16 @@ async fn project_create(
         data.openstack_id,
         user_class
     );
-    let Ok(result) = db_pool.execute(query).await else {
-        // TODO distinguish different database errors
-        // TODO apply context and map_err
-        return Err(bad_request_error(
-            "Failed to insert new project, maybe it already exists.",
-        ));
+    let result = match db_pool.execute(query).await {
+        Ok(result) => result,
+        Err(e) => {
+            // TODO distinguish different database errors
+            // TODO apply context and map_err
+            tracing::error!("Failed to insert new project: {:?}", e);
+            return Err(bad_request_error(
+                "Failed to insert new project, maybe it already exists",
+            ));
+        }
     };
     let id = result.last_insert_id();
     let project = ProjectCreated {
