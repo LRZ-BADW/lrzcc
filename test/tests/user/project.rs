@@ -120,7 +120,7 @@ async fn e2e_lib_project_list_returns_own_project() {
 
 #[tokio::test]
 async fn e2e_lib_project_create_and_get_works() {
-    // Arrange
+    // arrange
     let server = spawn_app().await;
     let (user, _project, token) = server
         .setup_test_user_and_project(true)
@@ -132,7 +132,7 @@ async fn e2e_lib_project_create_and_get_works() {
         .await;
 
     spawn_blocking(move || {
-        // Arrange
+        // arrange
         let client = Api::new(
             format!("{}/api", &server.address),
             Token::from_str(&token).unwrap(),
@@ -141,7 +141,7 @@ async fn e2e_lib_project_create_and_get_works() {
         )
         .unwrap();
 
-        // Act and Assert 1
+        // act and assert 1 - create
         let name = random_alphanumeric_string(10);
         let openstack_id = random_uuid();
         let user_class = random_number(1..6);
@@ -155,7 +155,7 @@ async fn e2e_lib_project_create_and_get_works() {
         assert_eq!(openstack_id, created.openstack_id);
         assert_eq!(user_class, created.user_class);
 
-        // Act and Assert 2
+        // act and assert 2 - get
         let detailed = client.project.get(created.id).unwrap();
         assert_eq!(detailed.id, created.id);
         assert_eq!(detailed.name, created.name);
