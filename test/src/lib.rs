@@ -71,13 +71,13 @@ impl TestApp {
         &self,
         admin: bool,
     ) -> Result<(User, Project, String), sqlx::Error> {
-        let project = Project {
+        let mut project = Project {
             id: 1,
             name: random_alphanumeric_string(10),
             openstack_id: random_uuid(),
             user_class: random_number(1..6),
         };
-        let user = User {
+        let mut user = User {
             id: 1,
             name: random_alphanumeric_string(10),
             openstack_id: random_uuid(),
@@ -93,20 +93,24 @@ impl TestApp {
             .begin()
             .await
             .expect("Failed to begin transaction.");
-        insert_project_into_db(&mut transaction, &project)
-            .await
-            .expect("Failed to insert project into database.");
-        insert_user_into_db(&mut transaction, &user)
-            .await
-            .expect("Failed to insert user into database.");
+        let Ok(project_id) =
+            insert_project_into_db(&mut transaction, &project).await
+        else {
+            panic!("Failed to insert project into database.");
+        };
+        project.id = project_id as u32;
+        user.project = project_id as u32;
+        let Ok(user_id) = insert_user_into_db(&mut transaction, &user).await
+        else {
+            panic!("Failed to insert user into database.");
+        };
+        user.id = user_id as u32;
         transaction
             .commit()
             .await
             .expect("Failed to commit transaction.");
 
         let token = Uuid::new_v4().to_string();
-
-        // TODO retrieve actual ids
 
         Ok((user, project, token))
     }
