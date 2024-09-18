@@ -210,7 +210,7 @@ async fn project_modify(
     };
     let name = data.name.clone().unwrap_or(row.name);
     let openstack_id = data.openstack_id.clone().unwrap_or(row.openstack_id);
-    let user_class = data.user_class.clone().unwrap_or(row.user_class);
+    let user_class = data.user_class.unwrap_or(row.user_class);
     let query = sqlx::query!(
         r#"
         UPDATE user_project
@@ -238,7 +238,7 @@ async fn project_modify(
         return Err(internal_server_error("Failed to commit transaction"));
     }
     let project = Project {
-        id: data.id as u32,
+        id: data.id,
         name,
         openstack_id,
         user_class,
