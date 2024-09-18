@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: "chore(cargo): update"
+      prefix: "chore(cargo)"
     labels: []
 
   - package-ecosystem: "github-actions"
@@ -15,5 +15,5 @@ updates:
     schedule:
       interval: "daily"
     commit-message:
-      prefix: "chore(ci): update"
+      prefix: "chore(ci)"
     labels: []
