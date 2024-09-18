@@ -1,6 +1,6 @@
 # lrzcc
 API bindings, CLI application and partial API-backend written in Rust for
-LRZ-specific features of the Openstack-based LRZ Compute Cloud, 
+LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 [https://cc.lrz.de](https://cc.lrz.de), first and foremost the budgeting system.
 
 ## Crates

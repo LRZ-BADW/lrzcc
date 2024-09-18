@@ -31,3 +31,17 @@ pub fn bad_request_error(message: &str) -> actix_web::Error {
     )
     .into()
 }
+
+pub fn not_found_error(message: &str) -> actix_web::Error {
+    InternalError::from_response(
+        anyhow::anyhow!(message.to_string()),
+        HttpResponse::BadRequest().json(ErrorResponse {
+            detail: message.to_string(),
+        }),
+    )
+    .into()
+}
+
+pub async fn not_found() -> Result<HttpResponse, actix_web::Error> {
+    Err(not_found_error("This route does not exist."))
+}

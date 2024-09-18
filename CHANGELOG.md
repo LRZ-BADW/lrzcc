@@ -5,6 +5,10 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add test crate for shared test helpers and cross-crate testing
 - move api/tests/helpers to test crate
 - add test/tests with two library e2e tests for hello endpoint
+- move endpoint scope creation to respective modules
+- add not_found(_error) and default_service
+- add rudimentary project endpoint
+- add move e2e tests
 
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
 
