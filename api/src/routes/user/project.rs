@@ -58,7 +58,7 @@ async fn project_create(
         "#,
         data.name,
         data.openstack_id,
-        data.user_class
+        user_class
     );
     let Ok(result) = db_pool.execute(query).await else {
         // TODO distinguish different database errors
