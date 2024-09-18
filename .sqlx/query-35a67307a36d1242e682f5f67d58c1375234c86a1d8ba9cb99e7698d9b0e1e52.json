@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE user_project\n        SET name = ?, openstack_id = ?, user_class = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "35a67307a36d1242e682f5f67d58c1375234c86a1d8ba9cb99e7698d9b0e1e52"
+}
