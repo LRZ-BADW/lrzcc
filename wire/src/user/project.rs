@@ -92,6 +92,7 @@ impl ProjectCreateData {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectModifyData {
+    // TODO: why again is this here? since this is already a URL parameter
     pub id: u32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
