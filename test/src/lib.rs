@@ -191,7 +191,7 @@ async fn configure_database(config: &DatabaseSettings) -> MySqlPool {
 pub async fn insert_project_into_db(
     transaction: &mut Transaction<'static, MySql>,
     project: &Project,
-) -> Result<(), sqlx::Error> {
+) -> Result<u64, sqlx::Error> {
     let query = sqlx::query!(
         r#"
             INSERT INTO user_project (
@@ -205,13 +205,16 @@ pub async fn insert_project_into_db(
         project.openstack_id,
         project.user_class,
     );
-    transaction.execute(query).await.map(|_| ())
+    transaction
+        .execute(query)
+        .await
+        .map(|result| result.last_insert_id())
 }
 
 pub async fn insert_user_into_db(
     transaction: &mut Transaction<'static, MySql>,
     user: &User,
-) -> Result<(), sqlx::Error> {
+) -> Result<u64, sqlx::Error> {
     let query = sqlx::query!(
         r#"
             INSERT INTO user_user (
@@ -232,7 +235,10 @@ pub async fn insert_user_into_db(
         user.is_staff,
         user.is_active,
     );
-    transaction.execute(query).await.map(|_| ())
+    transaction
+        .execute(query)
+        .await
+        .map(|result| result.last_insert_id())
 }
 
 pub fn random_uuid() -> String {
