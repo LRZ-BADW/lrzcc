@@ -481,3 +481,62 @@ async fn e2e_lib_project_create_get_delete_get_works() {
     .await
     .unwrap();
 }
+
+// TODO: how can we test internal server error responses?
+#[tokio::test]
+async fn e2e_lib_project_create_twice_returns_bad_request() {
+    // arrange
+    let server = spawn_app().await;
+    let (user, _project, token) = server
+        .setup_test_user_and_project(true)
+        .await
+        .expect("Failed to setup test user and project.");
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act and assert 1 - create
+        let name = random_alphanumeric_string(10);
+        let openstack_id = random_uuid();
+        let user_class = random_number(1..6);
+        let created = client
+            .project
+            .create(name.clone(), openstack_id.clone())
+            .user_class(user_class)
+            .send()
+            .unwrap();
+        assert_eq!(name, created.name);
+        assert_eq!(openstack_id, created.openstack_id);
+        assert_eq!(user_class, created.user_class);
+
+        // act and assert 2 - create
+        let create = client
+            .project
+            .create(name.clone(), openstack_id.clone())
+            .user_class(user_class)
+            .send();
+        match create {
+            Err(lrzcc::error::ApiError::ResponseError(message)) => {
+                assert_eq!(
+                    message,
+                    "Failed to insert new project, a conflicting entry exists"
+                        .to_string()
+                );
+            }
+            _ => panic!("Expected ApiError::ResponseError"),
+        }
+    })
+    .await
+    .unwrap();
+}
