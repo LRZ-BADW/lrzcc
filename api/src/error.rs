@@ -5,6 +5,7 @@ use actix_web::http::{header::CONTENT_TYPE, StatusCode};
 use actix_web::HttpResponse;
 use actix_web::ResponseError;
 use lrzcc_wire::error::{error_chain_fmt, ErrorResponse};
+use lrzcc_wire::user::User;
 
 pub fn unauthorized_error(message: &str) -> actix_web::Error {
     InternalError::from_response(
@@ -98,10 +99,10 @@ impl From<MinimalApiError> for NormalApiError {
     fn from(value: MinimalApiError) -> Self {
         match value {
             MinimalApiError::ValidationError(message) => {
-                NormalApiError::ValidationError(message)
+                Self::ValidationError(message)
             }
             MinimalApiError::UnexpectedError(error) => {
-                NormalApiError::UnexpectedError(error)
+                Self::UnexpectedError(error)
             }
         }
     }
@@ -118,5 +119,47 @@ pub enum MinimalApiError {
 impl std::fmt::Debug for MinimalApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
+    }
+}
+
+#[derive(thiserror::Error)]
+pub enum AuthOnlyError {
+    #[error("{0}")]
+    AuthorizationError(String),
+}
+
+impl std::fmt::Debug for AuthOnlyError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
+impl ResponseError for AuthOnlyError {
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        let (status_code, message) = match self {
+            AuthOnlyError::AuthorizationError(message) => {
+                (StatusCode::FORBIDDEN, message.clone())
+            }
+        };
+        HttpResponse::build(status_code)
+            .insert_header((
+                CONTENT_TYPE,
+                HeaderValue::from_static("application/json"),
+            ))
+            // TODO: handle unwrap
+            .body(
+                serde_json::to_string(&ErrorResponse { detail: message })
+                    .unwrap(),
+            )
+    }
+}
+
+impl From<AuthOnlyError> for NormalApiError {
+    fn from(value: AuthOnlyError) -> Self {
+        match value {
+            AuthOnlyError::AuthorizationError(message) => {
+                Self::AuthorizationError(message)
+            }
+        }
     }
 }

@@ -1,6 +1,4 @@
-use actix_web::body::BoxBody;
-use actix_web::http::header::HeaderValue;
-use actix_web::http::{header::CONTENT_TYPE, StatusCode};
+use crate::error::AuthOnlyError;
 use actix_web::web::ReqData;
 use actix_web::web::{get, scope};
 use actix_web::ResponseError;
@@ -30,43 +28,11 @@ async fn hello_user(
         })
 }
 
-#[derive(thiserror::Error)]
-pub enum HelloAdminError {
-    #[error("{0}")]
-    AuthorizationError(String),
-}
-
-impl std::fmt::Debug for HelloAdminError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        error_chain_fmt(self, f)
-    }
-}
-
-impl ResponseError for HelloAdminError {
-    fn error_response(&self) -> HttpResponse<BoxBody> {
-        let (status_code, message) = match self {
-            HelloAdminError::AuthorizationError(message) => {
-                (StatusCode::FORBIDDEN, message.clone())
-            }
-        };
-        HttpResponse::build(status_code)
-            .insert_header((
-                CONTENT_TYPE,
-                HeaderValue::from_static("application/json"),
-            ))
-            // TODO: handle unwrap
-            .body(
-                serde_json::to_string(&ErrorResponse { detail: message })
-                    .unwrap(),
-            )
-    }
-}
-
 #[tracing::instrument(name = "hello_admin")]
 async fn hello_admin(
     user: ReqData<User>,
     project: ReqData<Project>,
-) -> Result<HttpResponse, HelloAdminError> {
+) -> Result<HttpResponse, AuthOnlyError> {
     if !user.is_staff {
         return Err(HelloAdminError::AuthorizationError(
             "Admin privileges required".to_string(),
