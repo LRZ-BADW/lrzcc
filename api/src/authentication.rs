@@ -117,20 +117,3 @@ pub async fn extract_user_and_project(
 
     next.call(req).await
 }
-
-// TODO: should this really be a middleware? or do we wanna handle in handlers?
-pub async fn require_admin_user(
-    req: ServiceRequest,
-    next: Next<impl MessageBody>,
-) -> Result<ServiceResponse<impl MessageBody>, actix_web::Error> {
-    let user = match req.extensions().get::<User>() {
-        Some(user) => user.clone(),
-        None => {
-            return Err(internal_server_error("No user in request extensions"));
-        }
-    };
-    if !user.is_staff {
-        return Err(unauthorized_error("Requesting user is not an admin"));
-    }
-    next.call(req).await
-}
