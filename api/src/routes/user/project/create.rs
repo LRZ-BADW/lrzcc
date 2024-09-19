@@ -62,6 +62,7 @@ pub async fn project_create(
 }
 
 #[tracing::instrument(
+    // TODO: how to best handle trace names
     name = "Insert new project into database",
     skip(new_project, transaction)
 )]
