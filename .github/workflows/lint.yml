@@ -84,7 +84,7 @@ jobs:
       - name: Install cargo-spellcheck
         run: cargo install cargo-spellcheck
       - name: Check spelling
-        run: cargo spellcheck --cfg=.spellcheck.toml
+        run: cargo spellcheck --cfg=.spellcheck.toml --code 1
 
   machete:
     runs-on: ubuntu-latest
