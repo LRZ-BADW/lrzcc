@@ -68,7 +68,7 @@ async fn hello_admin_denies_access_to_normal_user() {
         .expect("Failed to execute request.");
 
     // assert
-    assert_eq!(response.status().as_u16(), 401);
+    assert_eq!(response.status().as_u16(), 403);
 }
 
 #[tokio::test]
