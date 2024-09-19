@@ -9,6 +9,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add not_found(_error) and default_service
 - add rudimentary project endpoint
 - add move e2e tests
+- split project endpoint into submodules
 
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
 
