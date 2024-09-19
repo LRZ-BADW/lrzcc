@@ -13,6 +13,8 @@ use sqlx::{Executor, MySql, MySqlPool, Transaction};
 pub enum ProjectCreateError {
     #[error("{0}")]
     ValidationError(String),
+    #[error("{0}")]
+    AuthorizationError(String),
     #[error(transparent)]
     UnexpectedError(#[from] anyhow::Error),
 }
@@ -28,6 +30,9 @@ impl ResponseError for ProjectCreateError {
         let (status_code, message) = match self {
             ProjectCreateError::ValidationError(message) => {
                 (StatusCode::BAD_REQUEST, message.clone())
+            }
+            ProjectCreateError::AuthorizationError(message) => {
+                (StatusCode::FORBIDDEN, message.clone())
             }
             ProjectCreateError::UnexpectedError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -87,6 +92,11 @@ pub async fn project_create(
     db_pool: Data<MySqlPool>,
     data: Json<ProjectCreateData>,
 ) -> Result<HttpResponse, ProjectCreateError> {
+    if !user.is_staff {
+        return Err(ProjectCreateError::AuthorizationError(
+            "Admin privileges required".to_string(),
+        ));
+    }
     let new_project: NewProject = data
         .0
         .try_into()
