@@ -74,7 +74,7 @@ async fn e2e_lib_project_list_denies_access_to_normal_user() {
         assert!(list.is_err());
         assert_eq!(
             list.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await
@@ -111,7 +111,7 @@ async fn e2e_lib_project_get_denies_access_to_normal_user() {
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await
@@ -148,7 +148,7 @@ async fn e2e_lib_project_modify_denies_access_to_normal_user() {
         assert!(modify.is_err());
         assert_eq!(
             modify.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await
@@ -185,7 +185,7 @@ async fn e2e_lib_project_delete_denies_access_to_normal_user() {
         assert!(delete.is_err());
         assert_eq!(
             delete.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await
