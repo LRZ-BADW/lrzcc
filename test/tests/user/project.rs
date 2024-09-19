@@ -37,7 +37,7 @@ async fn e2e_lib_project_create_denies_access_to_normal_user() {
         assert!(create.is_err());
         assert_eq!(
             create.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await
