@@ -10,8 +10,7 @@ use actix_web::HttpMessage;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
-// TODO test error messages as well
-// TODO revise error functions for use with map_err
+// TODO revise error handling here as well and test errors
 
 pub async fn require_valid_token(
     req: ServiceRequest,
@@ -119,6 +118,7 @@ pub async fn extract_user_and_project(
     next.call(req).await
 }
 
+// TODO: should this really be a middleware? or do we wanna handle in handlers?
 pub async fn require_admin_user(
     req: ServiceRequest,
     next: Next<impl MessageBody>,
