@@ -42,7 +42,7 @@ pub async fn project_create(
         .begin()
         .await
         .context("Failed to acquire a database connection from the pool")?;
-    let id = insert_project(&mut transaction, &new_project).await?;
+    let id = insert_project_into_db(&mut transaction, &new_project).await?;
     transaction
         .commit()
         .await
@@ -62,11 +62,10 @@ pub async fn project_create(
 }
 
 #[tracing::instrument(
-    // TODO: how to best handle trace names
-    name = "Insert new project into database",
+    name = "insert_project_into_db",
     skip(new_project, transaction)
 )]
-pub async fn insert_project(
+pub async fn insert_project_into_db(
     transaction: &mut Transaction<'_, MySql>,
     new_project: &NewProject,
 ) -> Result<u64, MinimalApiError> {
