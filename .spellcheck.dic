@@ -18,3 +18,5 @@ skip_serializing_if
 structs
 thiserror
 url
+user_class
+uuid
