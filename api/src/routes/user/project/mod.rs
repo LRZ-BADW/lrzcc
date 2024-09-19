@@ -1,11 +1,9 @@
 use crate::authentication::require_admin_user;
-use crate::error::not_found_error;
 use actix_web::middleware::from_fn;
-use actix_web::web::{delete, get, patch, post, scope, Data, Path, ReqData};
-use actix_web::{HttpResponse, Scope};
-use lrzcc_wire::user::{Project, User};
+use actix_web::web::{delete, get, patch, post, scope};
+use actix_web::Scope;
 use serde::Deserialize;
-use sqlx::{FromRow, MySqlPool};
+use sqlx::FromRow;
 
 mod create;
 use create::project_create;
@@ -15,6 +13,8 @@ mod get;
 use get::project_get;
 mod modify;
 use modify::project_modify;
+mod delete;
+use delete::project_delete;
 
 // TODO use anyhow and thiserror
 
@@ -44,27 +44,4 @@ struct ProjectRow {
     name: String,
     openstack_id: String,
     user_class: u32,
-}
-
-#[tracing::instrument(name = "project_delete")]
-async fn project_delete(
-    user: ReqData<User>,
-    project: ReqData<Project>,
-    db_pool: Data<MySqlPool>,
-    params: Path<ProjectIdParam>,
-) -> Result<HttpResponse, actix_web::Error> {
-    if sqlx::query!(
-        r#"DELETE FROM user_project WHERE id = ?"#,
-        params.project_id,
-    )
-    .execute(db_pool.get_ref())
-    .await
-    .is_err()
-    {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(not_found_error("Project with given ID not found"));
-    };
-
-    Ok(HttpResponse::NoContent().finish())
 }
