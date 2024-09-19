@@ -1,4 +1,4 @@
-use crate::error::{MinimalApiError, NormalApiError};
+use crate::error::{require_admin_user, MinimalApiError, NormalApiError};
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -31,11 +31,7 @@ pub async fn project_create(
     db_pool: Data<MySqlPool>,
     data: Json<ProjectCreateData>,
 ) -> Result<HttpResponse, NormalApiError> {
-    if !user.is_staff {
-        return Err(NormalApiError::AuthorizationError(
-            "Admin privileges required".to_string(),
-        ));
-    }
+    require_admin_user(&user)?;
     let new_project: NewProject =
         data.0.try_into().map_err(NormalApiError::ValidationError)?;
     let mut transaction = db_pool

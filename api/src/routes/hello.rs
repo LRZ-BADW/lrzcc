@@ -1,9 +1,7 @@
-use crate::error::AuthOnlyError;
+use crate::error::{require_admin_user, AuthOnlyError};
 use actix_web::web::ReqData;
 use actix_web::web::{get, scope};
-use actix_web::ResponseError;
 use actix_web::{HttpResponse, Scope};
-use lrzcc_wire::error::{error_chain_fmt, ErrorResponse};
 use lrzcc_wire::hello::Hello;
 use lrzcc_wire::user::{Project, User};
 
@@ -33,11 +31,7 @@ async fn hello_admin(
     user: ReqData<User>,
     project: ReqData<Project>,
 ) -> Result<HttpResponse, AuthOnlyError> {
-    if !user.is_staff {
-        return Err(HelloAdminError::AuthorizationError(
-            "Admin privileges required".to_string(),
-        ));
-    }
+    require_admin_user(&user)?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(Hello {
