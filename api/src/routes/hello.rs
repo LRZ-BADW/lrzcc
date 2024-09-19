@@ -18,28 +18,28 @@ pub fn hello_scope() -> Scope {
 async fn hello_user(
     user: ReqData<User>,
     project: ReqData<Project>,
-) -> Result<HttpResponse, actix_web::Error> {
-    Ok(HttpResponse::Ok()
+) -> HttpResponse {
+    HttpResponse::Ok()
         .content_type("application/json")
         .json(Hello {
             message: format!(
                 "Hello, {} from project {} with user class {}",
                 user.name, project.name, project.user_class
             ),
-        }))
+        })
 }
 
 #[tracing::instrument(name = "hello_admin")]
 async fn hello_admin(
     user: ReqData<User>,
     project: ReqData<Project>,
-) -> Result<HttpResponse, actix_web::Error> {
-    Ok(HttpResponse::Ok()
+) -> HttpResponse {
+    HttpResponse::Ok()
         .content_type("application/json")
         .json(Hello {
             message: format!(
                 "Hello, admin {} from project {} with user class {}",
                 user.name, project.name, project.user_class
             ),
-        }))
+        })
 }
