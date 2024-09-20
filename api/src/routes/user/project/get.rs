@@ -1,39 +1,37 @@
 use super::{ProjectIdParam, ProjectRow};
-use crate::error::not_found_error;
+use crate::error::{require_admin_user, OptionApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
+use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectDetailed, User};
-use sqlx::MySqlPool;
+use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
 // TODO proper query set and permissions
 #[tracing::instrument(name = "project_get")]
 pub async fn project_get(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
-) -> Result<HttpResponse, actix_web::Error> {
-    let Ok(row) = sqlx::query_as!(
-        ProjectRow,
-        r#"
-        SELECT
-            id,
-            name,
-            openstack_id,
-            user_class
-        FROM user_project AS project
-        WHERE
-            project.id = ?
-        "#,
-        params.project_id,
-    )
-    .fetch_one(db_pool.get_ref())
-    .await
+) -> Result<HttpResponse, OptionApiError> {
+    require_admin_user(&user)?;
+    let mut transaction = db_pool
+        .begin()
+        .await
+        .context("Failed to begin transaction")?;
+    let Some(row) =
+        select_project_from_db(&mut transaction, params.project_id as u64)
+            .await?
     else {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(not_found_error("Project with given ID not found"));
+        return Err(OptionApiError::NotFoundError(
+            "Project with given ID not found".to_string(),
+        ));
     };
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit transaction")?;
 
     let project = ProjectDetailed {
         id: row.id as u32,
@@ -48,4 +46,35 @@ pub async fn project_get(
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(project))
+}
+
+#[tracing::instrument(name = "select_project_from_db", skip(transaction))]
+pub async fn select_project_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<Option<ProjectRow>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name,
+            openstack_id,
+            user_class
+        FROM user_project AS project
+        WHERE
+            project.id = ?
+        "#,
+        project_id
+    );
+    let row = transaction
+        .fetch_optional(query)
+        .await
+        .context("Failed to execute select query")?;
+    Ok(match row {
+        Some(row) => Some(
+            ProjectRow::from_row(&row)
+                .context("Failed to parse project row")?,
+        ),
+        None => None,
+    })
 }
