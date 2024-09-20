@@ -164,6 +164,50 @@ impl From<AuthOnlyError> for NormalApiError {
     }
 }
 
+#[derive(thiserror::Error)]
+pub enum UnexpectedOnlyError {
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
+}
+
+impl std::fmt::Debug for UnexpectedOnlyError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
+impl ResponseError for UnexpectedOnlyError {
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        let (status_code, message) = match self {
+            UnexpectedOnlyError::UnexpectedError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error, contact admin or check logs"
+                    .to_string(),
+            ),
+        };
+        HttpResponse::build(status_code)
+            .insert_header((
+                CONTENT_TYPE,
+                HeaderValue::from_static("application/json"),
+            ))
+            // TODO: handle unwrap
+            .body(
+                serde_json::to_string(&ErrorResponse { detail: message })
+                    .unwrap(),
+            )
+    }
+}
+
+impl From<UnexpectedOnlyError> for NormalApiError {
+    fn from(value: UnexpectedOnlyError) -> Self {
+        match value {
+            UnexpectedOnlyError::UnexpectedError(message) => {
+                Self::UnexpectedError(message)
+            }
+        }
+    }
+}
+
 pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
     if !user.is_staff {
         return Err(AuthOnlyError::AuthorizationError(
