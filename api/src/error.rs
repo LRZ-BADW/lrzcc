@@ -306,6 +306,7 @@ impl From<UnexpectedOnlyError> for NormalApiError {
     }
 }
 
+// TODO: this should probably be in a separate authorization module
 pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
     if !user.is_staff {
         return Err(AuthOnlyError::AuthorizationError(
