@@ -9,6 +9,7 @@ use sqlx::MySqlPool;
 #[tracing::instrument(name = "project_list")]
 pub async fn project_list(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
 ) -> Result<HttpResponse, actix_web::Error> {

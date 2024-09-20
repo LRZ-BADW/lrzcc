@@ -27,6 +27,7 @@ impl TryFrom<ProjectCreateData> for NewProject {
 #[tracing::instrument(name = "project_create")]
 pub async fn project_create(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<ProjectCreateData>,
@@ -37,7 +38,7 @@ pub async fn project_create(
     let mut transaction = db_pool
         .begin()
         .await
-        .context("Failed to acquire a database connection from the pool")?;
+        .context("Failed to begin transaction")?;
     let id = insert_project_into_db(&mut transaction, &new_project).await?;
     transaction
         .commit()

@@ -10,6 +10,7 @@ use super::ProjectIdParam;
 #[tracing::instrument(name = "project_delete")]
 pub async fn project_delete(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
@@ -18,7 +19,7 @@ pub async fn project_delete(
     let mut transaction = db_pool
         .begin()
         .await
-        .context("Failed to acquire a database connection from the pool")?;
+        .context("Failed to begin transaction")?;
     delete_project_from_db(&mut transaction, params.project_id as u64).await?;
     transaction
         .commit()
