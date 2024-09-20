@@ -10,6 +10,10 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add rudimentary project endpoint
 - add move e2e tests
 - split project endpoint into submodules
+- move require_admin_user from middleware to handlers
+- add hierarchical api errors
+- split of query functions from all project handlers
+- add proper error handling to all project handlers
 
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
 
