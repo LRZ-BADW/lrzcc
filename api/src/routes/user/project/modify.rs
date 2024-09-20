@@ -8,7 +8,7 @@ use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectModifyData, User};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
-use super::{ProjectIdParam, ProjectRow};
+use super::ProjectIdParam;
 
 #[tracing::instrument(name = "project_modify")]
 pub async fn project_modify(
@@ -30,17 +30,11 @@ pub async fn project_modify(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let row = update_project_in_db(&mut transaction, &data).await?;
+    let project = update_project_in_db(&mut transaction, &data).await?;
     transaction
         .commit()
         .await
         .context("Failed to commit transaction")?;
-    let project = Project {
-        id: row.id as u32,
-        name: row.name,
-        openstack_id: row.openstack_id,
-        user_class: row.user_class,
-    };
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(project))
@@ -50,7 +44,7 @@ pub async fn project_modify(
 pub async fn update_project_in_db(
     transaction: &mut Transaction<'_, MySql>,
     data: &ProjectModifyData,
-) -> Result<ProjectRow, NotFoundOrUnexpectedApiError> {
+) -> Result<Project, NotFoundOrUnexpectedApiError> {
     let row = select_project_from_db(transaction, data.id as u64).await?;
     let name = data.name.clone().unwrap_or(row.name);
     let openstack_id = data.openstack_id.clone().unwrap_or(row.openstack_id);
@@ -70,8 +64,8 @@ pub async fn update_project_in_db(
         .execute(query)
         .await
         .context("Failed to execute update query")?;
-    let project = ProjectRow {
-        id: data.id as i32,
+    let project = Project {
+        id: data.id,
         name,
         openstack_id,
         user_class,

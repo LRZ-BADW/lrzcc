@@ -1,7 +1,6 @@
 use actix_web::web::{delete, get, patch, post, scope};
 use actix_web::Scope;
 use serde::Deserialize;
-use sqlx::FromRow;
 
 mod create;
 use create::project_create;
@@ -24,18 +23,10 @@ pub fn projects_scope() -> Scope {
         .route("/{project_id}/", delete().to(project_delete))
 }
 
+// TODO: wouldn't a general IdParam be better?
 #[derive(Deserialize, Debug)]
 struct ProjectIdParam {
     // TODO: why is this necessary, when this is clearly read in query_as
     #[allow(unused)]
     project_id: u32,
-}
-
-#[derive(Deserialize, FromRow, Debug)]
-struct ProjectRow {
-    // TODO: this should be a u64, and actually we should use wire types
-    id: i32,
-    name: String,
-    openstack_id: String,
-    user_class: u32,
 }

@@ -1,4 +1,4 @@
-use super::{ProjectIdParam, ProjectRow};
+use super::ProjectIdParam;
 use crate::error::{
     require_admin_user, NotFoundOrUnexpectedApiError, OptionApiError,
     UnexpectedOnlyError,
@@ -50,7 +50,7 @@ pub async fn project_get(
 pub async fn select_maybe_project_from_db(
     transaction: &mut Transaction<'_, MySql>,
     project_id: u64,
-) -> Result<Option<ProjectRow>, UnexpectedOnlyError> {
+) -> Result<Option<Project>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
         SELECT
@@ -70,8 +70,7 @@ pub async fn select_maybe_project_from_db(
         .context("Failed to execute select query")?;
     Ok(match row {
         Some(row) => Some(
-            ProjectRow::from_row(&row)
-                .context("Failed to parse project row")?,
+            Project::from_row(&row).context("Failed to parse project row")?,
         ),
         None => None,
     })
@@ -81,7 +80,7 @@ pub async fn select_maybe_project_from_db(
 pub async fn select_project_from_db(
     transaction: &mut Transaction<'_, MySql>,
     project_id: u64,
-) -> Result<ProjectRow, NotFoundOrUnexpectedApiError> {
+) -> Result<Project, NotFoundOrUnexpectedApiError> {
     select_maybe_project_from_db(transaction, project_id)
         .await?
         .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(

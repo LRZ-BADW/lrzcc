@@ -1,4 +1,3 @@
-use super::ProjectRow;
 use crate::error::{require_admin_user, NormalApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, ReqData};
 use actix_web::HttpResponse;
@@ -19,22 +18,11 @@ pub async fn project_list(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let rows = select_all_projects_from_db(&mut transaction).await?;
+    let projects = select_all_projects_from_db(&mut transaction).await?;
     transaction
         .commit()
         .await
         .context("Failed to commit transaction")?;
-
-    let projects = rows
-        .into_iter()
-        .map(|r| Project {
-            id: r.id as u32,
-            name: r.name,
-            openstack_id: r.openstack_id,
-            user_class: r.user_class,
-        })
-        .collect::<Vec<_>>();
-
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(projects))
@@ -43,7 +31,7 @@ pub async fn project_list(
 #[tracing::instrument(name = "select_all_projects_from_db", skip(transaction))]
 pub async fn select_all_projects_from_db(
     transaction: &mut Transaction<'_, MySql>,
-) -> Result<Vec<ProjectRow>, UnexpectedOnlyError> {
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
         SELECT
@@ -59,7 +47,7 @@ pub async fn select_all_projects_from_db(
         .await
         .context("Failed to execute select query")?
         .into_iter()
-        .map(|r| ProjectRow::from_row(&r))
+        .map(|r| Project::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
         .context("Failed to convert row to project")?;
     Ok(rows)
