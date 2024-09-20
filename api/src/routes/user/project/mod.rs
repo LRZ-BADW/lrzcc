@@ -14,8 +14,6 @@ use modify::project_modify;
 mod delete;
 use delete::project_delete;
 
-// TODO use anyhow and thiserror
-
 pub fn projects_scope() -> Scope {
     scope("/projects")
         .route("/", post().to(project_create))
@@ -35,6 +33,7 @@ struct ProjectIdParam {
 
 #[derive(Deserialize, FromRow, Debug)]
 struct ProjectRow {
+    // TODO: this should be a u64, and actually we should use wire types
     id: i32,
     name: String,
     openstack_id: String,
