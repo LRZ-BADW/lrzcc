@@ -12,7 +12,7 @@ echo '+cargo fmt --all -- --check'
 cargo fmt --all -- --check
 
 echo '+cargo spellcheck --cfg=.spellcheck.toml'
-cargo spellcheck --cfg=.spellcheck.toml
+cargo spellcheck --cfg=.spellcheck.toml -m 1
 
 echo '+cargo clippy --all -- -D warnings'
 cargo clippy --all -- -D warnings
