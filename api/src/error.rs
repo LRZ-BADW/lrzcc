@@ -129,7 +129,30 @@ impl From<MinimalApiError> for OptionApiError {
     }
 }
 
+impl From<NotFoundOrUnexpectedApiError> for OptionApiError {
+    fn from(value: NotFoundOrUnexpectedApiError) -> Self {
+        match value {
+            NotFoundOrUnexpectedApiError::NotFoundError(message) => {
+                Self::NotFoundError(message)
+            }
+            NotFoundOrUnexpectedApiError::UnexpectedError(error) => {
+                Self::UnexpectedError(error)
+            }
+        }
+    }
+}
+
 impl From<UnexpectedOnlyError> for OptionApiError {
+    fn from(value: UnexpectedOnlyError) -> Self {
+        match value {
+            UnexpectedOnlyError::UnexpectedError(message) => {
+                Self::UnexpectedError(message)
+            }
+        }
+    }
+}
+
+impl From<UnexpectedOnlyError> for NotFoundOrUnexpectedApiError {
     fn from(value: UnexpectedOnlyError) -> Self {
         match value {
             UnexpectedOnlyError::UnexpectedError(message) => {
@@ -215,6 +238,20 @@ pub enum MinimalApiError {
 }
 
 impl std::fmt::Debug for MinimalApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
+#[derive(thiserror::Error)]
+pub enum NotFoundOrUnexpectedApiError {
+    #[error("{0}")]
+    NotFoundError(String),
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
+}
+
+impl std::fmt::Debug for NotFoundOrUnexpectedApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
     }
