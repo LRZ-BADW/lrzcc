@@ -17,6 +17,7 @@ serde
 skip_serializing_if
 structs
 thiserror
+u64
 url
 user_class
 uuid
