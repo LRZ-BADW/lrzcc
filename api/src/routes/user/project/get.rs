@@ -1,5 +1,8 @@
 use super::{ProjectIdParam, ProjectRow};
-use crate::error::{require_admin_user, OptionApiError, UnexpectedOnlyError};
+use crate::error::{
+    require_admin_user, NotFoundOrUnexpectedApiError, OptionApiError,
+    UnexpectedOnlyError,
+};
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -20,14 +23,9 @@ pub async fn project_get(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let Some(row) =
+    let row =
         select_project_from_db(&mut transaction, params.project_id as u64)
-            .await?
-    else {
-        return Err(OptionApiError::NotFoundError(
-            "Project with given ID not found".to_string(),
-        ));
-    };
+            .await?;
     transaction
         .commit()
         .await
@@ -48,8 +46,8 @@ pub async fn project_get(
         .json(project))
 }
 
-#[tracing::instrument(name = "select_project_from_db", skip(transaction))]
-pub async fn select_project_from_db(
+#[tracing::instrument(name = "select_maybe_project_from_db", skip(transaction))]
+pub async fn select_maybe_project_from_db(
     transaction: &mut Transaction<'_, MySql>,
     project_id: u64,
 ) -> Result<Option<ProjectRow>, UnexpectedOnlyError> {
@@ -77,4 +75,16 @@ pub async fn select_project_from_db(
         ),
         None => None,
     })
+}
+
+#[tracing::instrument(name = "select_project_from_db", skip(transaction))]
+pub async fn select_project_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<ProjectRow, NotFoundOrUnexpectedApiError> {
+    select_maybe_project_from_db(transaction, project_id)
+        .await?
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
+            "Project with given ID not found".to_string(),
+        ))
 }
