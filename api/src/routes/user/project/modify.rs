@@ -1,8 +1,12 @@
-use crate::error::{bad_request_error, internal_server_error, not_found_error};
+use super::get::select_project_from_db;
+use crate::error::{
+    require_admin_user, NotFoundOrUnexpectedApiError, OptionApiError,
+};
 use actix_web::web::{Data, Json, Path, ReqData};
 use actix_web::HttpResponse;
+use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectModifyData, User};
-use sqlx::{Executor, FromRow, MySqlPool};
+use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::{ProjectIdParam, ProjectRow};
 
@@ -14,35 +18,40 @@ pub async fn project_modify(
     db_pool: Data<MySqlPool>,
     data: Json<ProjectModifyData>,
     params: Path<ProjectIdParam>,
-) -> Result<HttpResponse, actix_web::Error> {
+) -> Result<HttpResponse, OptionApiError> {
+    require_admin_user(&user)?;
+    // TODO: do further validation
     if data.id != params.project_id {
-        return Err(bad_request_error("ID in URL does not match ID in body"));
+        return Err(OptionApiError::ValidationError(
+            "ID in URL does not match ID in body".to_string(),
+        ));
     }
-    let Ok(mut transaction) = db_pool.begin().await else {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(internal_server_error("Failed to start transaction"));
+    let mut transaction = db_pool
+        .begin()
+        .await
+        .context("Failed to begin transaction")?;
+    let row = update_project_in_db(&mut transaction, &data).await?;
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit transaction")?;
+    let project = Project {
+        id: row.id as u32,
+        name: row.name,
+        openstack_id: row.openstack_id,
+        user_class: row.user_class,
     };
-    let query = sqlx::query_as::<_, ProjectRow>(
-        r#"
-        SELECT
-            id,
-            name,
-            openstack_id,
-            user_class
-        FROM user_project
-        WHERE id = ?
-        "#,
-    )
-    .bind(data.id);
-    let Ok(row) = transaction.fetch_one(query).await else {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(not_found_error("Project with given ID not found"));
-    };
-    let Ok(row) = ProjectRow::from_row(&row) else {
-        return Err(internal_server_error("Failed to parse project row"));
-    };
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .json(project))
+}
+
+#[tracing::instrument(name = "update_project_in_db", skip(data, transaction))]
+pub async fn update_project_in_db(
+    transaction: &mut Transaction<'_, MySql>,
+    data: &ProjectModifyData,
+) -> Result<ProjectRow, NotFoundOrUnexpectedApiError> {
+    let row = select_project_from_db(transaction, data.id as u64).await?;
     let name = data.name.clone().unwrap_or(row.name);
     let openstack_id = data.openstack_id.clone().unwrap_or(row.openstack_id);
     let user_class = data.user_class.unwrap_or(row.user_class);
@@ -57,28 +66,15 @@ pub async fn project_modify(
         user_class,
         data.id,
     );
-    match transaction.execute(query).await {
-        Ok(_) => (),
-        Err(e) => {
-            // TODO distinguish different database errors
-            // TODO apply context and map_err
-            tracing::error!("Failed to update project: {:?}", e);
-            return Err(bad_request_error(
-                "Failed to insert new project, maybe it already exists",
-            ));
-        }
-    };
-    if transaction.commit().await.is_err() {
-        // TODO apply context and map_err
-        return Err(internal_server_error("Failed to commit transaction"));
-    }
-    let project = Project {
-        id: data.id,
+    transaction
+        .execute(query)
+        .await
+        .context("Failed to execute update query")?;
+    let project = ProjectRow {
+        id: data.id as i32,
         name,
         openstack_id,
         user_class,
     };
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .json(project))
+    Ok(project)
 }
