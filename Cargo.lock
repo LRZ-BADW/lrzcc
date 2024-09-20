@@ -1602,6 +1602,7 @@ dependencies = [
  "cargo-husky",
  "chrono",
  "serde",
+ "sqlx",
  "tabled",
 ]
 
