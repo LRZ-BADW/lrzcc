@@ -72,7 +72,7 @@ async fn e2e_lib_hello_admin_denies_access_to_normal_user() {
         assert!(hello.is_err());
         assert_eq!(
             hello.unwrap_err().to_string(),
-            format!("Requesting user is not an admin")
+            format!("Admin privileges required")
         );
     })
     .await

@@ -1,30 +1,54 @@
-use crate::error::not_found_error;
+use crate::error::{require_admin_user, MinimalApiError, NormalApiError};
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
+use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
-use sqlx::MySqlPool;
+use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::ProjectIdParam;
 
 #[tracing::instrument(name = "project_delete")]
 pub async fn project_delete(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
-) -> Result<HttpResponse, actix_web::Error> {
-    if sqlx::query!(
-        r#"DELETE FROM user_project WHERE id = ?"#,
-        params.project_id,
-    )
-    .execute(db_pool.get_ref())
-    .await
-    .is_err()
-    {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(not_found_error("Project with given ID not found"));
-    };
-
+) -> Result<HttpResponse, NormalApiError> {
+    require_admin_user(&user)?;
+    let mut transaction = db_pool
+        .begin()
+        .await
+        .context("Failed to begin transaction")?;
+    delete_project_from_db(&mut transaction, params.project_id as u64).await?;
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit transaction")?;
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[tracing::instrument(name = "delete_project_from_db", skip(transaction))]
+pub async fn delete_project_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<(), MinimalApiError> {
+    let query = sqlx::query!(
+        r#"
+        DELETE IGNORE FROM user_project
+        WHERE id = ?
+        "#,
+        project_id
+    );
+    let result = transaction
+        .execute(query)
+        .await
+        .context("Failed to execute delete query")?;
+    if result.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            // TODO: test that this message is really correct
+            "Failed to delete project, either it doesn't exist or still has users or flavor groups.".to_string(),
+        ));
+    }
+    Ok(())
 }

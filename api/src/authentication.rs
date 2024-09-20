@@ -10,8 +10,7 @@ use actix_web::HttpMessage;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
-// TODO test error messages as well
-// TODO revise error functions for use with map_err
+// TODO revise error handling here as well and test errors
 
 pub async fn require_valid_token(
     req: ServiceRequest,
@@ -116,21 +115,5 @@ pub async fn extract_user_and_project(
     req.extensions_mut().insert(user);
     req.extensions_mut().insert(project);
 
-    next.call(req).await
-}
-
-pub async fn require_admin_user(
-    req: ServiceRequest,
-    next: Next<impl MessageBody>,
-) -> Result<ServiceResponse<impl MessageBody>, actix_web::Error> {
-    let user = match req.extensions().get::<User>() {
-        Some(user) => user.clone(),
-        None => {
-            return Err(internal_server_error("No user in request extensions"));
-        }
-    };
-    if !user.is_staff {
-        return Err(unauthorized_error("Requesting user is not an admin"));
-    }
     next.call(req).await
 }

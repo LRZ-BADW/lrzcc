@@ -1552,6 +1552,7 @@ dependencies = [
  "serde-aux",
  "serde_json",
  "sqlx",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-actix-web",
@@ -1601,6 +1602,7 @@ dependencies = [
  "cargo-husky",
  "chrono",
  "serde",
+ "sqlx",
  "tabled",
 ]
 

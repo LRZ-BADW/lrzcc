@@ -1,11 +1,13 @@
 use crate::resources::FlavorGroupMinimal;
 use crate::user::UserMinimal;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct Project {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes

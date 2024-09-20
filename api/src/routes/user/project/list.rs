@@ -1,19 +1,38 @@
-use super::ProjectRow;
-use crate::error::internal_server_error;
+use crate::error::{require_admin_user, NormalApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, ReqData};
 use actix_web::HttpResponse;
+use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
-use sqlx::MySqlPool;
+use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
 // TODO proper query set and permissions
 #[tracing::instrument(name = "project_list")]
 pub async fn project_list(
     user: ReqData<User>,
+    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
-) -> Result<HttpResponse, actix_web::Error> {
-    let Ok(rows) = sqlx::query_as!(
-        ProjectRow,
+) -> Result<HttpResponse, NormalApiError> {
+    require_admin_user(&user)?;
+    let mut transaction = db_pool
+        .begin()
+        .await
+        .context("Failed to begin transaction")?;
+    let projects = select_all_projects_from_db(&mut transaction).await?;
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit transaction")?;
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .json(projects))
+}
+
+#[tracing::instrument(name = "select_all_projects_from_db", skip(transaction))]
+pub async fn select_all_projects_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
         r#"
         SELECT
             id,
@@ -22,26 +41,14 @@ pub async fn project_list(
             user_class
         FROM user_project
         "#,
-    )
-    .fetch_all(db_pool.get_ref())
-    .await
-    else {
-        // TODO there might be other errors as well
-        // TODO apply context and map_err
-        return Err(internal_server_error("Failed to retrieve projects"));
-    };
-
-    let projects = rows
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
         .into_iter()
-        .map(|r| Project {
-            id: r.id as u32,
-            name: r.name,
-            openstack_id: r.openstack_id,
-            user_class: r.user_class,
-        })
-        .collect::<Vec<_>>();
-
-    Ok(HttpResponse::Ok()
-        .content_type("application/json")
-        .json(projects))
+        .map(|r| Project::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
 }
