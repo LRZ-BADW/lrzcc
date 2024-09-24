@@ -17,6 +17,8 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add proper error handling to all project handlers
 - api: bump secrecy from 0.10.1 to 0.10.2
 - api: bump thiserror from 1.0.63 to 1.0.64
+- wire: remove ProjectCreated
+- lib/api: refactor to use Project for project create response
 
 ## [lrzcc-cli-v1.1.2] - 2024-09-24
 
