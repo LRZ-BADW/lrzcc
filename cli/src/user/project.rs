@@ -4,6 +4,7 @@ use crate::common::{
 };
 use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
+use lrzcc_wire::user::ProjectRetrieved;
 use std::error::Error;
 
 #[derive(Args, Debug)]
@@ -132,7 +133,15 @@ fn get(
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
-    print_single_object(api.project.get(id)?, format)
+    match api.project.get(id)? {
+        ProjectRetrieved::Normal(project) => {
+            print_single_object(project, format)?
+        }
+        ProjectRetrieved::Detailed(project) => {
+            print_single_object(project, format)?
+        }
+    };
+    Ok(())
 }
 
 // TODO something here doesn't work ... no idea why so far
