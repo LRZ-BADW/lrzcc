@@ -2,8 +2,8 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    Project, ProjectCreateData, ProjectCreated, ProjectDetailed,
-    ProjectModifyData,
+    Project, ProjectCreateData, ProjectCreated, ProjectModifyData,
+    ProjectRetrieved,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -159,7 +159,7 @@ impl ProjectApi {
         ProjectListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<ProjectDetailed, ApiError> {
+    pub fn get(&self, id: u32) -> Result<ProjectRetrieved, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
