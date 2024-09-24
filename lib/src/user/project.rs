@@ -2,8 +2,7 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    Project, ProjectCreateData, ProjectCreated, ProjectModifyData,
-    ProjectRetrieved,
+    Project, ProjectCreateData, ProjectModifyData, ProjectRetrieved,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -94,7 +93,7 @@ impl ProjectCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<ProjectCreated, ApiError> {
+    pub fn send(&self) -> Result<Project, ApiError> {
         request(
             &self.client,
             Method::POST,
