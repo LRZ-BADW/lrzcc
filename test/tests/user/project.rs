@@ -2,6 +2,7 @@ use lrzcc::{Api, Token};
 use lrzcc_test::{
     random_alphanumeric_string, random_number, random_uuid, spawn_app,
 };
+use lrzcc_wire::user::ProjectRetrieved;
 use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
@@ -216,7 +217,11 @@ async fn e2e_lib_project_get_for_own_project_of_admin() {
         .unwrap();
 
         // act
-        let project_detailed = client.project.get(project.id).unwrap();
+        let ProjectRetrieved::Detailed(project_detailed) =
+            client.project.get(project.id).unwrap()
+        else {
+            panic!("Expected ProjectDetailed")
+        };
 
         // assert
         assert_eq!(project.id, project_detailed.id);
@@ -304,7 +309,11 @@ async fn e2e_lib_project_create_and_get_works() {
         assert_eq!(user_class, created.user_class);
 
         // act and assert 2 - get
-        let detailed = client.project.get(created.id).unwrap();
+        let ProjectRetrieved::Detailed(detailed) =
+            client.project.get(created.id).unwrap()
+        else {
+            panic!("Expected ProjectDetailed")
+        };
         assert_eq!(detailed.id, created.id);
         assert_eq!(detailed.name, created.name);
         assert_eq!(detailed.openstack_id, created.openstack_id);
@@ -411,7 +420,11 @@ async fn e2e_lib_project_modify_and_get_works() {
         assert_eq!(user_class, modified.user_class);
 
         // act and assert 2 - get
-        let detailed = client.project.get(modified.id).unwrap();
+        let ProjectRetrieved::Detailed(detailed) =
+            client.project.get(modified.id).unwrap()
+        else {
+            panic!("Expected ProjectDetailed")
+        };
         assert_eq!(detailed.id, modified.id);
         assert_eq!(detailed.name, modified.name);
         assert_eq!(detailed.openstack_id, modified.openstack_id);
@@ -459,7 +472,11 @@ async fn e2e_lib_project_create_get_delete_get_works() {
         assert_eq!(user_class, created.user_class);
 
         // act and assert 2 - get
-        let detailed = client.project.get(created.id).unwrap();
+        let ProjectRetrieved::Detailed(detailed) =
+            client.project.get(created.id).unwrap()
+        else {
+            panic!("Expected ProjectDetailed")
+        };
         assert_eq!(detailed.id, created.id);
         assert_eq!(detailed.name, created.name);
         assert_eq!(detailed.openstack_id, created.openstack_id);
