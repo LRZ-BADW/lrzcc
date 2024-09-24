@@ -1572,6 +1572,7 @@ dependencies = [
  "clap",
  "colored",
  "lrzcc",
+ "lrzcc-wire",
  "serde",
  "serde_json",
  "tabled",
