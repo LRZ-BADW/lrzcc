@@ -17,8 +17,10 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump secrecy from 0.10.1 to 0.10.2
 - bump thiserror from 1.0.63 to 1.0.64
 - bump clap from 4.5.17 to 4.5.18
-- add ProjectRetrieved enum to wire
 - revise lib and cli to parse ProjectRetrieved during project retrieval
+
+## [lrzcc-wire-v1.0.1] - 2024-09-24
+- add project.ProjectRetrieved enum
 
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
 
