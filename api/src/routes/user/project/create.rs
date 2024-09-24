@@ -2,7 +2,7 @@ use crate::error::{require_admin_user, MinimalApiError, NormalApiError};
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::user::{Project, ProjectCreateData, ProjectCreated, User};
+use lrzcc_wire::user::{Project, ProjectCreateData, User};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 pub struct NewProject {
@@ -44,14 +44,11 @@ pub async fn project_create(
         .commit()
         .await
         .context("Failed to commit transaction")?;
-    let project_created = ProjectCreated {
+    let project_created = Project {
         id: id as u32,
         name: new_project.name.clone(),
         openstack_id: new_project.openstack_id.clone(),
         user_class: new_project.user_class,
-        // TODO retrieve actual values
-        users: vec![],
-        flavor_groups: vec![],
     };
     Ok(HttpResponse::Created()
         .content_type("application/json")
