@@ -2,6 +2,8 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
+
+### lrzcc-api and lrzcc-test
 - add test crate for shared test helpers and cross-crate testing
 - move api/tests/helpers to test crate
 - add test/tests with two library e2e tests for hello endpoint
@@ -14,12 +16,27 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add hierarchical api errors
 - split of query functions from all project handlers
 - add proper error handling to all project handlers
+
+- revise lib and cli to parse ProjectRetrieved during project retrieval
+
 - bump secrecy from 0.10.1 to 0.10.2
 - bump thiserror from 1.0.63 to 1.0.64
 - bump clap from 4.5.17 to 4.5.18
-- revise lib and cli to parse ProjectRetrieved during project retrieval
+
+## [lrzcc-lib-v1.1.1] - 2024-09-24
+
+### Fixes
+- revise to parse ProjectRetrieved during ProjectApi.get_project
+
+### Dependencies
+- bump thiserror from 1.0.63 to 1.0.64
+
+### Testing
+- add e2e tests for hello and project modules
 
 ## [lrzcc-wire-v1.0.1] - 2024-09-24
+
+### Fixes
 - add project.ProjectRetrieved enum
 
 ## [lrzcc-cli-v1.1.1] - 2024-09-15
