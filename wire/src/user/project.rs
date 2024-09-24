@@ -54,6 +54,13 @@ impl Display for ProjectDetailed {
     }
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[serde(untagged)]
+pub enum ProjectRetrieved {
+    Detailed(ProjectDetailed),
+    Normal(Project),
+}
+
 // TODO can we merge this with ProjectDetailed via some enum
 // in the project field
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
