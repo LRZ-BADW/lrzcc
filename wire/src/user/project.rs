@@ -61,26 +61,6 @@ pub enum ProjectRetrieved {
     Normal(Project),
 }
 
-// TODO can we merge this with ProjectDetailed via some enum
-// in the project field
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct ProjectCreated {
-    pub id: u32,
-    pub name: String,
-    pub openstack_id: String, // UUIDv4 without dashes
-    pub user_class: u32,
-    #[tabled(skip)]
-    pub users: Vec<u32>,
-    #[tabled(skip)]
-    pub flavor_groups: Vec<u32>,
-}
-
-impl Display for ProjectCreated {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&format!("Project(id={}, name={}", self.id, self.name))
-    }
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectCreateData {
     pub name: String,
