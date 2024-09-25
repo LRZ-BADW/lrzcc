@@ -83,3 +83,31 @@ pub async fn select_projects_by_userclass_from_db(
         .context("Failed to convert row to project")?;
     Ok(rows)
 }
+
+#[tracing::instrument(name = "select_own_projects_by_id_db", skip(transaction))]
+pub async fn select_projects_by_id_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    id: u64,
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name,
+            openstack_id,
+            user_class
+        FROM user_project
+        WHERE id = ?
+        "#,
+        id
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Project::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
+}
