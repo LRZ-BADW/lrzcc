@@ -2,7 +2,8 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    Project, ProjectCreateData, ProjectModifyData, ProjectRetrieved,
+    Project, ProjectCreateData, ProjectListParams, ProjectModifyData,
+    ProjectRetrieved,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -19,8 +20,7 @@ pub struct ProjectListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
-    user_class: Option<u32>,
+    params: ProjectListParams,
 }
 
 impl ProjectListRequest {
@@ -28,16 +28,18 @@ impl ProjectListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            all: false,
-            user_class: None,
+            params: ProjectListParams {
+                all: false,
+                user_class: None,
+            },
         }
     }
 
     fn params(&self) -> Vec<(&str, String)> {
         let mut params = Vec::new();
-        if self.all {
+        if self.params.all {
             params.push(("all", "1".to_string()));
-        } else if let Some(user_class) = self.user_class {
+        } else if let Some(user_class) = self.params.user_class {
             params.push(("userclass", user_class.to_string()));
         }
         params
@@ -56,13 +58,13 @@ impl ProjectListRequest {
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = true;
         self
     }
 
     // TODO: use enum for this
     pub fn user_class(&mut self, user_class: u32) -> &mut Self {
-        self.user_class = Some(user_class);
+        self.params.user_class = Some(user_class);
         self
     }
 }
