@@ -61,10 +61,10 @@ pub enum ProjectRetrieved {
     Normal(Project),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ProjectListParams {
-    pub all: bool,
-    pub user_class: Option<u32>,
+    pub all: Option<bool>,
+    pub userclass: Option<u32>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
