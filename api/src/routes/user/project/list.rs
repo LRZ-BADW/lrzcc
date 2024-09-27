@@ -1,24 +1,37 @@
 use crate::error::{require_admin_user, NormalApiError, UnexpectedOnlyError};
-use actix_web::web::{Data, ReqData};
+use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::user::{Project, ProjectListParams, User};
 use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
-// TODO proper query set and permissions
 #[tracing::instrument(name = "project_list")]
 pub async fn project_list(
     user: ReqData<User>,
     // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
+    params: Query<ProjectListParams>,
 ) -> Result<HttpResponse, NormalApiError> {
-    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let projects = select_all_projects_from_db(&mut transaction).await?;
+    let all = match params.all {
+        Some(all) => all,
+        None => false,
+    };
+    let projects = if all {
+        require_admin_user(&user)?;
+        select_all_projects_from_db(&mut transaction).await?
+    } else if let Some(userclass) = params.userclass {
+        require_admin_user(&user)?;
+        select_projects_by_userclass_from_db(&mut transaction, userclass as u8)
+            .await?
+    } else {
+        select_projects_by_id_from_db(&mut transaction, project.id as u64)
+            .await?
+    };
     transaction
         .commit()
         .await
