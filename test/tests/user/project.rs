@@ -46,7 +46,7 @@ async fn e2e_lib_project_create_denies_access_to_normal_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_project_list_denies_access_to_normal_user() {
+async fn e2e_lib_project_list_all_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
     let (user, _project, token) = server
@@ -69,7 +69,7 @@ async fn e2e_lib_project_list_denies_access_to_normal_user() {
         .unwrap();
 
         // act
-        let list = client.project.list().send();
+        let list = client.project.list().all().send();
 
         // assert
         assert!(list.is_err());
@@ -363,7 +363,7 @@ async fn e2e_lib_project_create_and_list_works() {
         assert_eq!(user_class, created.user_class);
 
         // act and assert 2 - list
-        let projects = client.project.list().send().unwrap();
+        let projects = client.project.list().all().send().unwrap();
         assert_eq!(projects.len(), 2);
         let project2 = &projects[0];
         assert_eq!(project.id, project2.id);
