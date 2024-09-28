@@ -17,11 +17,7 @@ pub async fn project_list(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let all = match params.all {
-        Some(all) => all,
-        None => false,
-    };
-    let projects = if all {
+    let projects = if params.all.unwrap_or(false) {
         require_admin_user(&user)?;
         select_all_projects_from_db(&mut transaction).await?
     } else if let Some(userclass) = params.userclass {
