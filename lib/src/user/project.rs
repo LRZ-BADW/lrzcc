@@ -2,10 +2,10 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    Project, ProjectCreateData, ProjectModifyData, ProjectRetrieved,
+    Project, ProjectCreateData, ProjectListParams, ProjectModifyData,
+    ProjectRetrieved,
 };
 use reqwest::blocking::Client;
-use reqwest::Url;
 use reqwest::{Method, StatusCode};
 use std::rc::Rc;
 
@@ -19,8 +19,7 @@ pub struct ProjectListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
-    user_class: Option<u32>,
+    params: ProjectListParams,
 }
 
 impl ProjectListRequest {
@@ -28,24 +27,22 @@ impl ProjectListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            all: false,
-            user_class: None,
+            params: ProjectListParams {
+                all: None,
+                userclass: None,
+            },
         }
-    }
-
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        if self.all {
-            params.push(("all", "1".to_string()));
-        } else if let Some(user_class) = self.user_class {
-            params.push(("userclass", user_class.to_string()));
-        }
-        params
     }
 
     pub fn send(&self) -> Result<Vec<Project>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to encode URL parameters.")?;
+        // TODO: maybe use url join
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -56,13 +53,13 @@ impl ProjectListRequest {
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
     // TODO: use enum for this
-    pub fn user_class(&mut self, user_class: u32) -> &mut Self {
-        self.user_class = Some(user_class);
+    pub fn user_class(&mut self, userclass: u32) -> &mut Self {
+        self.params.userclass = Some(userclass);
         self
     }
 }

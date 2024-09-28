@@ -61,6 +61,12 @@ pub enum ProjectRetrieved {
     Normal(Project),
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ProjectListParams {
+    pub all: Option<bool>,
+    pub userclass: Option<u32>,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectCreateData {
     pub name: String,
