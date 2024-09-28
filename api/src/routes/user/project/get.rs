@@ -13,7 +13,6 @@ use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 #[tracing::instrument(name = "project_get")]
 pub async fn project_get(
     user: ReqData<User>,
-    // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
