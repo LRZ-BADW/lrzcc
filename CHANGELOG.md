@@ -19,6 +19,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: bump thiserror from 1.0.63 to 1.0.64
 - wire: remove ProjectCreated
 - lib/api: refactor to use Project for project create response
+- wire: add ProjectListParams
+- lib: use wire.project.ProjectListParams in project list with serde_urlencoded
+- api: implement all and user class filters for project list
+- test: revise project list tests to use all parameter
+- test: split project tests into submodules and add more tests
 
 ## [lrzcc-cli-v1.1.2] - 2024-09-24
 
