@@ -173,3 +173,66 @@ async fn e2e_lib_project_list_all_works() {
     .await
     .unwrap();
 }
+
+#[tokio::test]
+async fn e2e_lib_project_list_by_user_class_works() {
+    // arrange
+    let server = spawn_app().await;
+    let (user, project, token) = server
+        .setup_test_user_and_project(true)
+        .await
+        .expect("Failed to setup test user and project.");
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        let user_class = 3;
+
+        // act part 1 - create projects
+        let mut expected = Vec::new();
+        if project.user_class == user_class {
+            expected.push(project);
+        }
+        for _ in 0..=6 {
+            let name = random_alphanumeric_string(10);
+            let openstack_id = random_uuid();
+            let created = client
+                .project
+                .create(name.clone(), openstack_id.clone())
+                .user_class(user_class)
+                .send()
+                .unwrap();
+            if created.user_class == user_class {
+                expected.push(created);
+            }
+        }
+
+        // act part 2 - list all projects
+        let projects =
+            client.project.list().user_class(user_class).send().unwrap();
+
+        // assert
+        assert_eq!(projects.len(), expected.len());
+        for (project, expected) in
+            projects.into_iter().zip(expected.into_iter())
+        {
+            assert_eq!(project.id, expected.id);
+            assert_eq!(project.name, expected.name);
+            assert_eq!(project.openstack_id, expected.openstack_id);
+            assert_eq!(project.user_class, expected.user_class);
+        }
+    })
+    .await
+    .unwrap();
+}
