@@ -27,6 +27,8 @@ impl Application {
         let port = listener.local_addr().unwrap().port();
         let openstack = OpenStack::new(configuration.openstack).await?;
 
+        // TODO: insert admin user and project into database
+
         let server = run(
             listener,
             connection_pool,
