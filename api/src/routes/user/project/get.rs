@@ -6,7 +6,7 @@ use crate::error::{
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::user::{Project, ProjectDetailed, User};
+use lrzcc_wire::user::{Project, ProjectDetailed, ProjectRetrieved, User};
 use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
 #[tracing::instrument(name = "project_get")]
@@ -31,14 +31,23 @@ pub async fn project_get(
         .await
         .context("Failed to commit transaction")?;
 
-    let project = ProjectDetailed {
-        id: row.id as u32,
-        name: row.name,
-        openstack_id: row.openstack_id,
-        user_class: row.user_class,
-        // TODO retrieve actual values
-        users: vec![],
-        flavor_groups: vec![],
+    let project = if user.is_staff {
+        ProjectRetrieved::Detailed(ProjectDetailed {
+            id: row.id as u32,
+            name: row.name,
+            openstack_id: row.openstack_id,
+            user_class: row.user_class,
+            // TODO retrieve actual values
+            users: vec![],
+            flavor_groups: vec![],
+        })
+    } else {
+        ProjectRetrieved::Normal(Project {
+            id: row.id as u32,
+            name: row.name,
+            openstack_id: row.openstack_id,
+            user_class: row.user_class,
+        })
     };
 
     Ok(HttpResponse::Ok()
