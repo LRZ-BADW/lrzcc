@@ -28,19 +28,19 @@ pub async fn project_get(
     let row =
         select_project_from_db(&mut transaction, params.project_id as u64)
             .await?;
-    transaction
-        .commit()
-        .await
-        .context("Failed to commit transaction")?;
 
     let project = if user.is_staff {
+        let users = select_minimal_users_by_project_id_from_db(
+            &mut transaction,
+            row.id as u64,
+        )
+        .await?;
         ProjectRetrieved::Detailed(ProjectDetailed {
             id: row.id as u32,
             name: row.name,
             openstack_id: row.openstack_id,
             user_class: row.user_class,
-            // TODO retrieve actual values
-            users: vec![],
+            users,
             flavor_groups: vec![],
         })
     } else {
@@ -51,6 +51,11 @@ pub async fn project_get(
             user_class: row.user_class,
         })
     };
+
+    transaction
+        .commit()
+        .await
+        .context("Failed to commit transaction")?;
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")
