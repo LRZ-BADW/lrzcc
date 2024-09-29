@@ -24,6 +24,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: implement all and user class filters for project list
 - test: revise project list tests to use all parameter
 - test: split project tests into submodules and add more tests
+- api: implement limited normal user access for project get
 
 ## [lrzcc-cli-v1.1.2] - 2024-09-24
 
