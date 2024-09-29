@@ -1,6 +1,7 @@
 use crate::common::{is_false, is_true};
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
@@ -22,8 +23,9 @@ impl Display for User {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct UserMinimal {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
 }
