@@ -9,7 +9,6 @@ use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectDetailed, User};
 use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
-// TODO proper query set and permissions
 #[tracing::instrument(name = "project_get")]
 pub async fn project_get(
     user: ReqData<User>,
@@ -17,7 +16,9 @@ pub async fn project_get(
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
 ) -> Result<HttpResponse, OptionApiError> {
-    require_admin_user(&user)?;
+    if params.project_id != project.id {
+        require_admin_user(&user)?;
+    }
     let mut transaction = db_pool
         .begin()
         .await
