@@ -17,7 +17,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add proper error handling to all project handlers
 - api: bump secrecy from 0.10.1 to 0.10.2
 - api: bump thiserror from 1.0.63 to 1.0.64
-- wire: derive FromRow for Project and UserMinimal
+- wire: derive FromRow for Project, UserMinimal, FlavorGroupMinimal
 - wire: remove ProjectCreated
 - lib/api: refactor to use Project for project create response
 - wire: add ProjectListParams
@@ -26,7 +26,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - test: revise project list tests to use all parameter
 - test: split project tests into submodules and add more tests
 - api: implement limited normal user access for project get
-- api: fill users field in project get handler
+- api: fill users and flavor_groups field in project get handler
 
 ## [lrzcc-cli-v1.1.2] - 2024-09-24
 
