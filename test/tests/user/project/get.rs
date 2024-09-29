@@ -120,7 +120,10 @@ async fn e2e_lib_admin_can_get_own_project() {
         assert_eq!(project.name, project_detailed.name);
         assert_eq!(project.openstack_id, project_detailed.openstack_id);
         assert_eq!(project.user_class, project_detailed.user_class);
-        // TODO: check users
+        assert_eq!(project_detailed.users.len(), 1);
+        let project_user = &project_detailed.users[0];
+        assert_eq!(project_user.id, user.id);
+        assert_eq!(project_user.name, user.name);
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })
     .await
@@ -135,7 +138,7 @@ async fn e2e_lib_admin_can_get_other_project() {
         .setup_test_user_and_project(true)
         .await
         .expect("Failed to setup test user and project.");
-    let (_user2, project2, _token2) = server
+    let (user2, project2, _token2) = server
         .setup_test_user_and_project(false)
         .await
         .expect("Failed to setup test user2 and project.");
@@ -166,7 +169,9 @@ async fn e2e_lib_admin_can_get_other_project() {
         assert_eq!(project2.name, project_detailed.name);
         assert_eq!(project2.openstack_id, project_detailed.openstack_id);
         assert_eq!(project2.user_class, project_detailed.user_class);
-        // TODO: check users
+        let project_user = &project_detailed.users[0];
+        assert_eq!(project_user.id, user2.id);
+        assert_eq!(project_user.name, user2.name);
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })
     .await
