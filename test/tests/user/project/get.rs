@@ -28,7 +28,7 @@ async fn e2e_lib_user_can_get_own_project() {
         .unwrap();
 
         // act
-        let ProjectRetrieved::Detailed(project_detailed) =
+        let ProjectRetrieved::Normal(project_detailed) =
             client.project.get(project.id).unwrap()
         else {
             panic!("Expected ProjectDetailed")
