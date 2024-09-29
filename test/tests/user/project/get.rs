@@ -120,6 +120,7 @@ async fn e2e_lib_admin_can_get_own_project() {
         assert_eq!(project.name, project_detailed.name);
         assert_eq!(project.openstack_id, project_detailed.openstack_id);
         assert_eq!(project.user_class, project_detailed.user_class);
+        // TODO: check users and flavor_groups
     })
     .await
     .unwrap();
@@ -164,9 +165,8 @@ async fn e2e_lib_admin_can_get_other_project() {
         assert_eq!(project2.name, project_detailed.name);
         assert_eq!(project2.openstack_id, project_detailed.openstack_id);
         assert_eq!(project2.user_class, project_detailed.user_class);
+        // TODO: check users and flavor_groups
     })
     .await
     .unwrap();
 }
-
-// TODO: add master user cases
