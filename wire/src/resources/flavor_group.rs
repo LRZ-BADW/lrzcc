@@ -1,6 +1,7 @@
 use crate::resources::FlavorMinimal;
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
@@ -19,7 +20,7 @@ impl Display for FlavorGroup {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct FlavorGroupMinimal {
     pub id: u32,
     pub name: String,
