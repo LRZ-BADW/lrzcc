@@ -36,13 +36,18 @@ pub async fn project_get(
             row.id as u64,
         )
         .await?;
+        let flavor_groups = select_minimal_flavor_groups_by_project_id_from_db(
+            &mut transaction,
+            row.id as u64,
+        )
+        .await?;
         ProjectRetrieved::Detailed(ProjectDetailed {
             id: row.id as u32,
             name: row.name,
             openstack_id: row.openstack_id,
             user_class: row.user_class,
             users,
-            flavor_groups: vec![],
+            flavor_groups,
         })
     } else {
         ProjectRetrieved::Normal(Project {
