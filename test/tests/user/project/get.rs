@@ -124,6 +124,7 @@ async fn e2e_lib_admin_can_get_own_project() {
         let project_user = &project_detailed.users[0];
         assert_eq!(project_user.id, user.id);
         assert_eq!(project_user.name, user.name);
+        // TODO: this needs more rigorous testing
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })
     .await
@@ -172,6 +173,7 @@ async fn e2e_lib_admin_can_get_other_project() {
         let project_user = &project_detailed.users[0];
         assert_eq!(project_user.id, user2.id);
         assert_eq!(project_user.name, user2.name);
+        // TODO: this needs more rigorous testing
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })
     .await
