@@ -7,6 +7,7 @@ use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]
+// TODO: also test master user access
 async fn e2e_lib_user_create_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
