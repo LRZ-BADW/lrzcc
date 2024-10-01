@@ -25,6 +25,8 @@ mod user;
 
 use common::{Execute, Format, TableFormat};
 
+use user::UserCommand;
+
 #[derive(Args, Debug)]
 #[group(required = true, multiple = true)]
 struct CredentialArgs {
@@ -349,6 +351,21 @@ fn main() -> ExitCode {
     };
     let url = match cli.command {
         Command::Hello { .. } | Command::Project { .. } => {
+            if cli.rust {
+                cli.rust_url
+            } else {
+                cli.url
+            }
+        }
+        Command::User {
+            command:
+                UserCommand::List { .. }
+                | UserCommand::Get { .. }
+                | UserCommand::Create { .. }
+                | UserCommand::Modify { .. }
+                | UserCommand::Delete { .. }
+                | UserCommand::Me,
+        } => {
             if cli.rust {
                 cli.rust_url
             } else {
