@@ -2,7 +2,9 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-...
+- test: add user submodule with tests
+- api: add user me endpoint
+- cli: point user commands to rust api as well
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
