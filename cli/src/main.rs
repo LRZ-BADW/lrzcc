@@ -348,7 +348,7 @@ fn main() -> ExitCode {
         }
     };
     let url = match cli.command {
-        Command::Hello { .. } => {
+        Command::Hello { .. } | Command::Project { .. } => {
             if cli.rust {
                 cli.rust_url
             } else {
