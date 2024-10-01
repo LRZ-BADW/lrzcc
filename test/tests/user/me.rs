@@ -4,7 +4,7 @@ use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]
-async fn e2e_lib_user_me_returns_own_user() {
+async fn e2e_lib_user_me_works() {
     // arrange
     let server = spawn_app().await;
     let (user, project, token) = server
