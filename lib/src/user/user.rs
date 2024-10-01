@@ -2,7 +2,7 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    User, UserCreateData, UserCreated, UserDetailed, UserImport, UserModifyData,
+    User, UserCreateData, UserDetailed, UserImport, UserModifyData,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -103,7 +103,7 @@ impl UserCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<UserCreated, ApiError> {
+    pub fn send(&self) -> Result<User, ApiError> {
         request(
             &self.client,
             Method::POST,
