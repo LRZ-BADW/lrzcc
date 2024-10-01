@@ -4,6 +4,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 ## [Unreleased]
 ...
 
+## [lrzcc-cli-v1.2.1] - 2024-09-30
+
+### Features
+- use Rust API for project commands by default
+
 ## [lrzcc-cli-v1.2.0] - 2024-09-30
 
 ### Dependencies
