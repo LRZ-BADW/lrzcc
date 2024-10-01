@@ -2,7 +2,9 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-- test: add user submodule with tests
+- test: add tests for all user endpoints but import
+- wire: remove UserCreated
+- lib: remove use User instead of UserCreated for UserApi::create call
 - api: add user me endpoint
 - cli: point user commands to rust api as well
 
