@@ -3,6 +3,7 @@ use actix_web::Scope;
 
 mod project;
 use project::projects_scope;
+#[allow(clippy::module_inception)]
 mod user;
 use user::users_scope;
 mod me;
