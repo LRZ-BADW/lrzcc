@@ -1,6 +1,7 @@
 use actix_web::web::{
     delete,
-    // get, patch,
+    // get,
+    patch,
     post,
     scope,
 };
@@ -13,8 +14,8 @@ use create::user_create;
 // use list::user_list;
 mod get;
 // use get::user_get;
-// mod modify;
-// use modify::user_modify;
+mod modify;
+use modify::user_modify;
 mod delete;
 use delete::user_delete;
 
@@ -24,7 +25,7 @@ pub fn users_scope() -> Scope {
         // .route("", get().to(user_list))
         // .route("/{user_id}", get().to(user_get))
         // TODO: what about PUT?
-        // .route("/{user_id}/", patch().to(user_modify))
+        .route("/{user_id}/", patch().to(user_modify))
         .route("/{user_id}/", delete().to(user_delete))
 }
 
