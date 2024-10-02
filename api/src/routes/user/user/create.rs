@@ -27,8 +27,8 @@ impl TryFrom<UserCreateData> for NewUser {
             openstack_id: data.openstack_id,
             project_id: data.project,
             role: data.role.unwrap_or(1),
-            is_staff: data.is_staff,
-            is_active: data.is_active,
+            is_staff: data.is_staff.unwrap_or(false),
+            is_active: data.is_active.unwrap_or(true),
         })
     }
 }
