@@ -1,4 +1,3 @@
-use crate::common::{is_false, is_true};
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
