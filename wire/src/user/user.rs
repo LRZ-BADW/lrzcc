@@ -4,7 +4,7 @@ use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct User {
     pub id: u32,
     pub name: String,
