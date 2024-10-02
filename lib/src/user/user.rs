@@ -94,12 +94,12 @@ impl UserCreateRequest {
     }
 
     pub fn staff(&mut self) -> &mut Self {
-        self.data.is_staff = true;
+        self.data.is_staff = Some(true);
         self
     }
 
     pub fn inactive(&mut self) -> &mut Self {
-        self.data.is_active = false;
+        self.data.is_active = Some(false);
         self
     }
 
