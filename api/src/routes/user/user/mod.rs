@@ -11,7 +11,7 @@ mod create;
 use create::user_create;
 // mod list;
 // use list::user_list;
-// mod get;
+mod get;
 // use get::user_get;
 // mod modify;
 // use modify::user_modify;
