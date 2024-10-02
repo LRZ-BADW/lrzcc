@@ -63,10 +63,10 @@ pub struct UserCreateData {
     #[serde(skip_serializing_if = "Option::is_none")]
     // this could be an enum right
     pub role: Option<u32>,
-    #[serde(skip_serializing_if = "is_false")]
-    pub is_staff: bool,
-    #[serde(skip_serializing_if = "is_true")]
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_staff: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 }
 
 impl UserCreateData {
@@ -76,8 +76,8 @@ impl UserCreateData {
             openstack_id,
             project,
             role: None,
-            is_staff: false,
-            is_active: true,
+            is_staff: None,
+            is_active: None,
         }
     }
 }
