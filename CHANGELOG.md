@@ -11,6 +11,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - wire: make UserCreateData.is_staff/is_active Options
 - lib: revise UserCreateRequest for new UserCreateData
 - api: add user create endpoint
+- wire: derive FromRow for User
+- api: add user get module with database functions
+- api: add user modify endpoint
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
