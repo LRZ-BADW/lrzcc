@@ -1,4 +1,7 @@
-use crate::error::{require_admin_user, MinimalApiError, NormalApiError};
+use crate::error::{
+    require_admin_user, MinimalApiError, NormalApiError, OptionApiError,
+};
+use crate::routes::user::project::get::select_project_from_db;
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -40,7 +43,7 @@ pub async fn user_create(
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<UserCreateData>,
-) -> Result<HttpResponse, NormalApiError> {
+) -> Result<HttpResponse, OptionApiError> {
     require_admin_user(&user)?;
     let new_user: NewUser =
         data.0.try_into().map_err(NormalApiError::ValidationError)?;
@@ -50,6 +53,9 @@ pub async fn user_create(
         .begin()
         .await
         .context("Failed to begin transaction")?;
+    let project =
+        select_project_from_db(&mut transaction, new_user.project_id as u64)
+            .await?;
     let id = insert_user_into_db(&mut transaction, &new_user).await?;
     transaction
         .commit()
@@ -60,8 +66,7 @@ pub async fn user_create(
         name: new_user.name.clone(),
         openstack_id: new_user.openstack_id.clone(),
         project: new_user.project_id,
-        // TODO: get this from the actual project
-        project_name: "".to_string(),
+        project_name: project.name.clone(),
         role: new_user.role,
         is_staff: new_user.is_staff,
         is_active: new_user.is_active,
