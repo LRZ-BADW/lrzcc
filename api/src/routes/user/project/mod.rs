@@ -6,7 +6,7 @@ mod create;
 use create::project_create;
 mod list;
 use list::project_list;
-mod get;
+pub mod get;
 use get::project_get;
 mod modify;
 use modify::project_modify;
