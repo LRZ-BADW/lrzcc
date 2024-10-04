@@ -112,7 +112,7 @@ async fn e2e_lib_user_create_get_delete_get_works() {
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
-            format!("Project with given ID not found")
+            format!("User with given ID or linked project not found")
         );
     })
     .await
