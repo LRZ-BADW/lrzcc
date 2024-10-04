@@ -68,32 +68,32 @@ async fn e2e_lib_user_modify_and_get_works() {
         .unwrap();
 
         // act and assert 1 - modify
-        let name = random_alphanumeric_string(10);
         let openstack_id = random_uuid();
-        let role = random_number(0..3);
-        let is_staff = random_bool();
-        let is_active = random_bool();
         let modified = client
             .user
-            .modify(project.id)
-            .name(name.clone())
+            .modify(user.id)
             .openstack_id(openstack_id.clone())
-            .role(role)
-            .is_staff(is_staff)
-            .is_active(is_active)
             .send()
             .unwrap();
-        assert_eq!(name, modified.name);
+        assert_eq!(user.id, modified.id);
+        assert_eq!(user.name, modified.name);
         assert_eq!(openstack_id, modified.openstack_id);
-        assert_eq!(role, modified.role);
-        assert_eq!(is_staff, modified.is_staff);
-        assert_eq!(is_active, modified.is_active);
+        assert_eq!(user.role, modified.role);
+        assert_eq!(project.id, modified.project);
+        assert_eq!(project.name, modified.project_name);
+        assert_eq!(user.is_staff, modified.is_staff);
+        assert_eq!(user.is_active, modified.is_active);
+        assert_eq!(user.is_active, modified.is_active);
 
         // act and assert 2 - get
         let detailed = client.user.get(modified.id).unwrap();
         assert_eq!(detailed.id, modified.id);
         assert_eq!(detailed.name, modified.name);
         assert_eq!(detailed.openstack_id, modified.openstack_id);
+        assert_eq!(detailed.project.id, project.id);
+        assert_eq!(detailed.project.name, project.name);
+        assert_eq!(detailed.project.user_class, project.user_class);
+        assert_eq!(detailed.project_name, project.name);
         assert_eq!(detailed.role, modified.role);
         assert_eq!(detailed.is_staff, modified.is_staff);
         assert_eq!(detailed.is_active, modified.is_active);
