@@ -1,10 +1,4 @@
-use actix_web::web::{
-    delete,
-    // get,
-    patch,
-    post,
-    scope,
-};
+use actix_web::web::{delete, get, patch, post, scope};
 use actix_web::Scope;
 use serde::Deserialize;
 
@@ -13,7 +7,7 @@ use create::user_create;
 // mod list;
 // use list::user_list;
 mod get;
-// use get::user_get;
+use get::user_get;
 mod modify;
 use modify::user_modify;
 mod delete;
@@ -23,7 +17,7 @@ pub fn users_scope() -> Scope {
     scope("/users")
         .route("/", post().to(user_create))
         // .route("", get().to(user_list))
-        // .route("/{user_id}", get().to(user_get))
+        .route("/{user_id}", get().to(user_get))
         // TODO: what about PUT?
         .route("/{user_id}/", patch().to(user_modify))
         .route("/{user_id}/", delete().to(user_delete))
