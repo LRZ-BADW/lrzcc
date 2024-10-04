@@ -157,14 +157,14 @@ async fn e2e_lib_admin_can_get_other_user() {
         let detailed = client.user.get(user2.id).unwrap();
 
         // assert
-        assert_eq!(detailed.id, user.id);
-        assert_eq!(detailed.name, user.name);
-        assert_eq!(detailed.openstack_id, user.openstack_id);
+        assert_eq!(detailed.id, user2.id);
+        assert_eq!(detailed.name, user2.name);
+        assert_eq!(detailed.openstack_id, user2.openstack_id);
         assert_eq!(detailed.project.id, project2.id);
         assert_eq!(detailed.project.name, project2.name);
         assert_eq!(detailed.project_name, project2.name);
-        assert_eq!(detailed.role, user.role);
-        assert_eq!(detailed.is_staff, user.is_staff);
+        assert_eq!(detailed.role, user2.role);
+        assert_eq!(detailed.is_staff, user2.is_staff);
     })
     .await
     .unwrap();
