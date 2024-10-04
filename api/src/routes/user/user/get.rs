@@ -98,15 +98,17 @@ pub async fn select_maybe_user_from_db(
     let query = sqlx::query!(
         r#"
         SELECT
-            id,
-            name,
-            openstack_id,
-            project_id,
-            role,
-            is_staff,
-            is_active
-        FROM user_user AS user
+            user.id AS id,
+            user.name AS name,
+            user.openstack_id AS openstack_id,
+            user.role AS role,
+            project.id as project,
+            project.name AS project_name,
+            user.is_staff AS is_staff,
+            user.is_active AS is_active
+        FROM user_user AS user, user_project AS project
         WHERE
+            user.project_id = project.id AND
             user.id = ?
         "#,
         user_id
