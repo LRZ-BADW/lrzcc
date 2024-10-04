@@ -35,11 +35,13 @@ impl Display for UserMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct UserDetailed {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
+    #[sqlx(flatten)]
     pub project: ProjectMinimal,
     pub project_name: String,
     pub role: u32,
