@@ -47,7 +47,7 @@ pub async fn user_create(
     require_admin_user(&user)?;
     let new_user: NewUser =
         data.0.try_into().map_err(NormalApiError::ValidationError)?;
-    // TODO: validate that the user exists in openstack
+    // TODO: validate that the user exists in OpenStack
     let mut transaction = db_pool
         .begin()
         .await
