@@ -2,10 +2,10 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::user::{
-    User, UserCreateData, UserDetailed, UserImport, UserModifyData,
+    User, UserCreateData, UserDetailed, UserImport, UserListParams,
+    UserModifyData,
 };
 use reqwest::blocking::Client;
-use reqwest::Url;
 use reqwest::{Method, StatusCode};
 use std::rc::Rc;
 
@@ -19,8 +19,7 @@ pub struct UserListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
-    project: Option<u32>,
+    params: UserListParams,
 }
 
 impl UserListRequest {
@@ -28,24 +27,23 @@ impl UserListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            all: false,
-            project: None,
-        }
-    }
 
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        if self.all {
-            params.push(("all", "1".to_string()));
-        } else if let Some(project) = self.project {
-            params.push(("project", project.to_string()));
+            params: UserListParams {
+                all: None,
+                project: None,
+            },
         }
-        params
     }
 
     pub fn send(&self) -> Result<Vec<User>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to encode URL parameters.")?;
+        // TODO: maybe use url join
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -56,12 +54,12 @@ impl UserListRequest {
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
     pub fn project(&mut self, project: u32) -> &mut Self {
-        self.project = Some(project);
+        self.params.project = Some(project);
         self
     }
 }
