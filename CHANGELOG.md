@@ -16,6 +16,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add user modify endpoint
 - wire: derive FromRow for ProjectMinimal and UserDetailed
 - api: implement simplified user get endpoint
+- wire: add UserListParams
+- lib: revise UserListRequest to use UserListParams
+- api: implement simplified user list endpoint
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
