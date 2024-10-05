@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        DELETE IGNORE FROM user_user\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "e58e980eb446dd54f2aa7300e54ea1bedcb9620f118000e0c5bd77bc794347d2"
+}

@@ -11,6 +11,7 @@ pub struct NewProject {
     pub user_class: u32,
 }
 
+// TODO: validate that user class is in valid range (0-6)
 impl TryFrom<ProjectCreateData> for NewProject {
     type Error = String;
 

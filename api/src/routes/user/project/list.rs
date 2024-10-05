@@ -92,10 +92,10 @@ pub async fn select_projects_by_userclass_from_db(
     Ok(rows)
 }
 
-#[tracing::instrument(name = "select_own_projects_by_id_db", skip(transaction))]
+#[tracing::instrument(name = "select_projects_by_id_db", skip(transaction))]
 pub async fn select_projects_by_id_from_db(
     transaction: &mut Transaction<'_, MySql>,
-    id: u64,
+    project_id: u64,
 ) -> Result<Vec<Project>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
@@ -107,7 +107,7 @@ pub async fn select_projects_by_id_from_db(
         FROM user_project
         WHERE id = ?
         "#,
-        id
+        project_id
     );
     let rows = transaction
         .fetch_all(query)

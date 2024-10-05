@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO user_user (name, openstack_id, project_id, role, is_staff, is_active)\n        VALUES (?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "c912ac3933e16ed41181c767d9a0b65298bbd9675b532dbf342c484e9d1af7c5"
+}

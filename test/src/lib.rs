@@ -260,3 +260,7 @@ pub fn random_alphanumeric_string(length: usize) -> String {
 pub fn random_number(range: Range<u32>) -> u32 {
     thread_rng().gen_range(range)
 }
+
+pub fn random_bool() -> bool {
+    thread_rng().gen_bool(0.5)
+}

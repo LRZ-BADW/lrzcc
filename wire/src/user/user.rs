@@ -1,15 +1,16 @@
-use crate::common::{is_false, is_true};
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct User {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
+    #[sqlx(try_from = "i32")]
     pub project: u32,
     pub project_name: String,
     pub role: u32,
@@ -36,26 +37,14 @@ impl Display for UserMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct UserDetailed {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
+    #[sqlx(flatten)]
     pub project: ProjectMinimal,
-    pub project_name: String,
-    pub role: u32,
-    pub is_staff: bool,
-    pub is_active: bool,
-}
-
-// TODO can we merge this with UserDetailed via some enum
-// in the project field
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
-pub struct UserCreated {
-    pub id: u32,
-    pub name: String,
-    pub openstack_id: String, // UUIDv4 without dashes
-    pub project: u32,
     pub project_name: String,
     pub role: u32,
     pub is_staff: bool,
@@ -68,6 +57,12 @@ pub struct UserImport {
     pub new_user_count: u32,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserListParams {
+    pub all: Option<bool>,
+    pub project: Option<u32>,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserCreateData {
     pub name: String,
@@ -77,10 +72,10 @@ pub struct UserCreateData {
     #[serde(skip_serializing_if = "Option::is_none")]
     // this could be an enum right
     pub role: Option<u32>,
-    #[serde(skip_serializing_if = "is_false")]
-    pub is_staff: bool,
-    #[serde(skip_serializing_if = "is_true")]
-    pub is_active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_staff: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_active: Option<bool>,
 }
 
 impl UserCreateData {
@@ -90,8 +85,8 @@ impl UserCreateData {
             openstack_id,
             project,
             role: None,
-            is_staff: false,
-            is_active: true,
+            is_staff: None,
+            is_active: None,
         }
     }
 }

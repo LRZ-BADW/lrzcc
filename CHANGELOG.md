@@ -2,7 +2,23 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-...
+- test: add tests for all user endpoints but import
+- wire: remove UserCreated
+- lib: remove use User instead of UserCreated for UserApi::create call
+- api: add user me endpoint
+- cli: point user commands to rust api as well
+- api: add user delete endpoint
+- wire: make UserCreateData.is_staff/is_active Options
+- lib: revise UserCreateRequest for new UserCreateData
+- api: add user create endpoint
+- wire: derive FromRow for User
+- api: add user get module with database functions
+- api: add user modify endpoint
+- wire: derive FromRow for ProjectMinimal and UserDetailed
+- api: implement simplified user get endpoint
+- wire: add UserListParams
+- lib: revise UserListRequest to use UserListParams
+- api: implement simplified user list endpoint
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 

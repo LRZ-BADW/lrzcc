@@ -1,9 +1,17 @@
-use actix_web::web::scope;
+use actix_web::web::{get, scope};
 use actix_web::Scope;
 
 mod project;
 use project::projects_scope;
+#[allow(clippy::module_inception)]
+mod user;
+use user::users_scope;
+mod me;
+use me::user_me;
 
 pub fn user_scope() -> Scope {
-    scope("/user").service(projects_scope())
+    scope("/user")
+        .service(projects_scope())
+        .service(users_scope())
+        .route("/me", get().to(user_me))
 }

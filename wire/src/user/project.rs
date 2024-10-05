@@ -20,10 +20,13 @@ impl Display for Project {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct ProjectMinimal {
+    #[sqlx(try_from = "i32", rename = "project__id")]
     pub id: u32,
+    #[sqlx(rename = "project__name")]
     pub name: String,
+    #[sqlx(rename = "project__user_class")]
     pub user_class: u32,
 }
 
