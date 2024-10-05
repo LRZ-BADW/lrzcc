@@ -193,7 +193,7 @@ async fn e2e_lib_user_list_all_works() {
 async fn e2e_lib_user_list_by_project_works() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
+    let (user, _project, token) = server
         .setup_test_user_and_project(true)
         .await
         .expect("Failed to setup test user and project.");
@@ -215,8 +215,6 @@ async fn e2e_lib_user_list_by_project_works() {
         // act part 1 - create projects and users
         let mut projects = Vec::new();
         let mut users = Vec::new();
-        projects.push(project);
-        users.push(user);
         for i in 0..3 {
             let name = random_alphanumeric_string(10);
             let openstack_id = random_uuid();
