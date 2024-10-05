@@ -57,6 +57,12 @@ pub struct UserImport {
     pub new_user_count: u32,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserListParams {
+    pub all: Option<bool>,
+    pub project: Option<u32>,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserCreateData {
     pub name: String,
