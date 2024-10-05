@@ -19,6 +19,8 @@ This is the combined changelog of all contained `lrzcc` crates.
 - wire: add UserListParams
 - lib: revise UserListRequest to use UserListParams
 - api: implement simplified user list endpoint
+- dep: bump reqwest version from 0.12.7 to 0.12.8
+- dep: bump clap version from 4.5.18 to 4.5.19
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
