@@ -1,8 +1,5 @@
 use lrzcc::{Api, Token};
-use lrzcc_test::{
-    random_alphanumeric_string, random_bool, random_number, random_uuid,
-    spawn_app,
-};
+use lrzcc_test::{random_uuid, spawn_app};
 use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
