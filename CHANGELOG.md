@@ -24,6 +24,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add authorization module and move require_admin_user there
 - api: add require_master_user to authorization module
 - test: add TestUser/Project and TestApp.setup_test_user/project
+- wire: impl PartialEq for all response structs
+- wire: implement further PartialEqs for User and Project structs
+- test: simplify assertions by using PartialEq impls
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
