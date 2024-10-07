@@ -9,3 +9,16 @@ pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
     }
     Ok(())
 }
+
+pub fn require_master_user(
+    user: &User,
+    project_id: u32,
+) -> Result<(), AuthOnlyError> {
+    if !user.is_staff && (user.role != 2 || user.project != project_id) {
+        return Err(AuthOnlyError::AuthorizationError(
+            "Admin or master user privileges for respective project required"
+                .to_string(),
+        ));
+    }
+    Ok(())
+}
