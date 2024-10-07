@@ -43,6 +43,18 @@ pub struct TestApp {
     pub keystone_token: String,
 }
 
+pub struct TestUser {
+    pub user: User,
+    pub token: String,
+}
+
+pub struct TestProject {
+    pub project: Project,
+    pub admins: Vec<TestUser>,
+    pub masters: Vec<TestUser>,
+    pub normals: Vec<TestUser>,
+}
+
 impl TestApp {
     pub fn mock_keystone_auth(
         &self,
@@ -113,6 +125,97 @@ impl TestApp {
         let token = Uuid::new_v4().to_string();
 
         Ok((user, project, token))
+    }
+
+    pub async fn setup_test_user(
+        &self,
+        transaction: &mut Transaction<'static, MySql>,
+        project: &Project,
+        is_staff: bool,
+        role: u32,
+    ) -> Result<TestUser, sqlx::Error> {
+        let mut user = User {
+            id: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            project: project.id,
+            project_name: project.name.clone(),
+            is_staff,
+            is_active: true,
+            role,
+        };
+        user.id = insert_user_into_db(transaction, &user).await? as u32;
+        let token = Uuid::new_v4().to_string();
+        Ok(TestUser { user, token })
+    }
+
+    pub async fn setup_test_project(
+        &self,
+        admin_number: usize,
+        master_number: usize,
+        normal_number: usize,
+    ) -> Result<TestProject, sqlx::Error> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+
+        let mut project = Project {
+            id: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            user_class: random_number(1..6),
+        };
+        project.id =
+            insert_project_into_db(&mut transaction, &project).await? as u32;
+
+        let mut test_project = TestProject {
+            project,
+            admins: Vec::new(),
+            masters: Vec::new(),
+            normals: Vec::new(),
+        };
+
+        for _ in 0..admin_number {
+            test_project.admins.push(
+                self.setup_test_user(
+                    &mut transaction,
+                    &test_project.project,
+                    true,
+                    1,
+                )
+                .await?,
+            );
+        }
+
+        for _ in 0..master_number {
+            test_project.masters.push(
+                self.setup_test_user(
+                    &mut transaction,
+                    &test_project.project,
+                    false,
+                    2,
+                )
+                .await?,
+            );
+        }
+
+        for _ in 0..normal_number {
+            test_project.normals.push(
+                self.setup_test_user(
+                    &mut transaction,
+                    &test_project.project,
+                    false,
+                    1,
+                )
+                .await?,
+            );
+        }
+
+        transaction.commit().await?;
+
+        Ok(test_project)
     }
 }
 
