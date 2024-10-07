@@ -14,10 +14,12 @@ use tokio::task::spawn_blocking;
 async fn e2e_lib_user_can_get_own_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -37,7 +39,7 @@ async fn e2e_lib_user_can_get_own_user() {
         let detailed = client.user.get(user.id).unwrap();
 
         // assert
-        assert_eq!(detailed, user);
+        assert_eq!(&detailed, &user);
     })
     .await
     .unwrap();
