@@ -33,11 +33,7 @@ async fn e2e_lib_project_list_returns_own_project() {
 
         // assert
         assert_eq!(projects.len(), 1);
-        let project2 = &projects[0];
-        assert_eq!(project.id, project2.id);
-        assert_eq!(project.name, project2.name);
-        assert_eq!(project.openstack_id, project2.openstack_id);
-        assert_eq!(project.user_class, project2.user_class);
+        assert_eq!(projects[0], project);
     })
     .await
     .unwrap();
@@ -164,10 +160,7 @@ async fn e2e_lib_project_list_all_works() {
         for (project, expected) in
             projects.into_iter().zip(expected.into_iter())
         {
-            assert_eq!(project.id, expected.id);
-            assert_eq!(project.name, expected.name);
-            assert_eq!(project.openstack_id, expected.openstack_id);
-            assert_eq!(project.user_class, expected.user_class);
+            assert_eq!(project, expected);
         }
     })
     .await
@@ -223,15 +216,7 @@ async fn e2e_lib_project_list_by_user_class_works() {
             client.project.list().user_class(user_class).send().unwrap();
 
         // assert
-        assert_eq!(projects.len(), expected.len());
-        for (project, expected) in
-            projects.into_iter().zip(expected.into_iter())
-        {
-            assert_eq!(project.id, expected.id);
-            assert_eq!(project.name, expected.name);
-            assert_eq!(project.openstack_id, expected.openstack_id);
-            assert_eq!(project.user_class, expected.user_class);
-        }
+        assert_eq!(projects, expected);
     })
     .await
     .unwrap();

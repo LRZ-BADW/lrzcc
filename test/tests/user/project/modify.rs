@@ -88,10 +88,7 @@ async fn e2e_lib_project_modify_and_get_works() {
         else {
             panic!("Expected ProjectDetailed")
         };
-        assert_eq!(detailed.id, modified.id);
-        assert_eq!(detailed.name, modified.name);
-        assert_eq!(detailed.openstack_id, modified.openstack_id);
-        assert_eq!(detailed.user_class, modified.user_class);
+        assert_eq!(detailed, modified);
     })
     .await
     .unwrap();

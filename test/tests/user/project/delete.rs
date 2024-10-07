@@ -86,10 +86,7 @@ async fn e2e_lib_project_create_get_delete_get_works() {
         else {
             panic!("Expected ProjectDetailed")
         };
-        assert_eq!(detailed.id, created.id);
-        assert_eq!(detailed.name, created.name);
-        assert_eq!(detailed.openstack_id, created.openstack_id);
-        assert_eq!(detailed.user_class, created.user_class);
+        assert_eq!(detailed, created);
         assert_eq!(detailed.users.len(), 0);
         assert_eq!(detailed.flavor_groups.len(), 0);
 
