@@ -1,6 +1,7 @@
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use std::cmp::PartialEq;
 use std::fmt::Display;
 use tabled::Tabled;
 
@@ -24,11 +25,43 @@ impl Display for User {
     }
 }
 
+impl PartialEq<UserMinimal> for User {
+    fn eq(&self, other: &UserMinimal) -> bool {
+        self.id == other.id && self.name == other.name
+    }
+}
+
+impl PartialEq<UserDetailed> for User {
+    fn eq(&self, other: &UserDetailed) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.project == other.project.id
+            && self.project_name == other.project_name
+            && self.project_name == other.project.name
+            && self.is_staff == other.is_staff
+            && self.is_active == other.is_active
+            && self.role == other.role
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
 pub struct UserMinimal {
     #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
+}
+
+impl PartialEq<User> for UserMinimal {
+    fn eq(&self, other: &User) -> bool {
+        self.id == other.id && self.name == other.name
+    }
+}
+
+impl PartialEq<UserDetailed> for UserMinimal {
+    fn eq(&self, other: &UserDetailed) -> bool {
+        self.id == other.id && self.name == other.name
+    }
 }
 
 impl Display for UserMinimal {
@@ -49,6 +82,26 @@ pub struct UserDetailed {
     pub role: u32,
     pub is_staff: bool,
     pub is_active: bool,
+}
+
+impl PartialEq<UserMinimal> for UserDetailed {
+    fn eq(&self, other: &UserMinimal) -> bool {
+        self.id == other.id && self.name == other.name
+    }
+}
+
+impl PartialEq<User> for UserDetailed {
+    fn eq(&self, other: &User) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.project.id == other.project
+            && self.project.name == other.project_name
+            && self.project_name == other.project_name
+            && self.is_staff == other.is_staff
+            && self.is_active == other.is_active
+            && self.role == other.role
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
