@@ -92,6 +92,11 @@ async fn e2e_lib_user_cannot_get_other_users() {
     .unwrap();
 }
 
+// TODO: add master_user_can_get_own_projects_users function
+
+// TODO: add master_user_cannot_get_other_projects_users function
+
+// TODO: replace by an admin_can_get_all function
 #[tokio::test]
 async fn e2e_lib_admin_can_get_own_user() {
     // arrange
