@@ -4,6 +4,11 @@ use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 // TODO: also test master user access
+// Permission matrix:
+//                     own user     user from own project      other user
+//      admin user     X            X                          X
+//      master user    X            X                          -
+//      normal user    X            -                          -
 
 #[tokio::test]
 async fn e2e_lib_user_can_get_own_user() {
