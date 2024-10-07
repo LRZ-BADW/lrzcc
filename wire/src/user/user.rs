@@ -5,7 +5,7 @@ use std::cmp::PartialEq;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct User {
     #[sqlx(try_from = "i32")]
     pub id: u32,
@@ -45,7 +45,7 @@ impl PartialEq<UserDetailed> for User {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct UserMinimal {
     #[sqlx(try_from = "i32")]
     pub id: u32,
@@ -70,7 +70,7 @@ impl Display for UserMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct UserDetailed {
     #[sqlx(try_from = "i32")]
     pub id: u32,
@@ -104,7 +104,7 @@ impl PartialEq<User> for UserDetailed {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserImport {
     pub new_project_count: u32,
     pub new_user_count: u32,
