@@ -35,13 +35,7 @@ async fn e2e_lib_user_list_returns_own_user() {
 
         // assert
         assert_eq!(users.len(), 1);
-        let user2 = &users[0];
-        assert_eq!(user.id, user2.id);
-        assert_eq!(user.name, user2.name);
-        assert_eq!(user.openstack_id, user2.openstack_id);
-        assert_eq!(user.role, user2.role);
-        assert_eq!(user.is_staff, user2.is_staff);
-        assert_eq!(user.is_active, user2.is_active);
+        assert_eq!(users[0], user);
     })
     .await
     .unwrap();
@@ -175,15 +169,7 @@ async fn e2e_lib_user_list_all_works() {
         let users2 = client.user.list().all().send().unwrap();
 
         // assert
-        assert_eq!(users.len(), users2.len());
-        for (user, user2) in users.into_iter().zip(users2.into_iter()) {
-            assert_eq!(user.id, user2.id);
-            assert_eq!(user.name, user2.name);
-            assert_eq!(user.openstack_id, user2.openstack_id);
-            assert_eq!(user.role, user2.role);
-            assert_eq!(user.is_staff, user2.is_staff);
-            assert_eq!(user.is_active, user2.is_active);
-        }
+        assert_eq!(users, users2);
     })
     .await
     .unwrap();
@@ -257,15 +243,7 @@ async fn e2e_lib_user_list_by_project_works() {
         let users2 = client.user.list().project(project_id).send().unwrap();
 
         // assert
-        assert_eq!(users.len(), users2.len());
-        for (user, user2) in users.into_iter().zip(users2.into_iter()) {
-            assert_eq!(user.id, user2.id);
-            assert_eq!(user.name, user2.name);
-            assert_eq!(user.openstack_id, user2.openstack_id);
-            assert_eq!(user.role, user2.role);
-            assert_eq!(user.is_staff, user2.is_staff);
-            assert_eq!(user.is_active, user2.is_active);
-        }
+        assert_eq!(users, users2);
     })
     .await
     .unwrap();

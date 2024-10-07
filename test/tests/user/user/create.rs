@@ -288,23 +288,8 @@ async fn e2e_lib_user_create_and_list_works() {
         // act and assert 2 - list
         let users = client.user.list().all().send().unwrap();
         assert_eq!(users.len(), 2);
-        let user2 = &users[0];
-        assert_eq!(user.id, user2.id);
-        assert_eq!(user.name, user2.name);
-        assert_eq!(user.openstack_id, user2.openstack_id);
-        assert_eq!(user.project, user2.project);
-        assert_eq!(user.project_name, user2.project_name);
-        assert_eq!(user.role, user2.role);
-        assert_eq!(user.is_staff, user2.is_active);
-        let user3 = &users[1];
-        assert_eq!(created.id, user3.id);
-        assert_eq!(created.name, user3.name);
-        assert_eq!(created.openstack_id, user3.openstack_id);
-        assert_eq!(created.project, user3.project);
-        assert_eq!(created.project_name, user3.project_name);
-        assert_eq!(created.role, user3.role);
-        assert_eq!(created.is_staff, user3.is_staff);
-        assert_eq!(created.is_active, user3.is_active);
+        assert_eq!(user, users[0]);
+        assert_eq!(created, users[1]);
     })
     .await
     .unwrap();

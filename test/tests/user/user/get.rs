@@ -14,7 +14,7 @@ use tokio::task::spawn_blocking;
 async fn e2e_lib_user_can_get_own_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
+    let (user, _project, token) = server
         .setup_test_user_and_project(false)
         .await
         .expect("Failed to setup test user and project.");
@@ -37,14 +37,7 @@ async fn e2e_lib_user_can_get_own_user() {
         let detailed = client.user.get(user.id).unwrap();
 
         // assert
-        assert_eq!(detailed.id, user.id);
-        assert_eq!(detailed.name, user.name);
-        assert_eq!(detailed.openstack_id, user.openstack_id);
-        assert_eq!(detailed.project.id, project.id);
-        assert_eq!(detailed.project.name, project.name);
-        assert_eq!(detailed.project_name, project.name);
-        assert_eq!(detailed.role, user.role);
-        assert_eq!(detailed.is_staff, user.is_staff);
+        assert_eq!(detailed, user);
     })
     .await
     .unwrap();
@@ -95,7 +88,7 @@ async fn e2e_lib_user_cannot_get_other_user() {
 async fn e2e_lib_admin_can_get_own_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
+    let (user, _project, token) = server
         .setup_test_user_and_project(true)
         .await
         .expect("Failed to setup test user and project.");
@@ -118,14 +111,7 @@ async fn e2e_lib_admin_can_get_own_user() {
         let detailed = client.user.get(user.id).unwrap();
 
         // assert
-        assert_eq!(detailed.id, user.id);
-        assert_eq!(detailed.name, user.name);
-        assert_eq!(detailed.openstack_id, user.openstack_id);
-        assert_eq!(detailed.project.id, project.id);
-        assert_eq!(detailed.project.name, project.name);
-        assert_eq!(detailed.project_name, project.name);
-        assert_eq!(detailed.role, user.role);
-        assert_eq!(detailed.is_staff, user.is_staff);
+        assert_eq!(detailed, user);
     })
     .await
     .unwrap();
@@ -139,7 +125,7 @@ async fn e2e_lib_admin_can_get_other_user() {
         .setup_test_user_and_project(true)
         .await
         .expect("Failed to setup test user and project.");
-    let (user2, project2, _token2) = server
+    let (user2, _project2, _token2) = server
         .setup_test_user_and_project(false)
         .await
         .expect("Failed to setup test user2 and project.");
@@ -162,14 +148,7 @@ async fn e2e_lib_admin_can_get_other_user() {
         let detailed = client.user.get(user2.id).unwrap();
 
         // assert
-        assert_eq!(detailed.id, user2.id);
-        assert_eq!(detailed.name, user2.name);
-        assert_eq!(detailed.openstack_id, user2.openstack_id);
-        assert_eq!(detailed.project.id, project2.id);
-        assert_eq!(detailed.project.name, project2.name);
-        assert_eq!(detailed.project_name, project2.name);
-        assert_eq!(detailed.role, user2.role);
-        assert_eq!(detailed.is_staff, user2.is_staff);
+        assert_eq!(detailed, user2);
     })
     .await
     .unwrap();
