@@ -46,17 +46,21 @@ async fn e2e_lib_user_can_get_own_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_user_cannot_get_other_user() {
+async fn e2e_lib_user_cannot_get_other_users() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 2)
         .await
-        .expect("Failed to setup test user and project.");
-    let (user2, _project2, _token2) = server
-        .setup_test_user_and_project(false)
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
+    let user2 = test_project.normals[1].user.clone();
+    let test_project2 = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user2 and project.");
+        .expect("Failed to setup test project");
+    let user3 = test_project2.normals[0].user.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -72,15 +76,17 @@ async fn e2e_lib_user_cannot_get_other_user() {
         )
         .unwrap();
 
-        // act
-        let get = client.user.get(user2.id);
+        for user in vec![&user2, &user3] {
+            // act
+            let get = client.user.get(user.id);
 
-        // assert
-        assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
+            // assert
+            assert!(get.is_err());
+            assert_eq!(
+                get.unwrap_err().to_string(),
+                format!("Admin privileges required")
+            );
+        }
     })
     .await
     .unwrap();
