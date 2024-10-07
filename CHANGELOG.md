@@ -21,6 +21,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: implement simplified user list endpoint
 - dep: bump reqwest version from 0.12.7 to 0.12.8
 - dep: bump clap version from 4.5.18 to 4.5.19
+- api: add authorization module and move require_admin_user there
+- api: add require_master_user to authorization module
+- test: add TestUser/Project and TestApp.setup_test_user/project
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
