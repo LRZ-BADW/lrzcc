@@ -20,6 +20,23 @@ impl Display for Project {
     }
 }
 
+impl PartialEq<ProjectMinimal> for Project {
+    fn eq(&self, other: &ProjectMinimal) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<ProjectDetailed> for Project {
+    fn eq(&self, other: &ProjectDetailed) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.user_class == other.user_class
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct ProjectMinimal {
     #[sqlx(try_from = "i32", rename = "project__id")]
@@ -28,6 +45,22 @@ pub struct ProjectMinimal {
     pub name: String,
     #[sqlx(rename = "project__user_class")]
     pub user_class: u32,
+}
+
+impl PartialEq<Project> for ProjectMinimal {
+    fn eq(&self, other: &Project) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<ProjectDetailed> for ProjectMinimal {
+    fn eq(&self, other: &ProjectDetailed) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
 }
 
 impl Display for ProjectMinimal {
@@ -49,6 +82,23 @@ pub struct ProjectDetailed {
     pub users: Vec<UserMinimal>,
     #[tabled(skip)]
     pub flavor_groups: Vec<FlavorGroupMinimal>,
+}
+
+impl PartialEq<ProjectMinimal> for ProjectDetailed {
+    fn eq(&self, other: &ProjectMinimal) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<Project> for ProjectDetailed {
+    fn eq(&self, other: &Project) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.user_class == other.user_class
+    }
 }
 
 impl Display for ProjectDetailed {
