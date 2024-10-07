@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserBudget {
     pub id: u32,
     pub user: u32,
@@ -57,7 +57,7 @@ impl UserBudgetModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserBudgetOver {
     pub budget_id: u32,
     pub user_id: u32,
@@ -65,7 +65,7 @@ pub struct UserBudgetOver {
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserBudgetCombined {
     pub budget_id: u32,
     pub user_id: u32,
@@ -76,7 +76,7 @@ pub struct UserBudgetCombined {
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserBudgetDetail {
     pub budget_id: u32,
     pub user_id: u32,
@@ -86,7 +86,7 @@ pub struct UserBudgetDetail {
     pub budget: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserBudgetCombinedDetail {
     pub budget_id: u32,
     pub user_id: u32,
