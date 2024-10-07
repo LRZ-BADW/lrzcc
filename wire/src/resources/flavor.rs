@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct Flavor {
     pub id: u32,
     pub name: String,
@@ -22,7 +22,7 @@ impl Display for Flavor {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorMinimal {
     pub id: u32,
     pub name: String,
@@ -35,7 +35,7 @@ impl Display for FlavorMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorDetailed {
     pub id: u32,
     pub name: String,
@@ -53,7 +53,7 @@ impl Display for FlavorDetailed {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorImport {
     pub new_flavor_count: u32,
 }
