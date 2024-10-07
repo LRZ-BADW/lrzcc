@@ -1,7 +1,6 @@
 use super::get::select_project_from_db;
-use crate::error::{
-    require_admin_user, NotFoundOrUnexpectedApiError, OptionApiError,
-};
+use crate::authorization::require_admin_user;
+use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
 use actix_web::web::{Data, Json, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;

@@ -1,7 +1,7 @@
 use super::ProjectIdParam;
+use crate::authorization::require_admin_user;
 use crate::error::{
-    require_admin_user, NotFoundOrUnexpectedApiError, OptionApiError,
-    UnexpectedOnlyError,
+    NotFoundOrUnexpectedApiError, OptionApiError, UnexpectedOnlyError,
 };
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;

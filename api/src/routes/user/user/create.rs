@@ -1,6 +1,5 @@
-use crate::error::{
-    require_admin_user, MinimalApiError, NormalApiError, OptionApiError,
-};
+use crate::authorization::require_admin_user;
+use crate::error::{MinimalApiError, NormalApiError, OptionApiError};
 use crate::routes::user::project::get::select_project_from_db;
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
