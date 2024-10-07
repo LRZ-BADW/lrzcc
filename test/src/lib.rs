@@ -83,48 +83,20 @@ impl TestApp {
         &self,
         admin: bool,
     ) -> Result<(User, Project, String), sqlx::Error> {
-        let mut project = Project {
-            id: 1,
-            name: random_alphanumeric_string(10),
-            openstack_id: random_uuid(),
-            user_class: random_number(1..6),
+        let numbers = if admin { (1, 0, 0) } else { (0, 0, 1) };
+        let test_project = self
+            .setup_test_project(numbers.0, numbers.1, numbers.2)
+            .await?;
+        let test_user = if admin {
+            &test_project.admins[0]
+        } else {
+            &test_project.normals[0]
         };
-        let mut user = User {
-            id: 1,
-            name: random_alphanumeric_string(10),
-            openstack_id: random_uuid(),
-            project: project.id,
-            project_name: project.name.clone(),
-            is_staff: admin,
-            is_active: true,
-            role: 1,
-        };
-
-        let mut transaction = self
-            .db_pool
-            .begin()
-            .await
-            .expect("Failed to begin transaction.");
-        let Ok(project_id) =
-            insert_project_into_db(&mut transaction, &project).await
-        else {
-            panic!("Failed to insert project into database.");
-        };
-        project.id = project_id as u32;
-        user.project = project_id as u32;
-        let Ok(user_id) = insert_user_into_db(&mut transaction, &user).await
-        else {
-            panic!("Failed to insert user into database.");
-        };
-        user.id = user_id as u32;
-        transaction
-            .commit()
-            .await
-            .expect("Failed to commit transaction.");
-
-        let token = Uuid::new_v4().to_string();
-
-        Ok((user, project, token))
+        Ok((
+            test_user.user.clone(),
+            test_project.project,
+            test_user.token.clone(),
+        ))
     }
 
     pub async fn setup_test_user(
