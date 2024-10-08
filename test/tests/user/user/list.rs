@@ -1,20 +1,24 @@
 use lrzcc::{Api, Token};
-use lrzcc_test::{
-    random_alphanumeric_string, random_number, random_uuid, spawn_app,
-};
+use lrzcc_test::spawn_app;
 use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
-// TODO: also test master user access
+// Permission matrix:
+//                     no filter    project filter     all filter
+//      admin user     X            X                  X
+//      master user    X            X                  -
+//      normal user    X            -                  -
 
 #[tokio::test]
-async fn e2e_lib_user_list_returns_own_user() {
+async fn e2e_lib_normal_user_can_list_own_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(true)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -42,13 +46,16 @@ async fn e2e_lib_user_list_returns_own_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_user_list_all_denies_access_to_normal_user() {
+async fn e2e_lib_normal_user_cannot_use_user_list_filters() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let project = test_project.project.clone();
+    let token = test_project.normals[0].token.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -65,12 +72,18 @@ async fn e2e_lib_user_list_all_denies_access_to_normal_user() {
         .unwrap();
 
         // act
-        let list = client.user.list().all().send();
+        let list1 = client.user.list().all().send();
+        let list2 = client.user.list().project(project.id).send();
 
         // assert
-        assert!(list.is_err());
+        assert!(list1.is_err());
+        assert!(list2.is_err());
         assert_eq!(
-            list.unwrap_err().to_string(),
+            list1.unwrap_err().to_string(),
+            format!("Admin privileges required")
+        );
+        assert_eq!(
+            list2.unwrap_err().to_string(),
             format!("Admin privileges required")
         );
     })
@@ -79,13 +92,21 @@ async fn e2e_lib_user_list_all_denies_access_to_normal_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_user_list_by_project_denies_access_to_normal_user() {
+async fn e2e_lib_master_user_can_list_own_projects_users() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 1, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.masters[0].user.clone();
+    let token = test_project.masters[0].token.clone();
+    let user2 = test_project.normals[0].user.clone();
+    let project = test_project.project.clone();
+    let _test_project2 = server
+        .setup_test_project(0, 1, 1)
+        .await
+        .expect("Failed to setup test project");
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -102,27 +123,38 @@ async fn e2e_lib_user_list_by_project_denies_access_to_normal_user() {
         .unwrap();
 
         // act
-        let list = client.user.list().project(project.id).send();
+        let users1 = client.user.list().send().unwrap();
+        let users2 = client.user.list().project(project.id).send().unwrap();
 
         // assert
-        assert!(list.is_err());
-        assert_eq!(
-            list.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
+        assert_eq!(users1.len(), 1);
+        assert_eq!(users1[0], user);
+        assert_eq!(users2.len(), 2);
+        assert_eq!(users2[0], user);
+        assert_eq!(users2[1], user2);
     })
     .await
     .unwrap();
 }
 
 #[tokio::test]
-async fn e2e_lib_user_list_all_works() {
+async fn e2e_lib_admin_user_can_use_any_user_list_filters() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
-        .setup_test_user_and_project(true)
+    let test_project = server
+        .setup_test_project(1, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.admins[0].user.clone();
+    let token = test_project.admins[0].token.clone();
+    let user2 = test_project.normals[0].user.clone();
+    let project = test_project.project.clone();
+    let test_project2 = server
+        .setup_test_project(0, 1, 1)
+        .await
+        .expect("Failed to setup test project");
+    let user3 = test_project2.masters[0].user.clone();
+    let user4 = test_project2.normals[0].user.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -138,112 +170,22 @@ async fn e2e_lib_user_list_all_works() {
         )
         .unwrap();
 
-        // act part 1 - create projects and users
-        let mut projects = Vec::new();
-        let mut users = Vec::new();
-        projects.push(project);
-        users.push(user);
-        for _ in 0..5 {
-            let name = random_alphanumeric_string(10);
-            let openstack_id = random_uuid();
-            let user_class = random_number(0..6);
-            let project = client
-                .project
-                .create(name.clone(), openstack_id.clone())
-                .user_class(user_class)
-                .send()
-                .unwrap();
-            projects.push(project.clone());
-
-            let name = random_alphanumeric_string(10);
-            let openstack_id = random_uuid();
-            let user = client
-                .user
-                .create(name.clone(), openstack_id.clone(), project.id)
-                .send()
-                .unwrap();
-            users.push(user);
-        }
-
-        // act part 2 - list all users
-        let users2 = client.user.list().all().send().unwrap();
+        // act
+        let users1 = client.user.list().send().unwrap();
+        let users2 = client.user.list().project(project.id).send().unwrap();
+        let users3 = client.user.list().all().send().unwrap();
 
         // assert
-        assert_eq!(users, users2);
-    })
-    .await
-    .unwrap();
-}
-
-#[tokio::test]
-async fn e2e_lib_user_list_by_project_works() {
-    // arrange
-    let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(true)
-        .await
-        .expect("Failed to setup test user and project.");
-    server
-        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
-        .mount(&server.keystone_server)
-        .await;
-
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act part 1 - create projects and users
-        let mut projects = Vec::new();
-        let mut users = Vec::new();
-        for i in 0..3 {
-            let name = random_alphanumeric_string(10);
-            let openstack_id = random_uuid();
-            let user_class = random_number(0..6);
-            let project = client
-                .project
-                .create(name.clone(), openstack_id.clone())
-                .user_class(user_class)
-                .send()
-                .unwrap();
-            if i == 2 {
-                projects.push(project.clone());
-            }
-
-            let name = random_alphanumeric_string(10);
-            let openstack_id = random_uuid();
-            let user = client
-                .user
-                .create(name.clone(), openstack_id.clone(), project.id)
-                .send()
-                .unwrap();
-            if i == 2 {
-                users.push(user);
-            }
-
-            let name = random_alphanumeric_string(10);
-            let openstack_id = random_uuid();
-            let user = client
-                .user
-                .create(name.clone(), openstack_id.clone(), project.id)
-                .send()
-                .unwrap();
-            if i == 2 {
-                users.push(user);
-            }
-        }
-
-        // act part 2 - list users by project
-        let project_id = projects[0].id;
-        let users2 = client.user.list().project(project_id).send().unwrap();
-
-        // assert
-        assert_eq!(users, users2);
+        assert_eq!(users1.len(), 1);
+        assert_eq!(users1[0], user);
+        assert_eq!(users2.len(), 2);
+        assert_eq!(users2[0], user);
+        assert_eq!(users2[1], user2);
+        assert_eq!(users3.len(), 4);
+        assert_eq!(users3[0], user);
+        assert_eq!(users3[1], user2);
+        assert_eq!(users3[2], user3);
+        assert_eq!(users3[3], user4);
     })
     .await
     .unwrap();
