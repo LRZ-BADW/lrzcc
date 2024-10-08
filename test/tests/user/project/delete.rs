@@ -10,10 +10,53 @@ use tokio::task::spawn_blocking;
 async fn e2e_lib_project_delete_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
+    let project = test_project.project.clone();
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let delete = client.project.delete(project.id);
+
+        // assert
+        assert!(delete.is_err());
+        assert_eq!(
+            delete.unwrap_err().to_string(),
+            format!("Admin privileges required")
+        );
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn e2e_lib_project_delete_denies_access_to_master_user() {
+    // arrange
+    let server = spawn_app().await;
+    let test_project = server
+        .setup_test_project(0, 1, 0)
+        .await
+        .expect("Failed to setup test project");
+    let user = test_project.masters[0].user.clone();
+    let token = test_project.masters[0].token.clone();
+    let project = test_project.project.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
