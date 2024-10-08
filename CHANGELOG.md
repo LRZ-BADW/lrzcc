@@ -27,6 +27,8 @@ This is the combined changelog of all contained `lrzcc` crates.
 - wire: impl PartialEq for all response structs
 - wire: implement further PartialEqs for User and Project structs
 - test: simplify assertions by using PartialEq impls
+- test: add tests for master user authorization on user and project endpoints
+- api: implement proper master user access to user get and list endpoint
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
