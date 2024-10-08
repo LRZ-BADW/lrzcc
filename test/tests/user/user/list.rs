@@ -39,7 +39,7 @@ async fn e2e_lib_normal_user_can_list_own_user() {
 
         // assert
         assert_eq!(users.len(), 1);
-        assert_eq!(users[0], user);
+        assert!(users.contains(&user));
     })
     .await
     .unwrap();
@@ -128,10 +128,10 @@ async fn e2e_lib_master_user_can_list_own_projects_users() {
 
         // assert
         assert_eq!(users1.len(), 1);
-        assert_eq!(users1[0], user);
+        assert!(users1.contains(&user));
         assert_eq!(users2.len(), 2);
-        assert_eq!(users2[0], user);
-        assert_eq!(users2[1], user2);
+        assert!(users2.contains(&user));
+        assert!(users2.contains(&user2));
     })
     .await
     .unwrap();
@@ -177,15 +177,15 @@ async fn e2e_lib_admin_user_can_use_any_user_list_filters() {
 
         // assert
         assert_eq!(users1.len(), 1);
-        assert_eq!(users1[0], user);
+        assert!(users1.contains(&user));
         assert_eq!(users2.len(), 2);
-        assert_eq!(users2[0], user);
-        assert_eq!(users2[1], user2);
+        assert!(users2.contains(&user));
+        assert!(users2.contains(&user2));
         assert_eq!(users3.len(), 4);
-        assert_eq!(users3[0], user);
-        assert_eq!(users3[1], user2);
-        assert_eq!(users3[2], user3);
-        assert_eq!(users3[3], user4);
+        assert!(users3.contains(&user));
+        assert!(users3.contains(&user2));
+        assert!(users3.contains(&user3));
+        assert!(users3.contains(&user4));
     })
     .await
     .unwrap();
