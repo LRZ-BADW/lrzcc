@@ -5,7 +5,6 @@ use actix_web::http::{header::CONTENT_TYPE, StatusCode};
 use actix_web::HttpResponse;
 use actix_web::ResponseError;
 use lrzcc_wire::error::{error_chain_fmt, ErrorResponse};
-use lrzcc_wire::user::User;
 
 pub fn unauthorized_error(message: &str) -> actix_web::Error {
     InternalError::from_response(
@@ -341,14 +340,4 @@ impl From<UnexpectedOnlyError> for NormalApiError {
             }
         }
     }
-}
-
-// TODO: this should probably be in a separate authorization module
-pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
-    if !user.is_staff {
-        return Err(AuthOnlyError::AuthorizationError(
-            "Admin privileges required".to_string(),
-        ));
-    }
-    Ok(())
 }

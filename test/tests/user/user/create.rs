@@ -7,14 +7,58 @@ use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]
-// TODO: also test master user access
 async fn e2e_lib_user_create_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
+    let project = test_project.project.clone();
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let name = random_alphanumeric_string(10);
+        let openstack_id = random_uuid();
+        let create = client.user.create(name, openstack_id, project.id).send();
+
+        // assert
+        assert!(create.is_err());
+        assert_eq!(
+            create.unwrap_err().to_string(),
+            format!("Admin privileges required")
+        );
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn e2e_lib_user_create_denies_access_to_master_user() {
+    // arrange
+    let server = spawn_app().await;
+    let test_project = server
+        .setup_test_project(0, 1, 0)
+        .await
+        .expect("Failed to setup test project");
+    let user = test_project.masters[0].user.clone();
+    let token = test_project.masters[0].token.clone();
+    let project = test_project.project.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -288,23 +332,8 @@ async fn e2e_lib_user_create_and_list_works() {
         // act and assert 2 - list
         let users = client.user.list().all().send().unwrap();
         assert_eq!(users.len(), 2);
-        let user2 = &users[0];
-        assert_eq!(user.id, user2.id);
-        assert_eq!(user.name, user2.name);
-        assert_eq!(user.openstack_id, user2.openstack_id);
-        assert_eq!(user.project, user2.project);
-        assert_eq!(user.project_name, user2.project_name);
-        assert_eq!(user.role, user2.role);
-        assert_eq!(user.is_staff, user2.is_active);
-        let user3 = &users[1];
-        assert_eq!(created.id, user3.id);
-        assert_eq!(created.name, user3.name);
-        assert_eq!(created.openstack_id, user3.openstack_id);
-        assert_eq!(created.project, user3.project);
-        assert_eq!(created.project_name, user3.project_name);
-        assert_eq!(created.role, user3.role);
-        assert_eq!(created.is_staff, user3.is_staff);
-        assert_eq!(created.is_active, user3.is_active);
+        assert_eq!(user, users[0]);
+        assert_eq!(created, users[1]);
     })
     .await
     .unwrap();

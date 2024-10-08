@@ -5,7 +5,7 @@ use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct Project {
     #[sqlx(try_from = "i32")]
     pub id: u32,
@@ -20,7 +20,24 @@ impl Display for Project {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+impl PartialEq<ProjectMinimal> for Project {
+    fn eq(&self, other: &ProjectMinimal) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<ProjectDetailed> for Project {
+    fn eq(&self, other: &ProjectDetailed) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.user_class == other.user_class
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct ProjectMinimal {
     #[sqlx(try_from = "i32", rename = "project__id")]
     pub id: u32,
@@ -30,13 +47,29 @@ pub struct ProjectMinimal {
     pub user_class: u32,
 }
 
+impl PartialEq<Project> for ProjectMinimal {
+    fn eq(&self, other: &Project) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<ProjectDetailed> for ProjectMinimal {
+    fn eq(&self, other: &ProjectDetailed) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
 impl Display for ProjectMinimal {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("Project(id={}, name={})", self.id, self.name))
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectDetailed {
     pub id: u32,
     pub name: String,
@@ -51,13 +84,30 @@ pub struct ProjectDetailed {
     pub flavor_groups: Vec<FlavorGroupMinimal>,
 }
 
+impl PartialEq<ProjectMinimal> for ProjectDetailed {
+    fn eq(&self, other: &ProjectMinimal) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.user_class == other.user_class
+    }
+}
+
+impl PartialEq<Project> for ProjectDetailed {
+    fn eq(&self, other: &Project) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.openstack_id == other.openstack_id
+            && self.user_class == other.user_class
+    }
+}
+
 impl Display for ProjectDetailed {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&format!("Project(id={}, name={}", self.id, self.name))
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 #[serde(untagged)]
 pub enum ProjectRetrieved {
     Detailed(ProjectDetailed),

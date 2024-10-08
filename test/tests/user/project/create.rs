@@ -10,10 +10,53 @@ use tokio::task::spawn_blocking;
 async fn e2e_lib_project_create_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(false)
+    let test_project = server
+        .setup_test_project(0, 0, 1)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.normals[0].user.clone();
+    let token = test_project.normals[0].token.clone();
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let name = random_alphanumeric_string(10);
+        let openstack_id = random_uuid();
+        let create = client.project.create(name, openstack_id).send();
+
+        // assert
+        assert!(create.is_err());
+        assert_eq!(
+            create.unwrap_err().to_string(),
+            format!("Admin privileges required")
+        );
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn e2e_lib_project_create_denies_access_to_master_user() {
+    // arrange
+    let server = spawn_app().await;
+    let test_project = server
+        .setup_test_project(0, 1, 0)
+        .await
+        .expect("Failed to setup test project");
+    let user = test_project.masters[0].user.clone();
+    let token = test_project.masters[0].token.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
@@ -190,10 +233,7 @@ async fn e2e_lib_project_create_and_get_works() {
         else {
             panic!("Expected ProjectDetailed")
         };
-        assert_eq!(detailed.id, created.id);
-        assert_eq!(detailed.name, created.name);
-        assert_eq!(detailed.openstack_id, created.openstack_id);
-        assert_eq!(detailed.user_class, created.user_class);
+        assert_eq!(detailed, created);
         assert_eq!(detailed.users.len(), 0);
         assert_eq!(detailed.flavor_groups.len(), 0);
     })
@@ -241,16 +281,8 @@ async fn e2e_lib_project_create_and_list_works() {
         // act and assert 2 - list
         let projects = client.project.list().all().send().unwrap();
         assert_eq!(projects.len(), 2);
-        let project2 = &projects[0];
-        assert_eq!(project.id, project2.id);
-        assert_eq!(project.name, project2.name);
-        assert_eq!(project.openstack_id, project2.openstack_id);
-        assert_eq!(project.user_class, project2.user_class);
-        let project3 = &projects[1];
-        assert_eq!(created.id, project3.id);
-        assert_eq!(created.name, project3.name);
-        assert_eq!(created.openstack_id, project3.openstack_id);
-        assert_eq!(created.user_class, project3.user_class);
+        assert_eq!(project, projects[0]);
+        assert_eq!(created, projects[1]);
     })
     .await
     .unwrap();

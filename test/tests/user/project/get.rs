@@ -35,10 +35,7 @@ async fn e2e_lib_user_can_get_own_project() {
         };
 
         // assert
-        assert_eq!(project.id, project_detailed.id);
-        assert_eq!(project.name, project_detailed.name);
-        assert_eq!(project.openstack_id, project_detailed.openstack_id);
-        assert_eq!(project.user_class, project_detailed.user_class);
+        assert_eq!(project, project_detailed);
     })
     .await
     .unwrap();
@@ -116,14 +113,9 @@ async fn e2e_lib_admin_can_get_own_project() {
         };
 
         // assert
-        assert_eq!(project.id, project_detailed.id);
-        assert_eq!(project.name, project_detailed.name);
-        assert_eq!(project.openstack_id, project_detailed.openstack_id);
-        assert_eq!(project.user_class, project_detailed.user_class);
+        assert_eq!(project_detailed, project);
         assert_eq!(project_detailed.users.len(), 1);
-        let project_user = &project_detailed.users[0];
-        assert_eq!(project_user.id, user.id);
-        assert_eq!(project_user.name, user.name);
+        assert_eq!(project_detailed.users[0], user);
         // TODO: this needs more rigorous testing
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })
@@ -166,13 +158,8 @@ async fn e2e_lib_admin_can_get_other_project() {
         };
 
         // assert
-        assert_eq!(project2.id, project_detailed.id);
-        assert_eq!(project2.name, project_detailed.name);
-        assert_eq!(project2.openstack_id, project_detailed.openstack_id);
-        assert_eq!(project2.user_class, project_detailed.user_class);
-        let project_user = &project_detailed.users[0];
-        assert_eq!(project_user.id, user2.id);
-        assert_eq!(project_user.name, user2.name);
+        assert_eq!(project2, project_detailed);
+        assert_eq!(project_detailed.users[0], user2);
         // TODO: this needs more rigorous testing
         assert_eq!(project_detailed.flavor_groups.len(), 0);
     })

@@ -5,7 +5,7 @@ use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorGroup {
     pub id: u32,
     pub name: String,
@@ -20,7 +20,7 @@ impl Display for FlavorGroup {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct FlavorGroupMinimal {
     pub id: u32,
     pub name: String,
@@ -33,7 +33,7 @@ impl Display for FlavorGroupMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorGroupDetailed {
     pub id: u32,
     pub name: String,

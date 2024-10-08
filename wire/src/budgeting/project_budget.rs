@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectBudget {
     pub id: u32,
     pub project: u32,
@@ -57,7 +57,7 @@ impl ProjectBudgetModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectBudgetOver {
     pub budget_id: u32,
     pub project_id: u32,
@@ -65,7 +65,7 @@ pub struct ProjectBudgetOver {
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectBudgetDetail {
     pub budget_id: u32,
     pub project_id: u32,

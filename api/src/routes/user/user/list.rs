@@ -1,4 +1,5 @@
-use crate::error::{require_admin_user, NormalApiError, UnexpectedOnlyError};
+use crate::authorization::{require_admin_user, require_master_user};
+use crate::error::{NormalApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -20,7 +21,7 @@ pub async fn user_list(
         require_admin_user(&user)?;
         select_all_users_from_db(&mut transaction).await?
     } else if let Some(project_id) = params.project {
-        require_admin_user(&user)?;
+        require_master_user(&user, project_id)?;
         select_users_by_project_from_db(&mut transaction, project_id as u64)
             .await?
     } else {

@@ -1,4 +1,5 @@
-use crate::error::{require_admin_user, MinimalApiError, NormalApiError};
+use crate::authorization::require_admin_user;
+use crate::error::{MinimalApiError, NormalApiError};
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;

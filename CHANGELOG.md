@@ -21,6 +21,14 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: implement simplified user list endpoint
 - dep: bump reqwest version from 0.12.7 to 0.12.8
 - dep: bump clap version from 4.5.18 to 4.5.19
+- api: add authorization module and move require_admin_user there
+- api: add require_master_user to authorization module
+- test: add TestUser/Project and TestApp.setup_test_user/project
+- wire: impl PartialEq for all response structs
+- wire: implement further PartialEqs for User and Project structs
+- test: simplify assertions by using PartialEq impls
+- test: add tests for master user authorization on user and project endpoints
+- api: implement proper master user access to user get and list endpoint
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 

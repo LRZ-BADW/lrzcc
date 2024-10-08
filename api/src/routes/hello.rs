@@ -1,4 +1,5 @@
-use crate::error::{require_admin_user, AuthOnlyError};
+use crate::authorization::require_admin_user;
+use crate::error::AuthOnlyError;
 use actix_web::web::ReqData;
 use actix_web::web::{get, scope};
 use actix_web::{HttpResponse, Scope};

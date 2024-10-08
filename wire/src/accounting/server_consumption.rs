@@ -5,19 +5,19 @@ pub type ServerConsumptionFlavors = HashMap<String, f64>;
 
 pub type ServerConsumptionServer = ServerConsumptionFlavors;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerConsumptionUser {
     pub total: ServerConsumptionFlavors,
     pub servers: HashMap<String, ServerConsumptionServer>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerConsumptionProject {
     pub total: ServerConsumptionFlavors,
     pub users: HashMap<String, ServerConsumptionUser>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerConsumptionAll {
     pub total: ServerConsumptionFlavors,
     pub projects: HashMap<String, ServerConsumptionProject>,

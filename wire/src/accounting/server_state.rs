@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ServerState {
     pub id: u32,
     pub begin: DateTime<FixedOffset>,
@@ -25,7 +25,7 @@ impl Display for ServerState {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ServerStateImport {
     pub new_state_count: u32,
     pub end_state_count: u32,
