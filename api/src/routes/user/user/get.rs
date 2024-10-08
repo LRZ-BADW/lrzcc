@@ -1,5 +1,5 @@
 use super::UserIdParam;
-use crate::authorization::require_admin_user;
+use crate::authorization::require_master_user;
 use crate::error::{
     NotFoundOrUnexpectedApiError, OptionApiError, UnexpectedOnlyError,
 };
@@ -16,26 +16,24 @@ pub async fn user_get(
     db_pool: Data<MySqlPool>,
     params: Path<UserIdParam>,
 ) -> Result<HttpResponse, OptionApiError> {
-    // TODO: handle master user access
-    if params.user_id != user.id {
-        require_admin_user(&user)?;
-    }
-
     let mut transaction = db_pool
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let user =
+    let user2 =
         select_user_detail_from_db(&mut transaction, params.user_id as u64)
             .await?;
     transaction
         .commit()
         .await
         .context("Failed to commit transaction")?;
+    if user2.id != user.id {
+        require_master_user(&user, user2.project.id)?;
+    }
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .json(user))
+        .json(user2))
 }
 
 #[tracing::instrument(
