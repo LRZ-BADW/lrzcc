@@ -29,6 +29,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - test: simplify assertions by using PartialEq impls
 - test: add tests for master user authorization on user and project endpoints
 - api: implement proper master user access to user get and list endpoint
+- dep: bump once_cell from 1.20.1 to 1.20.2
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
