@@ -2,34 +2,65 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-- test: add tests for all user endpoints but import
-- wire: remove UserCreated
-- lib: remove use User instead of UserCreated for UserApi::create call
-- api: add user me endpoint
-- cli: point user commands to rust api as well
-- api: add user delete endpoint
-- wire: make UserCreateData.is_staff/is_active Options
-- lib: revise UserCreateRequest for new UserCreateData
-- api: add user create endpoint
-- wire: derive FromRow for User
-- api: add user get module with database functions
-- api: add user modify endpoint
-- wire: derive FromRow for ProjectMinimal and UserDetailed
-- api: implement simplified user get endpoint
-- wire: add UserListParams
-- lib: revise UserListRequest to use UserListParams
-- api: implement simplified user list endpoint
-- dep: bump reqwest version from 0.12.7 to 0.12.8
-- dep: bump clap version from 4.5.18 to 4.5.19
-- api: add authorization module and move require_admin_user there
-- api: add require_master_user to authorization module
-- test: add TestUser/Project and TestApp.setup_test_user/project
-- wire: impl PartialEq for all response structs
-- wire: implement further PartialEqs for User and Project structs
-- test: simplify assertions by using PartialEq impls
-- test: add tests for master user authorization on user and project endpoints
-- api: implement proper master user access to user get and list endpoint
-- dep: bump once_cell from 1.20.1 to 1.20.2
+-
+
+## [lrzcc-cli-v1.3.0] - 2024-10-08
+
+### Features
+- point user commands except import to rust api as well
+
+### Dependencies
+- bump wire from 1.1 to 1.2
+- bump lib from 1.2 to 1.3
+- bump clap version from 4.5.18 to 4.5.19
+
+## [lrzcc-test-v0.2.0] - 2024-10-08
+
+### Features
+- add tests for all user endpoints but import
+- add TestUser/Project and TestApp.setup_test_user/project
+- simplify assertions by using PartialEq implementations
+- add tests for master user authorization on user and project endpoints
+
+### Dependencies
+- bump wire from 1.1 to 1.2
+- bump api from 0.2 to 0.3
+- bump lib from 1.2 to 1.3
+- test: bump reqwest version from 0.12.7 to 0.12.8
+- test: bump once_cell from 1.20.1 to 1.20.2
+
+## [lrzcc-lib-v1.3.0] - 2024-10-08
+
+### Features
+- use User instead of UserCreated for UserApi::create call
+- revise UserCreateRequest for new UserCreateData
+- revise UserListRequest to use UserListParams
+
+### Dependencies
+- bump wire from 1.1 to 1.2
+- bump reqwest version from 0.12.7 to 0.12.8
+
+## [lrzcc-api-v0.3.0] - 2024-10-08
+
+### Features
+- add authorization module and move require_admin_user there
+- add require_master_user to authorization module
+- add user me, create, delete, get, list, and modify endpoints
+- implement proper master user access to user get and list endpoint
+
+### Dependencies
+- bump wire from 1.1 to 1.2
+- bump once_cell from 1.20.1 to 1.20.2
+
+## [lrzcc-wire-v1.2.0] - 2024-10-08
+
+### Features
+- remove UserCreated
+- make UserCreateData.is_staff/is_active Options
+- derive FromRow for User, UserDetailed, and ProjectMinimal
+- add UserListParams
+- impl PartialEq for all response structs
+- implement inter-type PartialEqs for User and Project structs
 
 ## [lrzcc-cli-v1.2.1] - 2024-09-30
 
