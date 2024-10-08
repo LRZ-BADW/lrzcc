@@ -33,7 +33,7 @@ async fn e2e_lib_project_list_returns_own_project() {
 
         // assert
         assert_eq!(projects.len(), 1);
-        assert_eq!(projects[0], project);
+        assert!(projects.contains(&project));
     })
     .await
     .unwrap();
@@ -156,12 +156,7 @@ async fn e2e_lib_project_list_all_works() {
         let projects = client.project.list().all().send().unwrap();
 
         // assert
-        assert_eq!(projects.len(), expected.len());
-        for (project, expected) in
-            projects.into_iter().zip(expected.into_iter())
-        {
-            assert_eq!(project, expected);
-        }
+        assert_eq!(projects, expected);
     })
     .await
     .unwrap();
