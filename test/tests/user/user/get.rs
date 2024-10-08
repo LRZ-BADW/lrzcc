@@ -83,7 +83,7 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
             assert!(get.is_err());
             assert_eq!(
                 get.unwrap_err().to_string(),
-                format!("Admin privileges required")
+                format!("Admin or master user privileges for respective project required")
             );
         }
     })
@@ -166,7 +166,7 @@ async fn e2e_lib_master_user_cannot_get_other_projects_users() {
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
-            format!("Admin privileges required")
+            format!("Admin or master user privileges for respective project required")
         );
     })
     .await

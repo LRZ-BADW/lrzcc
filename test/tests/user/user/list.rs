@@ -84,7 +84,7 @@ async fn e2e_lib_normal_user_cannot_use_user_list_filters() {
         );
         assert_eq!(
             list2.unwrap_err().to_string(),
-            format!("Admin privileges required")
+            format!("Admin or master user privileges for respective project required")
         );
     })
     .await
