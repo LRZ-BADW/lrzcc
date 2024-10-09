@@ -2,7 +2,7 @@ use actix_web::web::{delete, get, patch, post, scope};
 use actix_web::Scope;
 use serde::Deserialize;
 
-mod create;
+pub mod create;
 use create::user_create;
 mod list;
 use list::user_list;

@@ -1,10 +1,10 @@
 use actix_web::web::{get, scope};
 use actix_web::Scope;
 
-mod project;
+pub mod project;
 use project::projects_scope;
 #[allow(clippy::module_inception)]
-mod user;
+pub mod user;
 use user::users_scope;
 mod me;
 use me::user_me;
