@@ -18,6 +18,6 @@ read -p "Publish container? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    docker publish "gierens/lrzcc:v${VERSION}"
-    docker publish "gierens/lrzcc:latest"
+    docker push "gierens/lrzcc:v${VERSION}"
+    docker push "gierens/lrzcc:latest"
 fi
