@@ -1,11 +1,17 @@
 use crate::authentication::{extract_user_and_project, require_valid_token};
 use crate::configuration::{DatabaseSettings, Settings};
 use crate::error::not_found;
+use crate::error::MinimalApiError;
 use crate::openstack::OpenStack;
+use crate::routes::user::project::create::{
+    insert_project_into_db, NewProject,
+};
+use crate::routes::user::user::create::{insert_user_into_db, NewUser};
 use crate::routes::{health_check, hello_scope, user_scope};
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
+use anyhow::Context;
 use sqlx::mysql::MySqlPoolOptions;
 use sqlx::MySqlPool;
 use std::net::TcpListener;
@@ -25,9 +31,12 @@ impl Application {
         );
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
-        let openstack = OpenStack::new(configuration.openstack).await?;
 
-        // TODO: insert admin user and project into database
+        if configuration.application.insert_admin {
+            Self::insert_admin_user(&connection_pool, &configuration).await?;
+        }
+
+        let openstack = OpenStack::new(configuration.openstack).await?;
 
         let server = run(
             listener,
@@ -38,6 +47,56 @@ impl Application {
         .await?;
 
         Ok(Self { port, server })
+    }
+
+    async fn insert_admin_user(
+        connection_pool: &MySqlPool,
+        configuration: &Settings,
+    ) -> Result<(), anyhow::Error> {
+        let mut transaction = connection_pool
+            .begin()
+            .await
+            .context("Failed to begin transaction")?;
+        let project = NewProject {
+            name: configuration.openstack.domain.clone(),
+            openstack_id: configuration.openstack.domain_id.clone(),
+            user_class: 1,
+        };
+        let project_id =
+            match insert_project_into_db(&mut transaction, &project).await {
+                Ok(project_id) => project_id,
+                Err(MinimalApiError::ValidationError(_)) => {
+                    tracing::info!("Admin project already exists, skipping.");
+                    return Ok(());
+                }
+                Err(MinimalApiError::UnexpectedError(e)) => {
+                    return Err(e);
+                }
+            };
+        let user = NewUser {
+            name: configuration.openstack.project.clone(),
+            openstack_id: configuration.openstack.project_id.clone(),
+            project_id: project_id as u32,
+            role: 1,
+            is_staff: true,
+            is_active: true,
+        };
+        let _user_id = match insert_user_into_db(&mut transaction, &user).await
+        {
+            Ok(user_id) => user_id,
+            Err(MinimalApiError::ValidationError(_)) => {
+                tracing::info!("Admin user already exists, skipping.");
+                return Ok(());
+            }
+            Err(MinimalApiError::UnexpectedError(e)) => {
+                return Err(e);
+            }
+        };
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        Ok(())
     }
 
     pub fn port(&self) -> u16 {
