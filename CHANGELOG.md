@@ -12,7 +12,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - bump wire from 1.1 to 1.2
 - bump lib from 1.2 to 1.3
-- bump clap version from 4.5.18 to 4.5.19
+- bump clap version from 4.5.18 to 4.5.20
 
 ## [lrzcc-test-v0.2.0] - 2024-10-08
 
