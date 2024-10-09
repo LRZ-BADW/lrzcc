@@ -21,6 +21,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add TestUser/Project and TestApp.setup_test_user/project
 - simplify assertions by using PartialEq implementations
 - add tests for master user authorization on user and project endpoints
+- deactivate admin user insert in test setup
 
 ### Dependencies
 - bump wire from 1.1 to 1.2
@@ -47,6 +48,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add require_master_user to authorization module
 - add user me, create, delete, get, list, and modify endpoints
 - implement proper master user access to user get and list endpoint
+- make user and project create submodules public
+- add ApplicationSettings.insert_user_admin
+- insert admin user and project on application start when set
 
 ### Dependencies
 - bump wire from 1.1 to 1.2
