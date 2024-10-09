@@ -202,6 +202,7 @@ pub async fn spawn_app() -> TestApp {
         c.database.database_name = Uuid::new_v4().simple().to_string();
         c.application.port = 0;
         c.openstack.keystone_endpoint = keystone_server.uri();
+        c.application.insert_admin = false;
         c
     };
 
