@@ -1,7 +1,8 @@
 CREATE TABLE `resources_flavorgroup` (
-    -- TODO make this unsigned
+    -- TODO: make this unsigned
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `name` varchar(64) NOT NULL,
+    -- TODO: make this unsigned
     `project_id` int(11) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`),

@@ -1,15 +1,16 @@
 CREATE TABLE `user_user` (
-    -- TODO make this unsigned
+    -- TODO: make this unsigned
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `password` varchar(128) NOT NULL,
     `last_login` datetime(6) DEFAULT NULL,
     `name` varchar(255) NOT NULL,
-    -- TODO shorten to 36 chars or maybe use uuid type
+    -- TODO: shorten to 36 chars or maybe use uuid type
     `openstack_id` varchar(255) NOT NULL,
-    -- TODO replace by enum
+    -- TODO: replace by enum
     `role` smallint(5) unsigned NOT NULL,
     `is_staff` tinyint(1) NOT NULL,
     `is_active` tinyint(1) NOT NULL,
+    -- TODO: make this unsigned
     `project_id` int(11) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`),
