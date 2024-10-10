@@ -52,7 +52,7 @@ async fn delete_flavor_group_from_db(
     if result.rows_affected() == 0 {
         return Err(MinimalApiError::ValidationError(
             // TODO: test that this message is really correct
-            "Failed to delete server state.".to_string(),
+            "Failed to delete flavor group.".to_string(),
         ));
     }
     Ok(())

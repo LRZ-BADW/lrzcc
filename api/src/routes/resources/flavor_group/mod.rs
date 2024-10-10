@@ -18,7 +18,7 @@ mod delete;
 use delete::flavor_group_delete;
 
 pub fn flavor_groups_scope() -> Scope {
-    scope("/serverstates")
+    scope("/flavorgroups")
         // .route("/", post().to(flavor_group_create))
         // .route("", get().to(flavor_group_list))
         // .route("/{flavor_group_id}", get().to(flavor_group_get))
