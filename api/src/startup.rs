@@ -8,7 +8,8 @@ use crate::routes::user::project::create::{
 };
 use crate::routes::user::user::create::{insert_user_into_db, NewUser};
 use crate::routes::{
-    accounting_scope, health_check, hello_scope, resources_scope, user_scope,
+    accounting_scope, health_check, hello_scope, pricing_scope, quota_scope,
+    resources_scope, user_scope,
 };
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
@@ -137,7 +138,9 @@ async fn run(
                     .service(hello_scope())
                     .service(user_scope())
                     .service(accounting_scope())
-                    .service(resources_scope()),
+                    .service(resources_scope())
+                    .service(pricing_scope())
+                    .service(quota_scope()),
             )
             .default_service(web::route().to(not_found))
     })
