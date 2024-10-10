@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        DELETE IGNORE FROM budgeting_userbudget\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "94fb1f655bae8e1ce00cfb5fc8df5fdf3c8d7746b65d0b2c1fa3035335269456"
+}
