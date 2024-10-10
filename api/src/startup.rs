@@ -7,7 +7,7 @@ use crate::routes::user::project::create::{
     insert_project_into_db, NewProject,
 };
 use crate::routes::user::user::create::{insert_user_into_db, NewUser};
-use crate::routes::{health_check, hello_scope, user_scope};
+use crate::routes::{accounting_scope, health_check, hello_scope, user_scope};
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
@@ -133,7 +133,8 @@ async fn run(
                     .wrap(from_fn(require_valid_token))
                     .route("/secured_health_check", web::get().to(health_check))
                     .service(hello_scope())
-                    .service(user_scope()),
+                    .service(user_scope())
+                    .service(accounting_scope()),
             )
             .default_service(web::route().to(not_found))
     })
