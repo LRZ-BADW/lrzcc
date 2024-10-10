@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        DELETE IGNORE FROM accounting_serverstate\n        WHERE state_ptr_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "099117f6a99d4c075650b0f2ae23412181599cc8aecd533847f6f2cb35ad1358"
+}
