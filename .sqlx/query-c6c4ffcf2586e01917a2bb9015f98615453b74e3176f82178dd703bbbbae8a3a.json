@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        DELETE IGNORE FROM resources_flavorgroup\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "c6c4ffcf2586e01917a2bb9015f98615453b74e3176f82178dd703bbbbae8a3a"
+}
