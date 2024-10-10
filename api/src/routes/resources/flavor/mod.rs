@@ -18,7 +18,7 @@ mod delete;
 use delete::flavor_delete;
 
 pub fn flavors_scope() -> Scope {
-    scope("/serverstates")
+    scope("/flavors")
         // .route("/", post().to(flavor_create))
         // .route("", get().to(flavor_list))
         // .route("/{flavor_id}", get().to(flavor_get))
