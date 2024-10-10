@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        DELETE IGNORE FROM quota_flavorquota\n        WHERE quota_ptr_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "6b4df5fd6d927e7d9de827e358b797db88506c321641f31cc121a06280a487e9"
+}

@@ -139,6 +139,7 @@ pub async fn select_minimal_users_by_project_id_from_db(
     Ok(rows)
 }
 
+// TODO: maybe move this to resources module
 #[tracing::instrument(
     name = "select_minimal_flavor_groups_by_project_id_from_db",
     skip(transaction)
