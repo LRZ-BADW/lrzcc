@@ -2,7 +2,7 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
--
+- api: add migrations for remaining active tables
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
