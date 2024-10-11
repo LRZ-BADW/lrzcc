@@ -3,6 +3,19 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
 - api: add migrations for remaining active tables
+- api: add accounting module
+- api: add quota module
+- api: flavor pricing module
+- api: add budgeting module
+- api: add accounting::server_state_delete endpoint
+- api: add resources::flavor_group_delete endpoint
+- api: add resources::flavor_delete endpoint
+- api: add quota::flavor_quota_delete endpoint
+- api: add pricing::flavor_price_delete endpoint
+- api: add budgeting::project_budget_delete endpoint
+- api: add budgeting::user_budget_delete endpoint
+- TODO: add remaining crud endpoints for all new modules
+- TODO: add tests for all new endpoints
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
