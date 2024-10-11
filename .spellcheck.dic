@@ -25,6 +25,7 @@ uuid
 
 flavor_create
 flavor_get
+flavor_group
 flavor_group_create
 flavor_group_create
 flavor_group_delete
@@ -33,21 +34,25 @@ flavor_group_list
 flavor_group_modify
 flavor_list
 flavor_modify
+flavor_price
 flavor_price_create
 flavor_price_get
 flavor_price_list
 flavor_price_list
 flavor_price_modify
+flavor_quota
 flavor_quota_create
 flavor_quota_get
 flavor_quota_get
 flavor_quota_list
 flavor_quota_modify
+project_budget
 project_budget_create
 project_budget_get
 project_budget_get
 project_budget_list
 project_budget_modify
+server_state
 server_state_create
 server_state_get
 server_state_list
