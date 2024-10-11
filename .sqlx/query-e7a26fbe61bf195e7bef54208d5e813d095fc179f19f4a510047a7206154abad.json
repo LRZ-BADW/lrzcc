@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO accounting_serverstate (\n            state_ptr_id, instance_id, instance_name, status, flavor_id, user_id\n        )\n        VALUES (?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "e7a26fbe61bf195e7bef54208d5e813d095fc179f19f4a510047a7206154abad"
+}

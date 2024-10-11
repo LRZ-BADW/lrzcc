@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT name\n        FROM user_user AS user\n        WHERE user.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 1020
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "b032aff0a04b295841715d87b6a34fc3e4d5932bbd94ee1dd9d53ae4aed23706"
+}
