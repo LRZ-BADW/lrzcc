@@ -50,6 +50,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 jzon = "0.12"
 lrzcc-wire = { version = "1.2", path = "../wire" }
 thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
 
 [dependencies.sqlx]
 version = "0.8"
