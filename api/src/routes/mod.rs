@@ -15,5 +15,39 @@ pub use pricing::*;
 pub use quota::*;
 pub use resources::*;
 pub use user::*;
-// TODO:
+
+// TODO: create endpoints for
+// - accounting::server_state
+// - resources::flavor_group
+// - resources::flavor
+// - quota::flavor_quota
+// - pricing::flavor_price
+// - budgeting::project_budget
+// - budgeting::user_budget
+
+// TODO: modify endpoints for
+// - accounting::server_state
+// - resources::flavor_group
+// - resources::flavor
+// - quota::flavor_quota
+// - pricing::flavor_price
+// - budgeting::project_budget
+// - budgeting::user_budget
+
+// TODO: get endpoints for
+// - accounting::server_state
+// - resources::flavor_group
+// - resources::flavor
+// - quota::flavor_quota
+// - pricing::flavor_price
+// - budgeting::project_budget
+// - budgeting::user_budget
+
+// TODO: list endpoints for
+// - accounting::server_state
+// - resources::flavor_group
+// - resources::flavor
+// - quota::flavor_quota
+// - pricing::flavor_price
+// - budgeting::project_budget
 // - budgeting::user_budget
