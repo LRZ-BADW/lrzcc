@@ -1,15 +1,16 @@
 use crate::authorization::require_admin_user;
-use crate::error::{
-    MinimalApiError, NormalApiError, NotFoundOrUnexpectedApiError,
-    OptionApiError, UnexpectedOnlyError,
+use crate::database::{
+    resources::flavor::select_flavor_name_from_db,
+    user::user::select_user_name_from_db,
 };
+use crate::error::{MinimalApiError, NormalApiError, OptionApiError};
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
 use chrono::{DateTime, Utc};
 use lrzcc_wire::accounting::{ServerState, ServerStateCreateData};
 use lrzcc_wire::user::{Project, User};
-use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
+use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 pub struct NewServerState {
     pub begin: DateTime<Utc>,
@@ -87,100 +88,6 @@ pub async fn server_state_create(
     Ok(HttpResponse::Created()
         .content_type("application/json")
         .json(server_state_created))
-}
-
-#[tracing::instrument(
-    name = "select_maybe_user_name_from_db",
-    skip(transaction)
-)]
-pub async fn select_maybe_user_name_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    user_id: u64,
-) -> Result<Option<String>, UnexpectedOnlyError> {
-    #[derive(FromRow)]
-    #[allow(dead_code)]
-    struct Row {
-        name: String,
-    }
-    let query = sqlx::query!(
-        r#"
-        SELECT name
-        FROM user_user AS user
-        WHERE user.id = ?
-        "#,
-        user_id
-    );
-    let row = transaction
-        .fetch_optional(query)
-        .await
-        .context("Failed to execute select query")?;
-    Ok(match row {
-        Some(row) => Some(
-            Row::from_row(&row)
-                .context("Failed to parse user row")?
-                .name,
-        ),
-        None => None,
-    })
-}
-
-#[tracing::instrument(name = "select_user_name_from_db", skip(transaction))]
-pub async fn select_user_name_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    user_id: u64,
-) -> Result<String, NotFoundOrUnexpectedApiError> {
-    select_maybe_user_name_from_db(transaction, user_id)
-        .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID not found".to_string(),
-        ))
-}
-
-#[tracing::instrument(
-    name = "select_maybe_flavor_name_from_db",
-    skip(transaction)
-)]
-pub async fn select_maybe_flavor_name_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    flavor_id: u64,
-) -> Result<Option<String>, UnexpectedOnlyError> {
-    #[derive(FromRow)]
-    #[allow(dead_code)]
-    struct Row {
-        name: String,
-    }
-    let query = sqlx::query!(
-        r#"
-        SELECT name
-        FROM resources_flavor AS flavor
-        WHERE flavor.id = ?
-        "#,
-        flavor_id
-    );
-    let row = transaction
-        .fetch_optional(query)
-        .await
-        .context("Failed to execute select query")?;
-    Ok(match row {
-        Some(row) => Some(
-            Row::from_row(&row)
-                .context("Failed to parse flavor row")?
-                .name,
-        ),
-        None => None,
-    })
-}
-
-#[tracing::instrument(name = "select_flavor_name_from_db", skip(transaction))]
-pub async fn select_flavor_name_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    flavor_id: u64,
-) -> Result<String, NotFoundOrUnexpectedApiError> {
-    select_maybe_flavor_name_from_db(transaction, flavor_id)
-        .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID not found".to_string(),
-        ))
 }
 
 #[tracing::instrument(
