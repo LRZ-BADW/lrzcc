@@ -1,13 +1,14 @@
 use actix_web::web::{
     delete,
-    // get, patch, post,
+    // get, patch,
+    post,
     scope,
 };
 use actix_web::Scope;
 use serde::Deserialize;
 
-// mod create;
-// use create::server_state_create;
+mod create;
+use create::server_state_create;
 // mod list;
 // use list::server_state_list;
 // mod get;
@@ -19,7 +20,7 @@ use delete::server_state_delete;
 
 pub fn server_states_scope() -> Scope {
     scope("/serverstates")
-        // .route("/", post().to(server_state_create))
+        .route("/", post().to(server_state_create))
         // .route("", get().to(server_state_list))
         // .route("/{server_state_id}", get().to(server_state_get))
         // TODO: what about PUT?
