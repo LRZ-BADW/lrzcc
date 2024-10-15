@@ -23,6 +23,7 @@ url
 user_class
 uuid
 
+FlavorGroupCreateData
 flavor_create
 flavor_get
 flavor_group
@@ -52,6 +53,7 @@ project_budget_get
 project_budget_get
 project_budget_list
 project_budget_modify
+project_id
 server_state
 server_state_create
 server_state_get
