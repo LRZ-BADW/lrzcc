@@ -32,7 +32,7 @@ pub async fn flavor_group_create(
     let flavor_group_created = FlavorGroup {
         id: id as u32,
         name,
-        project: project.id as u32,
+        project: project.id,
         flavors: vec![],
     };
     Ok(HttpResponse::Created()
