@@ -1,8 +1,7 @@
 use super::ProjectIdParam;
 use crate::authorization::require_admin_user;
-use crate::error::{
-    NotFoundOrUnexpectedApiError, OptionApiError, UnexpectedOnlyError,
-};
+use crate::database::user::project::select_project_from_db;
+use crate::error::{OptionApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -66,48 +65,6 @@ pub async fn project_get(
     Ok(HttpResponse::Ok()
         .content_type("application/json")
         .json(project))
-}
-
-#[tracing::instrument(name = "select_maybe_project_from_db", skip(transaction))]
-pub async fn select_maybe_project_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    project_id: u64,
-) -> Result<Option<Project>, UnexpectedOnlyError> {
-    let query = sqlx::query!(
-        r#"
-        SELECT
-            id,
-            name,
-            openstack_id,
-            user_class
-        FROM user_project AS project
-        WHERE
-            project.id = ?
-        "#,
-        project_id
-    );
-    let row = transaction
-        .fetch_optional(query)
-        .await
-        .context("Failed to execute select query")?;
-    Ok(match row {
-        Some(row) => Some(
-            Project::from_row(&row).context("Failed to parse project row")?,
-        ),
-        None => None,
-    })
-}
-
-#[tracing::instrument(name = "select_project_from_db", skip(transaction))]
-pub async fn select_project_from_db(
-    transaction: &mut Transaction<'_, MySql>,
-    project_id: u64,
-) -> Result<Project, NotFoundOrUnexpectedApiError> {
-    select_maybe_project_from_db(transaction, project_id)
-        .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Project with given ID not found".to_string(),
-        ))
 }
 
 #[tracing::instrument(

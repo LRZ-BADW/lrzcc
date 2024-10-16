@@ -1,6 +1,6 @@
 use crate::authorization::require_admin_user;
+use crate::database::user::project::select_project_from_db;
 use crate::error::{MinimalApiError, NormalApiError, OptionApiError};
-use crate::routes::user::project::get::select_project_from_db;
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
