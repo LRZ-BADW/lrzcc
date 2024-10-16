@@ -51,7 +51,7 @@ pub async fn flavor_price_create(
         .context("Failed to begin transaction")?;
     let flavor_name = select_flavor_name_from_db(
         &mut transaction,
-        new_flavor_price.flavor_id as u64,
+        new_flavor_price.flavor_id,
     )
     .await?;
     let id = insert_flavor_price_into_db(&mut transaction, &new_flavor_price)
