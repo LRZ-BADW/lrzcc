@@ -27,7 +27,7 @@ pub struct FlavorPriceInitialize {
     pub new_flavor_price_count: u32,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlavorPriceCreateData {
     pub flavor: u32,
     // TODO use an enum for this
