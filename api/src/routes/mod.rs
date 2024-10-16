@@ -17,7 +17,6 @@ pub use resources::*;
 pub use user::*;
 
 // TODO: create endpoints for
-// - budgeting::project_budget
 // - budgeting::user_budget
 
 // TODO: modify endpoints for
