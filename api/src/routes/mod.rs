@@ -17,9 +17,6 @@ pub use resources::*;
 pub use user::*;
 
 // TODO: create endpoints for
-// - resources::flavor_group
-// - resources::flavor
-// - pricing::flavor_price
 // - budgeting::project_budget
 // - budgeting::user_budget
 
