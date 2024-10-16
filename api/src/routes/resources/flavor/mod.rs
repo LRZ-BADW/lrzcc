@@ -1,13 +1,14 @@
 use actix_web::web::{
     delete,
-    // get, patch, post,
+    // get, patch,
+    post,
     scope,
 };
 use actix_web::Scope;
 use serde::Deserialize;
 
-// mod create;
-// use create::flavor_create;
+mod create;
+use create::flavor_create;
 // mod list;
 // use list::flavor_list;
 // mod get;
@@ -19,7 +20,7 @@ use delete::flavor_delete;
 
 pub fn flavors_scope() -> Scope {
     scope("/flavors")
-        // .route("/", post().to(flavor_create))
+        .route("/", post().to(flavor_create))
         // .route("", get().to(flavor_list))
         // .route("/{flavor_id}", get().to(flavor_get))
         // TODO: what about PUT?
