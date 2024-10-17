@@ -16,9 +16,6 @@ pub use quota::*;
 pub use resources::*;
 pub use user::*;
 
-// TODO: create endpoints for
-// - budgeting::user_budget
-
 // TODO: modify endpoints for
 // - accounting::server_state
 // - resources::flavor_group
