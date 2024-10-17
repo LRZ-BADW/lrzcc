@@ -18,7 +18,7 @@ impl Display for UserBudget {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserBudgetCreateData {
     pub user: u32,
     #[serde(skip_serializing_if = "Option::is_none")]

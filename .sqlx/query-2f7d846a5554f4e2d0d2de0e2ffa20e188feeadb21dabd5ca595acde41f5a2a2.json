@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO resources_flavor (name, openstack_id, weight, group_id)\n        VALUES (?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "2f7d846a5554f4e2d0d2de0e2ffa20e188feeadb21dabd5ca595acde41f5a2a2"
+}

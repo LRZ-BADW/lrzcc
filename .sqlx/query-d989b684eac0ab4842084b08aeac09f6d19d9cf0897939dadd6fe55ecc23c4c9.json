@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT name\n        FROM resources_flavor AS flavor\n        WHERE flavor.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 256
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d989b684eac0ab4842084b08aeac09f6d19d9cf0897939dadd6fe55ecc23c4c9"
+}

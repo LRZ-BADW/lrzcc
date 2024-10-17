@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO pricing_flavorprice (user_class, unit_price, start_time, flavor_id)\n        VALUES (?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "fb40c0a014eb570f50073585f049bf9279afe8003a819bb1e54b2e9103bedda9"
+}

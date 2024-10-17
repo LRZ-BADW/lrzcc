@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO quota_flavorquota (quota_ptr_id, flavor_group_id)\n        VALUES (?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "da5fbe590cd1dd71b9d8eec65be72e1eb00019f34e12aaeba8671eebdc61544f"
+}

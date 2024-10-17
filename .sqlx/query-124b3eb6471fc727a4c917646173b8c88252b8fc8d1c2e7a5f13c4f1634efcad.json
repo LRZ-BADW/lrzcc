@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO budgeting_userbudget (year, amount, user_id)\n        VALUES (?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "124b3eb6471fc727a4c917646173b8c88252b8fc8d1c2e7a5f13c4f1634efcad"
+}

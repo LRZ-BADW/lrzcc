@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO resources_flavorgroup (name, project_id)\n        VALUES (?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "701b2e664a995c1dcfe3af7e3e6c47f6862ff665cdfc396374db1b013964ac20"
+}

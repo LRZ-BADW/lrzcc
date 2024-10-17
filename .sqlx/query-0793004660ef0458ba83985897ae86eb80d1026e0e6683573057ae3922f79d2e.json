@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT IGNORE INTO accounting_state (begin, end)\n        VALUES (?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "0793004660ef0458ba83985897ae86eb80d1026e0e6683573057ae3922f79d2e"
+}
