@@ -26,6 +26,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add budgeting::user_budget_create endpoint
 - api: add resources::select_flavor_group_from_db to database module
 - api: add resources::flavor_group_modify endpoint
+- deb: bump uuid from 1.10.0 to 1.11.0
+- deb: bump anyhow from 1.0.89 to 1.0.90
+- deb: bump tracing-actix-web from 0.7.13 to 0.7.14
+- deb: bump serde_json from 1.0.128 to 1.0.132
+- deb: bump serde from 1.0.210 to 1.0.211
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
 
