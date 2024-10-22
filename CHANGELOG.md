@@ -24,6 +24,8 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add budgeting::project_budget_create endpoint
 - wire: derive Deserialize for UserBudgetCreateData
 - api: add budgeting::user_budget_create endpoint
+- api: add resources::select_flavor_group_from_db to database module
+- api: add resources::flavor_group_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
 
