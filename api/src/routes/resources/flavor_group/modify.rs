@@ -51,7 +51,7 @@ pub async fn update_flavor_group_in_db(
 ) -> Result<FlavorGroup, NotFoundOrUnexpectedApiError> {
     let row = select_flavor_group_from_db(transaction, data.id as u64).await?;
     let name = data.name.clone().unwrap_or(row.name);
-    let project = data.project.clone().unwrap_or(row.project);
+    let project = data.project.unwrap_or(row.project);
     let query = sqlx::query!(
         r#"
         UPDATE resources_flavorgroup
