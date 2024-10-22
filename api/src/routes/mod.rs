@@ -18,7 +18,6 @@ pub use user::*;
 
 // TODO: modify endpoints for
 // - accounting::server_state
-// - resources::flavor_group
 // - resources::flavor
 // - quota::flavor_quota
 // - pricing::flavor_price
