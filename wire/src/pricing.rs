@@ -49,7 +49,7 @@ impl FlavorPriceCreateData {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlavorPriceModifyData {
     pub id: u32,
 
