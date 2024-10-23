@@ -31,6 +31,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - deb: bump tracing-actix-web from 0.7.13 to 0.7.14
 - deb: bump serde_json from 1.0.128 to 1.0.132
 - deb: bump serde from 1.0.210 to 1.0.211
+- wire: derive FromRow for Flavor and make group_name field public
+- api: add resources::select_flavor_from_db to database module
+- api: add resources::flavor_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
 
