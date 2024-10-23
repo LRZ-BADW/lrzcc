@@ -50,7 +50,7 @@ pub async fn update_flavor_price_in_db(
     data: &FlavorPriceModifyData,
 ) -> Result<FlavorPrice, NotFoundOrUnexpectedApiError> {
     let row = select_flavor_price_from_db(transaction, data.id as u64).await?;
-    let user_class = data.user_class.clone().unwrap_or(row.user_class);
+    let user_class = data.user_class.unwrap_or(row.user_class);
     let unit_price = data.unit_price.unwrap_or(row.unit_price);
     let start_time = data.start_time.unwrap_or(row.start_time);
     let flavor = data.flavor.unwrap_or(row.flavor);
