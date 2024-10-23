@@ -57,9 +57,11 @@ pub async fn select_maybe_flavor_from_db(
 ) -> Result<Option<Flavor>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
-        SELECT id, name, openstack_id, weight, group_id
-        FROM resources_flavor
-        WHERE id = ?
+        SELECT f.id, f.name, f.openstack_id, f.weight, f.group_id, g.name as group_name
+        FROM resources_flavor as f, resources_flavorgroup as g
+        WHERE
+            f.group_id = g.id AND
+            f.id = ?
         "#,
         flavor_id
     );
