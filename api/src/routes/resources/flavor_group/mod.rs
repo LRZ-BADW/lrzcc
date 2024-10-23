@@ -1,6 +1,7 @@
 use actix_web::web::{
     delete,
-    // get, patch,
+    // get,
+    patch,
     post,
     scope,
 };
@@ -13,8 +14,8 @@ use create::flavor_group_create;
 // use list::flavor_group_list;
 // mod get;
 // use get::flavor_group_get;
-// mod modify;
-// use modify::flavor_group_modify;
+mod modify;
+use modify::flavor_group_modify;
 mod delete;
 use delete::flavor_group_delete;
 
@@ -24,7 +25,7 @@ pub fn flavor_groups_scope() -> Scope {
         // .route("", get().to(flavor_group_list))
         // .route("/{flavor_group_id}", get().to(flavor_group_get))
         // TODO: what about PUT?
-        // .route("/{flavor_group_id}/", patch().to(flavor_group_modify))
+        .route("/{flavor_group_id}/", patch().to(flavor_group_modify))
         .route("/{flavor_group_id}/", delete().to(flavor_group_delete))
 }
 

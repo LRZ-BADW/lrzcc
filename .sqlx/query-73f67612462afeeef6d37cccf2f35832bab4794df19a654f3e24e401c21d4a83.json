@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE resources_flavorgroup\n        SET name = ?, project_id = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "73f67612462afeeef6d37cccf2f35832bab4794df19a654f3e24e401c21d4a83"
+}

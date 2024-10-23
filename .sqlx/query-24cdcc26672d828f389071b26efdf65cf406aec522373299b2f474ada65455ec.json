@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE pricing_flavorprice\n        SET user_class = ?, unit_price = ?, start_time = ?, flavor_id = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "24cdcc26672d828f389071b26efdf65cf406aec522373299b2f474ada65455ec"
+}
