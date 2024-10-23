@@ -34,6 +34,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - wire: derive FromRow for Flavor and make group_name field public
 - api: add resources::select_flavor_from_db to database module
 - api: add resources::flavor_modify endpoint
+- api: add database::pricing::flavor_price submodule
+- wire: derive Deserialize for FlavorPriceModifyData
+- api: add flavor_price_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
 
