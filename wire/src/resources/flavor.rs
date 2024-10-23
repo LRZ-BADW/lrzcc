@@ -13,7 +13,7 @@ pub struct Flavor {
     #[tabled(display_with = "display_option")]
     pub group: Option<u32>,
     #[tabled(display_with = "display_option")]
-    group_name: Option<String>,
+    pub group_name: Option<String>,
     pub weight: u32,
 }
 
