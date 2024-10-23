@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE resources_flavor\n        SET name = ?, openstack_id = ?, weight = ?, group_id = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "6cbbd76bb7fbe3d1c7200fee2588dc0d2ff2e278ecbceb6907aefbbe4f0f7e32"
+}
