@@ -19,7 +19,6 @@ pub use user::*;
 // TODO: modify endpoints for
 // - accounting::server_state
 // - quota::flavor_quota
-// - pricing::flavor_price
 // - budgeting::project_budget
 // - budgeting::user_budget
 
