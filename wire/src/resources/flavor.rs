@@ -1,10 +1,11 @@
 use crate::common::display_option;
 use crate::resources::FlavorGroupMinimal;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct Flavor {
     pub id: u32,
     pub name: String,
