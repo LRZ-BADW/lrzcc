@@ -61,7 +61,7 @@ pub struct FlavorGroupDb {
 }
 
 #[tracing::instrument(
-    name = "select_maybe_flavor_group_name_from_db",
+    name = "select_maybe_flavor_group_from_db",
     skip(transaction)
 )]
 pub async fn select_maybe_flavor_group_from_db(
@@ -122,10 +122,7 @@ pub async fn select_maybe_flavor_group_from_db(
     }))
 }
 
-#[tracing::instrument(
-    name = "select_flavor_group_name_from_db",
-    skip(transaction)
-)]
+#[tracing::instrument(name = "select_flavor_group_from_db", skip(transaction))]
 pub async fn select_flavor_group_from_db(
     transaction: &mut Transaction<'_, MySql>,
     flavor_group_id: u64,
