@@ -39,6 +39,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add flavor_price_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
+- deb: bump config from 0.14.0 to 0.14.1
+- deb: bump anyhow from 1.0.90 to 1.0.91
+- deb: bump serde from 1.0.211 to 1.0.213
+- deb: bump thiserror from 1.0.64 to 1.0.65
+- deb: bump tokio from 1.40.0 to 1.41.0
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
