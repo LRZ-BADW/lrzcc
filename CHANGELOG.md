@@ -44,6 +44,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - deb: bump serde from 1.0.211 to 1.0.213
 - deb: bump thiserror from 1.0.64 to 1.0.65
 - deb: bump tokio from 1.40.0 to 1.41.0
+- wire: derive FromRow for ProjectBudget and UserBudget
+- wire: derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
+- api: add database::budgeting::project/user_budget submodule with helpers
+- api: add simplified budgeting::project_budget_modify endpoint
+- api: add simplified budgeting::user_budget_modify endpoint
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
