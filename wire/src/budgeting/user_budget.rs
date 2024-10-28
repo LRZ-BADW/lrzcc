@@ -38,7 +38,7 @@ impl UserBudgetCreateData {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserBudgetModifyData {
     pub id: u32,
 
