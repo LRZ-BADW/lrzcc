@@ -52,7 +52,7 @@ pub async fn update_user_budget_in_db(
     data: &UserBudgetModifyData,
 ) -> Result<UserBudget, NotFoundOrUnexpectedApiError> {
     let row = select_user_budget_from_db(transaction, data.id as u64).await?;
-    let amount = data.amount.clone().unwrap_or(row.amount);
+    let amount = data.amount.unwrap_or(row.amount);
     let query = sqlx::query!(
         r#"
         UPDATE budgeting_userbudget
