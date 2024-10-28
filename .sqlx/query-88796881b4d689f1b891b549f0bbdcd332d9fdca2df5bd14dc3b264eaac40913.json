@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE budgeting_userbudget\n        SET amount = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "88796881b4d689f1b891b549f0bbdcd332d9fdca2df5bd14dc3b264eaac40913"
+}
