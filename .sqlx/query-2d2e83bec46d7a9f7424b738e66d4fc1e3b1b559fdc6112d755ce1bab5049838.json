@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE accounting_serverstate\n        SET\n            instance_id = ?,\n            instance_name = ?,\n            flavor_id = ?,\n            status = ?,\n            user_id = ?\n        WHERE state_ptr_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "2d2e83bec46d7a9f7424b738e66d4fc1e3b1b559fdc6112d755ce1bab5049838"
+}
