@@ -53,6 +53,8 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add database::quota submodule with helper functions
 - api: minor naming fixes in user and pricing modules
 - api: add simplified quota::flavor_quota_modify endpoint
+- api: add database::accounting submodule with helper functions
+- api: add simplified accounting::server_state_modify endpoint
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
