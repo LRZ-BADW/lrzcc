@@ -49,6 +49,10 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add database::budgeting::project/user_budget submodule with helpers
 - api: add simplified budgeting::project_budget_modify endpoint
 - api: add simplified budgeting::user_budget_modify endpoint
+- wire: derive FromRow for FlavorQuota
+- api: add database::quota submodule with helper functions
+- api: minor naming fixes in user and pricing modules
+- api: add simplified quota::flavor_quota_modify endpoint
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
