@@ -74,6 +74,7 @@ pub async fn update_project_in_db(
         name,
         openstack_id,
         project: project_id,
+        // TODO: we need to get the new project's name
         project_name: row.project_name,
         role,
         is_staff,
