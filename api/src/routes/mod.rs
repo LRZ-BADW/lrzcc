@@ -16,9 +16,6 @@ pub use quota::*;
 pub use resources::*;
 pub use user::*;
 
-// TODO: modify endpoints for
-// - accounting::server_state
-
 // TODO: get endpoints for
 // - accounting::server_state
 // - resources::flavor_group
@@ -42,3 +39,4 @@ pub use user::*;
 // - budgeting::user_budget::modify
 // - pricing::flavor_price::modify
 // - quota::flavor_quota::modify
+// - accounting::server_state::modify
