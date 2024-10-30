@@ -1,6 +1,7 @@
 use actix_web::web::{
     delete,
-    // get, patch,
+    // get,
+    patch,
     post,
     scope,
 };
@@ -13,8 +14,8 @@ use create::flavor_quota_create;
 // use list::flavor_quota_list;
 // mod get;
 // use get::flavor_quota_get;
-// mod modify;
-// use modify::flavor_quota_modify;
+mod modify;
+use modify::flavor_quota_modify;
 mod delete;
 use delete::flavor_quota_delete;
 
@@ -24,7 +25,7 @@ pub fn flavor_quotas_scope() -> Scope {
         // .route("", get().to(flavor_quota_list))
         // .route("/{flavor_quota_id}", get().to(flavor_quota_get))
         // TODO: what about PUT?
-        // .route("/{flavor_quota_id}/", patch().to(flavor_quota_modify))
+        .route("/{flavor_quota_id}/", patch().to(flavor_quota_modify))
         .route("/{flavor_quota_id}/", delete().to(flavor_quota_delete))
 }
 

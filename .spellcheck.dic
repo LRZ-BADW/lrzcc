@@ -21,6 +21,7 @@ thiserror
 u64
 url
 user_class
+username
 uuid
 
 FlavorGroupCreateData

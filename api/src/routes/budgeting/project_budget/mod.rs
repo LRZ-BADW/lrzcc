@@ -1,6 +1,7 @@
 use actix_web::web::{
     delete,
-    // get, patch,
+    // get,
+    patch,
     post,
     scope,
 };
@@ -13,8 +14,8 @@ use create::project_budget_create;
 // use list::project_budget_list;
 // mod get;
 // use get::project_budget_get;
-// mod modify;
-// use modify::project_budget_modify;
+mod modify;
+use modify::project_budget_modify;
 mod delete;
 use delete::project_budget_delete;
 
@@ -24,7 +25,7 @@ pub fn project_budgets_scope() -> Scope {
         // .route("", get().to(project_budget_list))
         // .route("/{project_budget_id}", get().to(project_budget_get))
         // TODO: what about PUT?
-        // .route("/{project_budget_id}/", patch().to(project_budget_modify))
+        .route("/{project_budget_id}/", patch().to(project_budget_modify))
         .route("/{project_budget_id}/", delete().to(project_budget_delete))
 }
 

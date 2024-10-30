@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE quota_quota\n        SET\n            user_id = ?,\n            quota = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "1d7bce4cb1885d5c62149462f3ee893939d369e1b5d76aff33c46ef89f2b5aa1"
+}

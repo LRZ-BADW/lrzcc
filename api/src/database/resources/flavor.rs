@@ -1,5 +1,6 @@
 use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
 use anyhow::Context;
+use lrzcc_wire::resources::Flavor;
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[tracing::instrument(
@@ -46,5 +47,45 @@ pub async fn select_flavor_name_from_db(
         .await?
         .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
             "User with given ID not found".to_string(),
+        ))
+}
+
+#[tracing::instrument(name = "select_maybe_flavor_from_db", skip(transaction))]
+pub async fn select_maybe_flavor_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    flavor_id: u64,
+) -> Result<Option<Flavor>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT f.id, f.name, f.openstack_id, f.weight, f.group_id, g.name as group_name
+        FROM resources_flavor as f, resources_flavorgroup as g
+        WHERE
+            f.group_id = g.id AND
+            f.id = ?
+        "#,
+        flavor_id
+    );
+    let row = transaction
+        .fetch_optional(query)
+        .await
+        .context("Failed to execute select query")?;
+    // TODO: isn't there a nicer way to write this?
+    Ok(match row {
+        Some(row) => {
+            Some(Flavor::from_row(&row).context("Failed to parse flavor row")?)
+        }
+        None => None,
+    })
+}
+
+#[tracing::instrument(name = "select_flavor_from_db", skip(transaction))]
+pub async fn select_flavor_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    flavor_id: u64,
+) -> Result<Flavor, NotFoundOrUnexpectedApiError> {
+    select_maybe_flavor_from_db(transaction, flavor_id)
+        .await?
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
+            "Flavor  with given ID not found".to_string(),
         ))
 }

@@ -1,26 +1,28 @@
-use super::get::select_user_from_db;
 use crate::authorization::require_admin_user;
+use crate::database::resources::flavor::select_flavor_from_db;
+use crate::database::resources::flavor_group::select_flavor_group_name_from_db;
 use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
 use actix_web::web::{Data, Json, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::user::{Project, User, UserModifyData};
+use lrzcc_wire::resources::{Flavor, FlavorModifyData};
+use lrzcc_wire::user::{Project, User};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
-use super::UserIdParam;
+use super::FlavorIdParam;
 
-#[tracing::instrument(name = "user_modify")]
-pub async fn user_modify(
+#[tracing::instrument(name = "flavor_modify")]
+pub async fn flavor_modify(
     user: ReqData<User>,
     // TODO: we don't need this right?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
-    data: Json<UserModifyData>,
-    params: Path<UserIdParam>,
+    data: Json<FlavorModifyData>,
+    params: Path<FlavorIdParam>,
 ) -> Result<HttpResponse, OptionApiError> {
     require_admin_user(&user)?;
     // TODO: do further validation
-    if data.id != params.user_id {
+    if data.id != params.flavor_id {
         return Err(OptionApiError::ValidationError(
             "ID in URL does not match ID in body".to_string(),
         ));
@@ -29,56 +31,57 @@ pub async fn user_modify(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let project = update_user_in_db(&mut transaction, &data).await?;
+    let flavor = update_flavor_in_db(&mut transaction, &data).await?;
     transaction
         .commit()
         .await
         .context("Failed to commit transaction")?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .json(project))
+        .json(flavor))
 }
 
-#[tracing::instrument(name = "update_user_in_db", skip(data, transaction))]
-pub async fn update_user_in_db(
+#[tracing::instrument(name = "update_flavor_in_db", skip(data, transaction))]
+pub async fn update_flavor_in_db(
     transaction: &mut Transaction<'_, MySql>,
-    data: &UserModifyData,
-) -> Result<User, NotFoundOrUnexpectedApiError> {
-    let row = select_user_from_db(transaction, data.id as u64).await?;
+    data: &FlavorModifyData,
+) -> Result<Flavor, NotFoundOrUnexpectedApiError> {
+    let row = select_flavor_from_db(transaction, data.id as u64).await?;
     let name = data.name.clone().unwrap_or(row.name);
     let openstack_id = data.openstack_id.clone().unwrap_or(row.openstack_id);
-    let project_id = data.project.unwrap_or(row.project);
-    let role = data.role.unwrap_or(row.role);
-    let is_staff = data.is_staff.unwrap_or(row.is_staff);
-    let is_active = data.is_active.unwrap_or(row.is_active);
+    let weight = data.weight.unwrap_or(row.weight);
+    let group = data.group.unwrap_or(row.group);
     let query = sqlx::query!(
         r#"
-        UPDATE user_user
-        SET name = ?, openstack_id = ?, project_id = ?, role = ?, is_staff = ?, is_active = ?
+        UPDATE resources_flavor
+        SET name = ?, openstack_id = ?, weight = ?, group_id = ?
         WHERE id = ?
         "#,
         name,
         openstack_id,
-        project_id,
-        role,
-        is_staff,
-        is_active,
+        weight,
+        group,
         data.id,
     );
     transaction
         .execute(query)
         .await
         .context("Failed to execute update query")?;
-    let user = User {
+    let group_name = if let Some(group_id) = group {
+        Some(
+            select_flavor_group_name_from_db(transaction, group_id as u64)
+                .await?,
+        )
+    } else {
+        None
+    };
+    let project = Flavor {
         id: data.id,
         name,
         openstack_id,
-        project: project_id,
-        // TODO: we need to get the new project's name
-        project_name: row.project_name,
-        role,
-        is_staff,
-        is_active,
+        weight,
+        group,
+        group_name,
     };
-    Ok(user)
+    Ok(project)
 }

@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE quota_flavorquota\n        SET flavor_group_id = ?\n        WHERE quota_ptr_id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "0cd6ae84400d5fbb5964a9cab3b8b4b499f3ba6c9b63154bdf56a09017b91ebf"
+}

@@ -1,6 +1,7 @@
 use actix_web::web::{
     delete,
-    // get, patch,
+    // get,
+    patch,
     post,
     scope,
 };
@@ -13,8 +14,8 @@ use create::server_state_create;
 // use list::server_state_list;
 // mod get;
 // use get::server_state_get;
-// mod modify;
-// use modify::server_state_modify;
+mod modify;
+use modify::server_state_modify;
 mod delete;
 use delete::server_state_delete;
 
@@ -24,7 +25,7 @@ pub fn server_states_scope() -> Scope {
         // .route("", get().to(server_state_list))
         // .route("/{server_state_id}", get().to(server_state_get))
         // TODO: what about PUT?
-        // .route("/{server_state_id}/", patch().to(server_state_modify))
+        .route("/{server_state_id}/", patch().to(server_state_modify))
         .route("/{server_state_id}/", delete().to(server_state_delete))
 }
 

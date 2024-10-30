@@ -1,9 +1,10 @@
 use crate::common::is_false;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct UserBudget {
     pub id: u32,
     pub user: u32,
@@ -37,7 +38,7 @@ impl UserBudgetCreateData {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct UserBudgetModifyData {
     pub id: u32,
 

@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE accounting_state\n        SET\n            begin = ?,\n            end = ?\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "edefd297e2a16cac1f42cf3f1176c71b9773e5e821eb96c166b7311d6ad6abd8"
+}

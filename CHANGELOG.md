@@ -24,8 +24,37 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add budgeting::project_budget_create endpoint
 - wire: derive Deserialize for UserBudgetCreateData
 - api: add budgeting::user_budget_create endpoint
+- api: add resources::select_flavor_group_from_db to database module
+- api: add resources::flavor_group_modify endpoint
+- deb: bump uuid from 1.10.0 to 1.11.0
+- deb: bump anyhow from 1.0.89 to 1.0.90
+- deb: bump tracing-actix-web from 0.7.13 to 0.7.14
+- deb: bump serde_json from 1.0.128 to 1.0.132
+- deb: bump serde from 1.0.210 to 1.0.211
+- wire: derive FromRow for Flavor and make group_name field public
+- api: add resources::select_flavor_from_db to database module
+- api: add resources::flavor_modify endpoint
+- api: add database::pricing::flavor_price submodule
+- wire: derive Deserialize for FlavorPriceModifyData
+- api: add flavor_price_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
+- deb: bump config from 0.14.0 to 0.14.1
+- deb: bump anyhow from 1.0.90 to 1.0.91
+- deb: bump serde from 1.0.211 to 1.0.213
+- deb: bump thiserror from 1.0.64 to 1.0.65
+- deb: bump tokio from 1.40.0 to 1.41.0
+- wire: derive FromRow for ProjectBudget and UserBudget
+- wire: derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
+- api: add database::budgeting::project/user_budget submodule with helpers
+- api: add simplified budgeting::project_budget_modify endpoint
+- api: add simplified budgeting::user_budget_modify endpoint
+- wire: derive FromRow for FlavorQuota
+- api: add database::quota submodule with helper functions
+- api: minor naming fixes in user and pricing modules
+- api: add simplified quota::flavor_quota_modify endpoint
+- api: add database::accounting submodule with helper functions
+- api: add simplified accounting::server_state_modify endpoint
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
