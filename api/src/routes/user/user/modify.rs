@@ -29,7 +29,7 @@ pub async fn user_modify(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let project = update_project_in_db(&mut transaction, &data).await?;
+    let project = update_user_in_db(&mut transaction, &data).await?;
     transaction
         .commit()
         .await
@@ -39,8 +39,8 @@ pub async fn user_modify(
         .json(project))
 }
 
-#[tracing::instrument(name = "update_project_in_db", skip(data, transaction))]
-pub async fn update_project_in_db(
+#[tracing::instrument(name = "update_user_in_db", skip(data, transaction))]
+pub async fn update_user_in_db(
     transaction: &mut Transaction<'_, MySql>,
     data: &UserModifyData,
 ) -> Result<User, NotFoundOrUnexpectedApiError> {
