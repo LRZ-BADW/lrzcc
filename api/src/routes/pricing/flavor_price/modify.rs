@@ -70,7 +70,7 @@ pub async fn update_flavor_price_in_db(
         .execute(query)
         .await
         .context("Failed to execute update query")?;
-    let project = FlavorPrice {
+    let price = FlavorPrice {
         id: data.id,
         user_class,
         unit_price,
@@ -78,5 +78,5 @@ pub async fn update_flavor_price_in_db(
         flavor,
         flavor_name: row.flavor_name,
     };
-    Ok(project)
+    Ok(price)
 }
