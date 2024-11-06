@@ -25,6 +25,7 @@ pub async fn flavor_group_get(
         .begin()
         .await
         .context("Failed to begin transaction")?;
+    // TODO: this can all be condensed into one database function
     let flavor_group = select_flavor_group_from_db(
         &mut transaction,
         params.flavor_group_id as u64,
