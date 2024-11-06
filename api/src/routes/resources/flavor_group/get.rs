@@ -1,8 +1,9 @@
 use super::FlavorGroupIdParam;
+use crate::authorization::require_admin_user;
 use crate::database::resources::flavor::select_minimal_flavors_by_group_from_db;
 use crate::database::resources::flavor_group::select_flavor_group_from_db;
 use crate::database::user::project::select_project_minimal_from_db;
-use crate::error::NotFoundOrUnexpectedApiError;
+use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -17,7 +18,9 @@ pub async fn flavor_group_get(
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<FlavorGroupIdParam>,
-) -> Result<HttpResponse, NotFoundOrUnexpectedApiError> {
+    // TODO: is the ValidationError variant ever used?
+) -> Result<HttpResponse, OptionApiError> {
+    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
