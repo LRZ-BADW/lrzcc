@@ -23,7 +23,7 @@ impl Display for Flavor {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct FlavorMinimal {
     pub id: u32,
     pub name: String,
