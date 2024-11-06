@@ -15,6 +15,7 @@ pub async fn user_get(
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<UserIdParam>,
+    // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
     let mut transaction = db_pool
         .begin()
