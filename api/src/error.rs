@@ -256,6 +256,31 @@ impl std::fmt::Debug for NotFoundOrUnexpectedApiError {
     }
 }
 
+impl ResponseError for NotFoundOrUnexpectedApiError {
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        let (status_code, message) = match self {
+            NotFoundOrUnexpectedApiError::NotFoundError(message) => {
+                (StatusCode::NOT_FOUND, message.clone())
+            }
+            NotFoundOrUnexpectedApiError::UnexpectedError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal server error, contact admin or check logs"
+                    .to_string(),
+            ),
+        };
+        HttpResponse::build(status_code)
+            .insert_header((
+                CONTENT_TYPE,
+                HeaderValue::from_static("application/json"),
+            ))
+            // TODO: handle unwrap
+            .body(
+                serde_json::to_string(&ErrorResponse { detail: message })
+                    .unwrap(),
+            )
+    }
+}
+
 #[derive(thiserror::Error)]
 pub enum AuthOnlyError {
     #[error("{0}")]
