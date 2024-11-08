@@ -40,10 +40,6 @@ This is the combined changelog of all contained `lrzcc` crates.
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
 - deb: bump config from 0.14.0 to 0.14.1
-- deb: bump anyhow from 1.0.90 to 1.0.91
-- deb: bump serde from 1.0.211 to 1.0.213
-- deb: bump thiserror from 1.0.64 to 1.0.65
-- deb: bump tokio from 1.40.0 to 1.41.0
 - wire: derive FromRow for ProjectBudget and UserBudget
 - wire: derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
 - api: add database::budgeting::project/user_budget submodule with helpers
@@ -55,6 +51,25 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add simplified quota::flavor_quota_modify endpoint
 - api: add database::accounting submodule with helper functions
 - api: add simplified accounting::server_state_modify endpoint
+- api: implement ResponseError for NotFoundOrUnexpectedApiError
+- api: add simplified server_state_get endpoint
+- api: add select_project_minimal_from_db function
+- api: add select_minimal_flavors_by_group_from_db function
+- wire: derive FromRow for FlavorMinimal
+- api: add simplified flavor_group_get endpoint
+- api: require admin user for server_state_get
+- api: require admin user for flavor_group_get
+- api: add select_flavor_detail_from_db function
+- api: add simplified flavor_get endpoint
+- api: add simplified flavor_quota_get endpoint
+- api: add simplified flavor_price_get endpoint
+- api: add simplified project_budget_get
+- api: add simplified user_budget_get endpoint
+- deb: bump reqwest from 0.12.8 to 0.12.9
+- deb: bump anyhow from 1.0.90 to 1.0.93
+- deb: bump serde from 1.0.211 to 1.0.214
+- deb: bump thiserror from 1.0.64 to 2.0.0
+- deb: bump tokio from 1.40.0 to 1.41.1
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
