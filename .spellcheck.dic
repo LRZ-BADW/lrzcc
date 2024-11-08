@@ -23,6 +23,7 @@ url
 user_class
 username
 uuid
+ValidationError
 
 FlavorGroupCreateData
 flavor_create

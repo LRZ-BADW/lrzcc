@@ -17,6 +17,7 @@ pub async fn project_get(
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ProjectIdParam>,
+    // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
     if params.project_id != project.id {
         require_admin_user(&user)?;
