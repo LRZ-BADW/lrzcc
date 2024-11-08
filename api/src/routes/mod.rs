@@ -17,7 +17,6 @@ pub use resources::*;
 pub use user::*;
 
 // TODO: get endpoints for
-// - budgeting::project_budget
 // - budgeting::user_budget
 
 // TODO: list endpoints for
@@ -40,3 +39,4 @@ pub use user::*;
 // - resources::flavor::get
 // - quota::flavor_quota::get
 // - pricing::flavor_price::get
+// - budgeting::project_budget::get
