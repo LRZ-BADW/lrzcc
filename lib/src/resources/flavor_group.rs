@@ -3,8 +3,8 @@ use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::resources::{
     FlavorGroup, FlavorGroupCreateData, FlavorGroupCreated,
-    FlavorGroupDetailed, FlavorGroupInitialize, FlavorGroupModifyData,
-    FlavorGroupUsage, FlavorGroupUsageAggregate,
+    FlavorGroupDetailed, FlavorGroupInitialize, FlavorGroupListParams,
+    FlavorGroupModifyData, FlavorGroupUsage, FlavorGroupUsageAggregate,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -21,7 +21,7 @@ pub struct FlavorGroupListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
+    params: FlavorGroupListParams,
 }
 
 impl FlavorGroupListRequest {
@@ -29,21 +29,20 @@ impl FlavorGroupListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            all: false,
+
+            params: FlavorGroupListParams { all: None },
         }
     }
 
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        if self.all {
-            params.push(("all", "1".to_string()));
-        }
-        params
-    }
-
+    // TODO: only the return type changes, pull these functions into a macro
     pub fn send(&self) -> Result<Vec<FlavorGroup>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to envode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -54,7 +53,7 @@ impl FlavorGroupListRequest {
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 }
