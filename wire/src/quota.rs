@@ -28,6 +28,13 @@ pub struct FlavorQuotaCheck {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FlavorQuotaListParams {
+    pub all: Option<bool>,
+    pub group: Option<u32>,
+    pub user: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlavorQuotaCreateData {
     pub flavor_group: u32,
     pub user: u32,
