@@ -20,6 +20,14 @@ impl Display for ProjectBudget {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ProjectBudgetListParams {
+    pub user: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+    pub year: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectBudgetCreateData {
     pub project: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
