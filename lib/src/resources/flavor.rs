@@ -2,8 +2,8 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::resources::{
-    Flavor, FlavorCreateData, FlavorDetailed, FlavorImport, FlavorModifyData,
-    FlavorUsage, FlavorUsageAggregate,
+    Flavor, FlavorCreateData, FlavorDetailed, FlavorImport, FlavorListParams,
+    FlavorModifyData, FlavorUsage, FlavorUsageAggregate,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -20,8 +20,7 @@ pub struct FlavorListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
-    group: Option<u32>,
+    params: FlavorListParams,
 }
 
 impl FlavorListRequest {
@@ -29,36 +28,32 @@ impl FlavorListRequest {
         Self {
             url: url.to_string(),
             client: Rc::clone(client),
-            all: false,
-            group: None,
-        }
-    }
 
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        // TODO maybe flip the order here, since the most specific
-        // should take precedence
-        if self.all {
-            params.push(("all", "1".to_string()));
-        } else if let Some(group) = self.group {
-            params.push(("flavorgroup", group.to_string()));
+            params: FlavorListParams {
+                all: None,
+                group: None,
+            },
         }
-        params
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
     pub fn group(&mut self, group: u32) -> &mut Self {
-        self.group = Some(group);
+        self.params.group = Some(group);
         self
     }
 
     pub fn send(&self) -> Result<Vec<Flavor>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to envode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,

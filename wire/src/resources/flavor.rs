@@ -54,6 +54,12 @@ impl Display for FlavorDetailed {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FlavorListParams {
+    pub all: Option<bool>,
+    pub group: Option<u32>,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorImport {
     pub new_flavor_count: u32,
