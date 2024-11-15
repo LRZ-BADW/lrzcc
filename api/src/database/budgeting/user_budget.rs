@@ -68,7 +68,7 @@ pub async fn select_all_user_budgets_from_db(
         .into_iter()
         .map(|r| UserBudget::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project budget")?;
+        .context("Failed to convert row to user budget")?;
     Ok(rows)
 }
 
@@ -97,7 +97,7 @@ pub async fn select_user_budgets_by_project_from_db(
         .into_iter()
         .map(|r| UserBudget::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project budget")?;
+        .context("Failed to convert row to user budget")?;
     Ok(rows)
 }
 
@@ -126,7 +126,7 @@ pub async fn select_user_budgets_by_user_from_db(
         .into_iter()
         .map(|r| UserBudget::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project budget")?;
+        .context("Failed to convert row to user budget")?;
     Ok(rows)
 }
 
@@ -155,6 +155,6 @@ pub async fn select_user_budgets_by_year_from_db(
         .into_iter()
         .map(|r| UserBudget::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project budget")?;
+        .context("Failed to convert row to user budget")?;
     Ok(rows)
 }
