@@ -1,5 +1,5 @@
-use super::get::select_user_from_db;
 use crate::authorization::require_admin_user;
+use crate::database::user::user::select_user_from_db;
 use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
 use actix_web::web::{Data, Json, Path, ReqData};
 use actix_web::HttpResponse;

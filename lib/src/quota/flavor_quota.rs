@@ -2,7 +2,8 @@ use crate::common::{request, request_bare, SerializableNone};
 use crate::error::ApiError;
 use anyhow::Context;
 use lrzcc_wire::quota::{
-    FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData, FlavorQuotaModifyData,
+    FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData,
+    FlavorQuotaListParams, FlavorQuotaModifyData,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -19,9 +20,7 @@ pub struct FlavorQuotaListRequest {
     url: String,
     client: Rc<Client>,
 
-    all: bool,
-    group: Option<u32>,
-    user: Option<u32>,
+    params: FlavorQuotaListParams,
 }
 
 impl FlavorQuotaListRequest {
@@ -30,29 +29,22 @@ impl FlavorQuotaListRequest {
             url: url.to_string(),
             client: Rc::clone(client),
 
-            all: false,
-            group: None,
-            user: None,
+            params: FlavorQuotaListParams {
+                all: None,
+                group: None,
+                user: None,
+            },
         }
-    }
-
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        // TODO maybe flip the order here, since the most specific
-        // should take precedence
-        if self.all {
-            params.push(("all", "1".to_string()));
-        } else if let Some(group) = self.group {
-            params.push(("flavorgroup", group.to_string()));
-        } else if let Some(user) = self.user {
-            params.push(("user", user.to_string()));
-        }
-        params
     }
 
     pub fn send(&self) -> Result<Vec<FlavorQuota>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to envode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -63,17 +55,17 @@ impl FlavorQuotaListRequest {
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
     pub fn group(&mut self, group: u32) -> &mut Self {
-        self.group = Some(group);
+        self.params.group = Some(group);
         self
     }
 
     pub fn user(&mut self, user: u32) -> &mut Self {
-        self.user = Some(user);
+        self.params.user = Some(user);
         self
     }
 }

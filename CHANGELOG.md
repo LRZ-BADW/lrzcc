@@ -70,6 +70,19 @@ This is the combined changelog of all contained `lrzcc` crates.
 - deb: bump serde from 1.0.211 to 1.0.214
 - deb: bump thiserror from 1.0.64 to 2.0.0
 - deb: bump tokio from 1.40.0 to 1.41.1
+- api: move all select functions from routes to database module
+- lib,wire: move ServerStateListParams from lib to wire
+- api: add server state select functions to database module
+- api: add simplified server_state_list endpoint
+- lib,wire: move FlavorGroupListParams from lib to wire
+- lib,wire: move FlavorListParams from lib to wire
+- lib,wire: move FlavorQuotaListParams from lib to wire
+- lib,wire: move ProjectBudgetListParams from lib to wire
+- lib,wire: move UserBudgetListParams from lib to wire
+- api: add project budget select functions to database module
+- api: add user budget select functions to database module
+- api: add flavor price select functions to database module
+- api: add flavor quota select functions to database module
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 

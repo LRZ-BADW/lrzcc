@@ -32,6 +32,14 @@ pub struct ServerStateImport {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServerStateListParams {
+    pub server: Option<String>,
+    pub user: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ServerStateCreateData {
     pub begin: DateTime<FixedOffset>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -4,7 +4,7 @@ use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
     ProjectBudget, ProjectBudgetCreateData, ProjectBudgetDetail,
-    ProjectBudgetModifyData, ProjectBudgetOver,
+    ProjectBudgetListParams, ProjectBudgetModifyData, ProjectBudgetOver,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -21,10 +21,7 @@ pub struct ProjectBudgetListRequest {
     url: String,
     client: Rc<Client>,
 
-    user: Option<u32>,
-    project: Option<u32>,
-    all: bool,
-    year: Option<u32>,
+    params: ProjectBudgetListParams,
 }
 
 impl ProjectBudgetListRequest {
@@ -33,31 +30,23 @@ impl ProjectBudgetListRequest {
             url: url.to_string(),
             client: Rc::clone(client),
 
-            user: None,
-            project: None,
-            all: false,
-            year: None,
+            params: ProjectBudgetListParams {
+                user: None,
+                project: None,
+                all: None,
+                year: None,
+            },
         }
-    }
-
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        if let Some(user) = self.user {
-            params.push(("user", user.to_string()));
-        } else if let Some(project) = self.project {
-            params.push(("project", project.to_string()));
-        } else if self.all {
-            params.push(("all", "1".to_string()));
-        }
-        if let Some(year) = self.year {
-            params.push(("year", year.to_string()));
-        }
-        params
     }
 
     pub fn send(&self) -> Result<Vec<ProjectBudget>, ApiError> {
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to envode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -68,22 +57,22 @@ impl ProjectBudgetListRequest {
     }
 
     pub fn user(&mut self, user: u32) -> &mut Self {
-        self.user = Some(user);
+        self.params.user = Some(user);
         self
     }
 
     pub fn project(&mut self, project: u32) -> &mut Self {
-        self.project = Some(project);
+        self.params.project = Some(project);
         self
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
     pub fn year(&mut self, year: u32) -> &mut Self {
-        self.year = Some(year);
+        self.params.year = Some(year);
         self
     }
 }

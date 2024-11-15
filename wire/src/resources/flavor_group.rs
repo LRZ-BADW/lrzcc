@@ -48,6 +48,11 @@ impl Display for FlavorGroupDetailed {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct FlavorGroupListParams {
+    pub all: Option<bool>,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
 pub struct FlavorGroupCreated {
     pub id: u32,

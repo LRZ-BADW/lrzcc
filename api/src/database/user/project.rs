@@ -136,3 +136,87 @@ pub async fn select_project_name_from_db(
             "Project with given ID not found".to_string(),
         ))
 }
+
+#[tracing::instrument(name = "select_all_projects_from_db", skip(transaction))]
+pub async fn select_all_projects_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name,
+            openstack_id,
+            user_class
+        FROM user_project
+        "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Project::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_projects_by_userclass_from_db",
+    skip(transaction)
+)]
+pub async fn select_projects_by_userclass_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    user_class: u8,
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name,
+            openstack_id,
+            user_class
+        FROM user_project
+        where user_class = ?
+        "#,
+        user_class
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Project::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(name = "select_projects_by_id_db", skip(transaction))]
+pub async fn select_projects_by_id_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<Vec<Project>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name,
+            openstack_id,
+            user_class
+        FROM user_project
+        WHERE id = ?
+        "#,
+        project_id
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Project::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
+}

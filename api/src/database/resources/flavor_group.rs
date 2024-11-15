@@ -1,6 +1,6 @@
 use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
 use anyhow::Context;
-use lrzcc_wire::resources::FlavorGroup;
+use lrzcc_wire::resources::{FlavorGroup, FlavorGroupMinimal};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[tracing::instrument(
@@ -132,4 +132,33 @@ pub async fn select_flavor_group_from_db(
         .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
             "Flavor group with given ID not found".to_string(),
         ))
+}
+
+#[tracing::instrument(
+    name = "select_minimal_flavor_groups_by_project_id_from_db",
+    skip(transaction)
+)]
+pub async fn select_minimal_flavor_groups_by_project_id_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<Vec<FlavorGroupMinimal>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            id,
+            name
+        FROM resources_flavorgroup
+        WHERE project_id = ?
+        "#,
+        project_id
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| FlavorGroupMinimal::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
 }
