@@ -74,3 +74,32 @@ pub async fn select_all_project_budgets_from_db(
         .context("Failed to convert row to project")?;
     Ok(rows)
 }
+
+#[tracing::instrument(
+    name = "select_project_budgets_by_year_from_db",
+    skip(transaction)
+)]
+pub async fn select_project_budgets_by_year_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    year: u32,
+) -> Result<Vec<ProjectBudget>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT b.id, p.id as project, p.name as project_name, b.year, b.amount
+        FROM budgeting_projectbudget as b, user_project as p
+        WHERE
+            b.project_id = p.id AND
+            b.year = ?
+        "#,
+        year
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| ProjectBudget::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to project")?;
+    Ok(rows)
+}
