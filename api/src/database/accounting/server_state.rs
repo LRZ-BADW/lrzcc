@@ -269,7 +269,7 @@ pub async fn select_server_states_by_user_from_db(
 )]
 pub async fn select_server_states_by_server_from_db(
     transaction: &mut Transaction<'_, MySql>,
-    server_id: u64,
+    server_id: String,
 ) -> Result<Vec<ServerState>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
