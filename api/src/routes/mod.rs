@@ -20,7 +20,6 @@ pub use user::*;
 // - resources::flavor_group
 // - resources::flavor
 // - quota::flavor_quota
-// - pricing::flavor_price
 
 // TODO: improve the following endpoints
 // - budgeting::project_budget::modify
