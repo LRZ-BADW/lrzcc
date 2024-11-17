@@ -4,8 +4,8 @@ use serde::Deserialize;
 
 mod create;
 use create::user_budget_create;
-// mod list;
-// use list::user_budget_list;
+mod list;
+use list::user_budget_list;
 mod get;
 use get::user_budget_get;
 mod modify;
@@ -16,7 +16,7 @@ use delete::user_budget_delete;
 pub fn user_budgets_scope() -> Scope {
     scope("/userbudgets")
         .route("/", post().to(user_budget_create))
-        // .route("", get().to(user_budget_list))
+        .route("", get().to(user_budget_list))
         .route("/{user_budget_id}", get().to(user_budget_get))
         // TODO: what about PUT?
         .route("/{user_budget_id}/", patch().to(user_budget_modify))
