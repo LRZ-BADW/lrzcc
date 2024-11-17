@@ -13,7 +13,7 @@ use lrzcc_wire::accounting::ServerStateListParams;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
-#[tracing::instrument(name = "user_list")]
+#[tracing::instrument(name = "server_state_list")]
 pub async fn server_state_list(
     user: ReqData<User>,
     project: ReqData<Project>,
@@ -24,7 +24,7 @@ pub async fn server_state_list(
         .begin()
         .await
         .context("Failed to begin transaction")?;
-    let users = if params.all.unwrap_or(false) {
+    let server_states = if params.all.unwrap_or(false) {
         require_admin_user(&user)?;
         select_all_server_states_from_db(&mut transaction).await?
     } else if let Some(project_id) = params.project {
@@ -41,10 +41,13 @@ pub async fn server_state_list(
         require_master_user(&user, user.project)?;
         select_server_states_by_user_from_db(&mut transaction, user.id as u64)
             .await?
-    } else {
+    } else if let Some(server_id) = params.server.clone() {
         // TODO: can we make this master user accessible?
         require_admin_user(&user)?;
-        select_server_states_by_server_from_db(&mut transaction, user.id as u64)
+        select_server_states_by_server_from_db(&mut transaction, server_id)
+            .await?
+    } else {
+        select_server_states_by_user_from_db(&mut transaction, user.id as u64)
             .await?
     };
     transaction
@@ -53,5 +56,5 @@ pub async fn server_state_list(
         .context("Failed to commit transaction")?;
     Ok(HttpResponse::Ok()
         .content_type("application/json")
-        .json(users))
+        .json(server_states))
 }
