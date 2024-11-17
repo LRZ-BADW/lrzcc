@@ -26,11 +26,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add budgeting::user_budget_create endpoint
 - api: add resources::select_flavor_group_from_db to database module
 - api: add resources::flavor_group_modify endpoint
-- deb: bump uuid from 1.10.0 to 1.11.0
-- deb: bump anyhow from 1.0.89 to 1.0.90
-- deb: bump tracing-actix-web from 0.7.13 to 0.7.14
-- deb: bump serde_json from 1.0.128 to 1.0.132
-- deb: bump serde from 1.0.210 to 1.0.211
+- dep: bump uuid from 1.10.0 to 1.11.0
+- dep: bump anyhow from 1.0.89 to 1.0.90
+- dep: bump serde from 1.0.210 to 1.0.211
 - wire: derive FromRow for Flavor and make group_name field public
 - api: add resources::select_flavor_from_db to database module
 - api: add resources::flavor_modify endpoint
@@ -39,7 +37,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add flavor_price_modify endpoint
 - TODO: add remaining crud endpoints for all new modules
 - TODO: add tests for all new endpoints
-- deb: bump config from 0.14.0 to 0.14.1
+- dep: bump config from 0.14.0 to 0.14.1
 - wire: derive FromRow for ProjectBudget and UserBudget
 - wire: derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
 - api: add database::budgeting::project/user_budget submodule with helpers
@@ -65,11 +63,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add simplified flavor_price_get endpoint
 - api: add simplified project_budget_get
 - api: add simplified user_budget_get endpoint
-- deb: bump reqwest from 0.12.8 to 0.12.9
-- deb: bump anyhow from 1.0.90 to 1.0.93
-- deb: bump serde from 1.0.211 to 1.0.214
-- deb: bump thiserror from 1.0.64 to 2.0.0
-- deb: bump tokio from 1.40.0 to 1.41.1
+- dep: bump reqwest from 0.12.8 to 0.12.9
+- dep: bump anyhow from 1.0.90 to 1.0.93
+- dep: bump serde from 1.0.211 to 1.0.214
+- dep: bump thiserror from 1.0.64 to 2.0.0
+- dep: bump tokio from 1.40.0 to 1.41.1
 - api: move all select functions from routes to database module
 - lib,wire: move ServerStateListParams from lib to wire
 - api: add server state select functions to database module
@@ -83,6 +81,20 @@ This is the combined changelog of all contained `lrzcc` crates.
 - api: add user budget select functions to database module
 - api: add flavor price select functions to database module
 - api: add flavor quota select functions to database module
+- api: add project_budget_list endpoint
+- api: add user_budget_list endpoint
+- api: add falvor_price_list endpoint
+- api: fix typo in select_project_budget_by_user_from_db function name
+- api: add flavor_quota_list endpoint
+- dep: bump tracing-actix-web from 0.7.13 to 0.7.15
+- dep: bump serde_json from 1.0.128 to 1.0.133
+- api: add select_all_flavor_groups_from_db to database module
+- api: add select_lrz_flavor_groups_from_db to database module
+- api: add select_all_flavors_from_db to datbase module
+- api: add select_lrz_flavors_from_db to datbase module
+- api: add select_flavors_by_flavor_group_from_db to datbase module
+- api: add flavor_group_list endpoint
+- api: add flavor_list endpoint
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
