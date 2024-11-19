@@ -4,8 +4,8 @@ use serde::Deserialize;
 
 mod create;
 use create::flavor_price_create;
-// mod list;
-// use list::flavor_price_list;
+mod list;
+use list::flavor_price_list;
 mod get;
 use get::flavor_price_get;
 mod modify;
@@ -16,7 +16,7 @@ use delete::flavor_price_delete;
 pub fn flavor_prices_scope() -> Scope {
     scope("/flavorprices")
         .route("/", post().to(flavor_price_create))
-        // .route("", get().to(flavor_price_list))
+        .route("", get().to(flavor_price_list))
         .route("/{flavor_price_id}", get().to(flavor_price_get))
         // TODO: what about PUT?
         .route("/{flavor_price_id}/", patch().to(flavor_price_modify))

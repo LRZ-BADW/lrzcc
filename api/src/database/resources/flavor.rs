@@ -186,3 +186,96 @@ pub async fn select_flavor_detail_from_db(
             "Flavor with given ID or linked project not found".to_string(),
         ))
 }
+
+#[tracing::instrument(name = "select_all_flavors_from_db", skip(transaction))]
+pub async fn select_all_flavors_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<Flavor>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            f.id as id,
+            f.name as name,
+            f.openstack_id as openstack_id,
+            f.group_id as group_id,
+            g.name as group_name,
+            f.weight as weight
+        FROM resources_flavorgroup as g, resources_flavor as f
+        WHERE g.id = f.group_id
+        "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Flavor::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(name = "select_lrz_flavors_from_db", skip(transaction))]
+pub async fn select_lrz_flavors_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<Flavor>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            f.id as id,
+            f.name as name,
+            f.openstack_id as openstack_id,
+            f.group_id as group_id,
+            g.name as group_name,
+            f.weight as weight
+        FROM resources_flavorgroup as g, resources_flavor as f
+        WHERE
+            g.id = f.group_id AND
+            g.name like 'lrz.%'
+        "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Flavor::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_flavors_by_flavor_group_from_db",
+    skip(transaction)
+)]
+pub async fn select_flavors_by_flavor_group_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    flavor_group_id: u64,
+) -> Result<Vec<Flavor>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            f.id as id,
+            f.name as name,
+            f.openstack_id as openstack_id,
+            f.group_id as group_id,
+            g.name as group_name,
+            f.weight as weight
+        FROM resources_flavorgroup as g, resources_flavor as f
+        WHERE
+            g.id = f.group_id AND
+            g.id = ?
+        "#,
+        flavor_group_id
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| Flavor::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor")?;
+    Ok(rows)
+}

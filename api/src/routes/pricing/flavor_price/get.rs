@@ -1,5 +1,4 @@
 use super::FlavorPriceIdParam;
-use crate::authorization::require_admin_user;
 use crate::database::pricing::flavor_price::select_flavor_price_from_db;
 use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
@@ -17,7 +16,6 @@ pub async fn flavor_price_get(
     params: Path<FlavorPriceIdParam>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await

@@ -159,6 +159,68 @@ pub async fn select_minimal_flavor_groups_by_project_id_from_db(
         .into_iter()
         .map(|r| FlavorGroupMinimal::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to flavor group")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_all_flavor_groups_from_db",
+    skip(transaction)
+)]
+pub async fn select_all_flavor_groups_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<FlavorGroup>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            g.id as id,
+            g.name as name,
+            g.project_id as project,
+            GROUP_CONCAT(f.id) as flavors
+        FROM resources_flavorgroup as g, resources_flavor as f
+        WHERE g.id = f.group_id
+        GROUP BY g.id
+        "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| FlavorGroup::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor group")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_lrz_flavor_groups_from_db",
+    skip(transaction)
+)]
+pub async fn select_lrz_flavor_groups_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<Vec<FlavorGroup>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            g.id as id,
+            g.name as name,
+            g.project_id as project,
+            GROUP_CONCAT(f.id) as flavors
+        FROM resources_flavorgroup as g, resources_flavor as f
+        WHERE
+            g.id = f.group_id AND
+            g.name LIKE 'lrz.%'
+        GROUP BY g.id
+        "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| FlavorGroup::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor group")?;
     Ok(rows)
 }
