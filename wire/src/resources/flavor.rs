@@ -57,6 +57,7 @@ impl Display for FlavorDetailed {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FlavorListParams {
     pub all: Option<bool>,
+    #[serde(rename = "flavorgroup")]
     pub group: Option<u32>,
 }
 
