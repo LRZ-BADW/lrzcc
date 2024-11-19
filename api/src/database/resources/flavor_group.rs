@@ -159,7 +159,7 @@ pub async fn select_minimal_flavor_groups_by_project_id_from_db(
         .into_iter()
         .map(|r| FlavorGroupMinimal::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to flavor group")?;
     Ok(rows)
 }
 
@@ -189,7 +189,7 @@ pub async fn select_all_flavor_groups_from_db(
         .into_iter()
         .map(|r| FlavorGroup::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to flavor group")?;
     Ok(rows)
 }
 
@@ -221,6 +221,6 @@ pub async fn select_lrz_flavor_groups_from_db(
         .into_iter()
         .map(|r| FlavorGroup::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to flavor group")?;
     Ok(rows)
 }

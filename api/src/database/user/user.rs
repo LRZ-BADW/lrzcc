@@ -77,7 +77,7 @@ pub async fn select_all_users_from_db(
         .into_iter()
         .map(|r| User::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to user")?;
     Ok(rows)
 }
 
@@ -114,7 +114,7 @@ pub async fn select_users_by_project_from_db(
         .into_iter()
         .map(|r| User::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to user")?;
     Ok(rows)
 }
 
@@ -148,7 +148,7 @@ pub async fn select_users_by_id_from_db(
         .into_iter()
         .map(|r| User::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to user")?;
     Ok(rows)
 }
 
@@ -276,6 +276,6 @@ pub async fn select_minimal_users_by_project_id_from_db(
         .into_iter()
         .map(|r| UserMinimal::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?;
+        .context("Failed to convert row to user")?;
     Ok(rows)
 }

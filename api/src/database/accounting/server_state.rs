@@ -127,7 +127,7 @@ pub async fn select_all_server_states_from_db(
         .into_iter()
         .map(|r| ServerStateRow::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?
+        .context("Failed to convert row to server state")?
         .into_iter()
         .map(|r| ServerState {
             id: r.id,
@@ -186,7 +186,7 @@ pub async fn select_server_states_by_project_from_db(
         .into_iter()
         .map(|r| ServerStateRow::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?
+        .context("Failed to convert row to server state")?
         .into_iter()
         .map(|r| ServerState {
             id: r.id,
@@ -245,7 +245,7 @@ pub async fn select_server_states_by_user_from_db(
         .into_iter()
         .map(|r| ServerStateRow::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?
+        .context("Failed to convert row to server state")?
         .into_iter()
         .map(|r| ServerState {
             id: r.id,
@@ -304,7 +304,7 @@ pub async fn select_server_states_by_server_from_db(
         .into_iter()
         .map(|r| ServerStateRow::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
-        .context("Failed to convert row to project")?
+        .context("Failed to convert row to server state")?
         .into_iter()
         .map(|r| ServerState {
             id: r.id,
