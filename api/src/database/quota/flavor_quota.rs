@@ -141,7 +141,7 @@ pub async fn select_flavor_quotas_by_flavor_group_from_db(
     name = "select_flavor_quotas_by_user_from_db",
     skip(transaction)
 )]
-pub async fn select_flavor_quotas_by_group_from_db(
+pub async fn select_flavor_quotas_by_user_from_db(
     transaction: &mut Transaction<'_, MySql>,
     user_id: u64,
 ) -> Result<Vec<FlavorQuota>, UnexpectedOnlyError> {
