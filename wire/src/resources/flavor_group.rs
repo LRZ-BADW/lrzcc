@@ -1,7 +1,7 @@
 use crate::resources::FlavorMinimal;
 use crate::user::ProjectMinimal;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{mysql::MySqlRow, FromRow, Row};
 use std::fmt::Display;
 use tabled::Tabled;
 
@@ -12,6 +12,21 @@ pub struct FlavorGroup {
     #[tabled(skip)]
     pub flavors: Vec<u32>,
     pub project: u32,
+}
+
+impl<'r> FromRow<'r, MySqlRow> for FlavorGroup {
+    fn from_row(row: &'r MySqlRow) -> Result<Self, sqlx::Error> {
+        Ok(Self {
+            id: row.try_get("id")?,
+            name: row.try_get("name")?,
+            flavors: {
+                let flavors: String = row.try_get("flavors")?;
+                // TODO: can we get rid of this unwrap here
+                flavors.split(',').map(|f| f.parse().unwrap()).collect()
+            },
+            project: row.try_get("project_id")?,
+        })
+    }
 }
 
 impl Display for FlavorGroup {
