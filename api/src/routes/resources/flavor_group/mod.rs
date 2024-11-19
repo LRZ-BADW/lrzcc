@@ -4,8 +4,8 @@ use serde::Deserialize;
 
 mod create;
 use create::flavor_group_create;
-// mod list;
-// use list::flavor_group_list;
+mod list;
+use list::flavor_group_list;
 mod get;
 use get::flavor_group_get;
 mod modify;
@@ -16,7 +16,7 @@ use delete::flavor_group_delete;
 pub fn flavor_groups_scope() -> Scope {
     scope("/flavorgroups")
         .route("/", post().to(flavor_group_create))
-        // .route("", get().to(flavor_group_list))
+        .route("", get().to(flavor_group_list))
         .route("/{flavor_group_id}", get().to(flavor_group_get))
         // TODO: what about PUT?
         .route("/{flavor_group_id}/", patch().to(flavor_group_modify))

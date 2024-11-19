@@ -17,7 +17,6 @@ pub use resources::*;
 pub use user::*;
 
 // TODO: list endpoints for
-// - resources::flavor_group
 // - resources::flavor
 
 // TODO: improve the following endpoints
