@@ -19,7 +19,6 @@ pub use user::*;
 // TODO: list endpoints for
 // - resources::flavor_group
 // - resources::flavor
-// - quota::flavor_quota
 
 // TODO: improve the following endpoints
 // - budgeting::project_budget::modify

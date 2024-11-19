@@ -4,8 +4,8 @@ use serde::Deserialize;
 
 mod create;
 use create::flavor_quota_create;
-// mod list;
-// use list::flavor_quota_list;
+mod list;
+use list::flavor_quota_list;
 mod get;
 use get::flavor_quota_get;
 mod modify;
@@ -16,7 +16,7 @@ use delete::flavor_quota_delete;
 pub fn flavor_quotas_scope() -> Scope {
     scope("/flavorquotas")
         .route("/", post().to(flavor_quota_create))
-        // .route("", get().to(flavor_quota_list))
+        .route("", get().to(flavor_quota_list))
         .route("/{flavor_quota_id}", get().to(flavor_quota_get))
         // TODO: what about PUT?
         .route("/{flavor_quota_id}/", patch().to(flavor_quota_modify))
