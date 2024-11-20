@@ -2,99 +2,140 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-- api: add migrations for remaining active tables
-- api: add accounting module
-- api: add quota module
-- api: flavor pricing module
-- api: add budgeting module
-- api: add accounting::server_state_delete endpoint
-- api: add resources::flavor_group_delete endpoint
-- api: add resources::flavor_delete endpoint
-- api: add quota::flavor_quota_delete endpoint
-- api: add pricing::flavor_price_delete endpoint
-- api: add budgeting::project_budget_delete endpoint
-- api: add budgeting::user_budget_delete endpoint
-- api: add accounting::server_state_create endpoint
-- api: add database module for shared database functions
-- api: add quota::flavor_quota_create endpoint
-- api: add resources::flavor_group_create endpoint
-- api: add resources::flavor_create endpoint
-- api: add pricing::flavor_price_create endpoint
-- wire: derive Deserialize for FlavorPriceCreateData
-- api: add budgeting::project_budget_create endpoint
-- wire: derive Deserialize for UserBudgetCreateData
-- api: add budgeting::user_budget_create endpoint
-- api: add resources::select_flavor_group_from_db to database module
-- api: add resources::flavor_group_modify endpoint
-- dep: bump uuid from 1.10.0 to 1.11.0
-- dep: bump anyhow from 1.0.89 to 1.0.90
-- dep: bump serde from 1.0.210 to 1.0.211
-- wire: derive FromRow for Flavor and make group_name field public
-- api: add resources::select_flavor_from_db to database module
-- api: add resources::flavor_modify endpoint
-- api: add database::pricing::flavor_price submodule
-- wire: derive Deserialize for FlavorPriceModifyData
-- api: add flavor_price_modify endpoint
-- TODO: add remaining crud endpoints for all new modules
-- TODO: add tests for all new endpoints
-- dep: bump config from 0.14.0 to 0.14.1
-- wire: derive FromRow for ProjectBudget and UserBudget
-- wire: derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
-- api: add database::budgeting::project/user_budget submodule with helpers
-- api: add simplified budgeting::project_budget_modify endpoint
-- api: add simplified budgeting::user_budget_modify endpoint
-- wire: derive FromRow for FlavorQuota
-- api: add database::quota submodule with helper functions
-- api: minor naming fixes in user and pricing modules
-- api: add simplified quota::flavor_quota_modify endpoint
-- api: add database::accounting submodule with helper functions
-- api: add simplified accounting::server_state_modify endpoint
-- api: implement ResponseError for NotFoundOrUnexpectedApiError
-- api: add simplified server_state_get endpoint
-- api: add select_project_minimal_from_db function
-- api: add select_minimal_flavors_by_group_from_db function
-- wire: derive FromRow for FlavorMinimal
-- api: add simplified flavor_group_get endpoint
-- api: require admin user for server_state_get
-- api: require admin user for flavor_group_get
-- api: add select_flavor_detail_from_db function
-- api: add simplified flavor_get endpoint
-- api: add simplified flavor_quota_get endpoint
-- api: add simplified flavor_price_get endpoint
-- api: add simplified project_budget_get
-- api: add simplified user_budget_get endpoint
-- dep: bump reqwest from 0.12.8 to 0.12.9
-- dep: bump anyhow from 1.0.90 to 1.0.93
-- dep: bump serde from 1.0.211 to 1.0.214
-- dep: bump thiserror from 1.0.64 to 2.0.0
-- dep: bump tokio from 1.40.0 to 1.41.1
-- api: move all select functions from routes to database module
-- lib,wire: move ServerStateListParams from lib to wire
-- api: add server state select functions to database module
-- api: add simplified server_state_list endpoint
-- lib,wire: move FlavorGroupListParams from lib to wire
-- lib,wire: move FlavorListParams from lib to wire
-- lib,wire: move FlavorQuotaListParams from lib to wire
-- lib,wire: move ProjectBudgetListParams from lib to wire
-- lib,wire: move UserBudgetListParams from lib to wire
-- api: add project budget select functions to database module
-- api: add user budget select functions to database module
-- api: add flavor price select functions to database module
-- api: add flavor quota select functions to database module
-- api: add project_budget_list endpoint
-- api: add user_budget_list endpoint
-- api: add falvor_price_list endpoint
-- api: fix typo in select_project_budget_by_user_from_db function name
-- api: add flavor_quota_list endpoint
-- dep: bump tracing-actix-web from 0.7.13 to 0.7.15
-- dep: bump serde_json from 1.0.128 to 1.0.133
-- api: add select_all_flavor_groups_from_db to database module
-- api: add select_lrz_flavor_groups_from_db to database module
-- api: add select_all_flavors_from_db to datbase module
-- api: add select_lrz_flavors_from_db to datbase module
-- api: add select_flavors_by_flavor_group_from_db to datbase module
-- api: add flavor_group_list endpoint
-- api: add flavor_list endpoint
+
+...
+
+## [lrzcc-wire-v1.3.0] - 2024-11-20
+
+### Features
+- derive Deserialize for FlavorPriceCreateData
+- derive Deserialize for UserBudgetCreateData
+- derive FromRow for Flavor and make group_name field public
+- derive Deserialize for FlavorPriceModifyData
+- derive FromRow for ProjectBudget and UserBudget
+- derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
+- derive FromRow for FlavorQuota
+- derive FromRow for FlavorMinimal
+- move ServerStateListParams from lib to wire
+- move FlavorGroupListParams from lib to wire
+- move FlavorListParams from lib to wire
+- move FlavorQuotaListParams from lib to wire
+- move ProjectBudgetListParams from lib to wire
+- move UserBudgetListParams from lib to wire
+
+### Dependencies
+- bump serde from 1.0.210 to 1.0.214
+- bump uuid from 1.10.0 to 1.11.0
+
+## [lrzcc-lib-v1.4.0] - 2024-11-20
+
+### Refactors
+- move ServerStateListParams from lib to wire
+- move FlavorGroupListParams from lib to wire
+- move FlavorListParams from lib to wire
+- move FlavorQuotaListParams from lib to wire
+- move ProjectBudgetListParams from lib to wire
+- move UserBudgetListParams from lib to wire
+
+### Dependencies
+- bump anyhow from 1.0.89 to 1.0.93
+- bump config from 0.14.0 to 0.14.1
+- bump reqwest from 0.12.8 to 0.12.9
+- bump serde from 1.0.210 to 1.0.214
+- bump serde_json from 1.0.128 to 1.0.133
+- bump thiserror from 1.0.64 to 2.0.0
+
+## [lrzcc-cli-v1.3.1] - 2024-11-20
+
+### Dependencies
+- bump anyhow from 1.0.89 to 1.0.93
+- bump serde from 1.0.210 to 1.0.214
+- bump serde_json from 1.0.128 to 1.0.133
+
+## [lrzcc-api-v0.4.0] - 2024-11-20
+
+### Features
+
+#### General
+- add migrations for remaining active tables
+- add accounting, quota, pricing, budgeting modules
+- implement ResponseError for NotFoundOrUnexpectedApiError
+
+#### Database
+- add database module for shared database functions
+- add resources::select_flavor_group_from_db to database module
+- add resources::select_flavor_from_db to database module
+- add database::pricing::flavor_price submodule
+- add database::budgeting::project/user_budget submodule with helpers
+- add database::quota submodule with helper functions
+- add database::accounting submodule with helper functions
+- add select_project_minimal_from_db function
+- add select_minimal_flavors_by_group_from_db function
+- add select_flavor_detail_from_db function
+- move all select functions from routes to database module
+- add server state select functions to database module
+- add project budget select functions to database module
+- add user budget select functions to database module
+- add flavor price select functions to database module
+- add flavor quota select functions to database module
+- add select_all_flavor_groups_from_db to database module
+- add select_lrz_flavor_groups_from_db to database module
+- add select_all_flavors_from_db to database module
+- add select_lrz_flavors_from_db to database module
+- add select_flavors_by_flavor_group_from_db to database module
+
+#### Endpoints
+- add accounting::server_state_delete endpoint
+- add resources::flavor_group_delete endpoint
+- add resources::flavor_delete endpoint
+- add quota::flavor_quota_delete endpoint
+- add pricing::flavor_price_delete endpoint
+- add budgeting::project_budget_delete endpoint
+- add budgeting::user_budget_delete endpoint
+- add accounting::server_state_create endpoint
+- add quota::flavor_quota_create endpoint
+- add resources::flavor_group_create endpoint
+- add resources::flavor_create endpoint
+- add pricing::flavor_price_create endpoint
+- add budgeting::project_budget_create endpoint
+- add budgeting::user_budget_create endpoint
+- add resources::flavor_group_modify endpoint
+- add resources::flavor_modify endpoint
+- add pricing::flavor_price_modify endpoint
+- add simplified budgeting::project_budget_modify endpoint
+- add simplified budgeting::user_budget_modify endpoint
+- add simplified quota::flavor_quota_modify endpoint
+- add simplified accounting::server_state_modify endpoint
+- add simplified accounting::erver_state_get endpoint
+- add simplified resources::flavor_group_get endpoint
+- require admin user for accounting::server_state_get
+- require admin user for resources::flavor_group_get
+- add simplified resources::flavor_get endpoint
+- add simplified quota::flavor_quota_get endpoint
+- add simplified pricing::flavor_price_get endpoint
+- add simplified budgeting::project_budget_get
+- add simplified budgeting::user_budget_get endpoint
+- add simplified accounting::server_state_list endpoint
+- add budgeting::project_budget_list endpoint
+- add budgeting::user_budget_list endpoint
+- add pricing::flavor_price_list endpoint
+- add quota::flavor_quota_list endpoint
+- add resources::flavor_group_list endpoint
+- add resources::flavor_list endpoint
+
+### Fixes
+- minor naming fixes in user and pricing modules
+- fix typo in select_project_budget_by_user_from_db function name
+
+### Dependencies
+- bump anyhow from 1.0.89 to 1.0.93
+- bump config from 0.14.0 to 0.14.1
+- bump reqwest from 0.12.8 to 0.12.9
+- bump serde from 1.0.210 to 1.0.214
+- bump serde_json from 1.0.128 to 1.0.133
+- bump thiserror from 1.0.64 to 2.0.0
+- bump tokio from 1.40.0 to 1.41.1
+- bump tracing-actix-web from 0.7.13 to 0.7.15
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
