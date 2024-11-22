@@ -1746,6 +1746,7 @@ name = "lrzcc-test"
 version = "0.2.1"
 dependencies = [
  "cargo-husky",
+ "chrono",
  "lrzcc",
  "lrzcc-api",
  "lrzcc-wire",
