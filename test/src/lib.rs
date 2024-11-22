@@ -1,6 +1,7 @@
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
+use lrzcc_wire::resources::Flavor;
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use rand::distributions::Alphanumeric;
@@ -189,6 +190,26 @@ impl TestApp {
 
         Ok(test_project)
     }
+
+    pub async fn setup_test_flavor(&self) -> Result<Flavor, sqlx::Error> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let mut flavor = Flavor {
+            id: 1,
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            group: None,
+            group_name: None,
+            weight: 0,
+        };
+        flavor.id =
+            insert_flavor_into_db(&mut transaction, &flavor).await? as u32;
+        transaction.commit().await?;
+        Ok(flavor)
+    }
 }
 
 pub async fn spawn_app() -> TestApp {
@@ -314,6 +335,31 @@ pub async fn insert_user_into_db(
         user.role,
         user.is_staff,
         user.is_active,
+    );
+    transaction
+        .execute(query)
+        .await
+        .map(|result| result.last_insert_id())
+}
+
+pub async fn insert_flavor_into_db(
+    transaction: &mut Transaction<'static, MySql>,
+    flavor: &Flavor,
+) -> Result<u64, sqlx::Error> {
+    let query = sqlx::query!(
+        r#"
+            INSERT INTO resources_flavor (
+            name,
+            openstack_id,
+            group_id,
+            weight
+            )
+            VALUES (?, ?, ?, ?)
+        "#,
+        flavor.name,
+        flavor.openstack_id,
+        flavor.group,
+        flavor.weight,
     );
     transaction
         .execute(query)
