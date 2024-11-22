@@ -6,14 +6,17 @@ use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[derive(FromRow)]
 pub struct ServerStateRow {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub begin: DateTime<Utc>,
     pub end: Option<DateTime<Utc>>,
     pub instance_id: String,
     pub instance_name: String,
+    #[sqlx(try_from = "i64")]
     pub flavor: u32,
     pub flavor_name: String,
     pub status: String,
+    #[sqlx(try_from = "i32")]
     pub user: u32,
     pub username: String,
 }
