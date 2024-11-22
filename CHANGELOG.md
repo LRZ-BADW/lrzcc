@@ -5,29 +5,25 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ...
 
-## [lrzcc-wire-v1.3.0] - 2024-11-20
-
-### Features
-- derive Deserialize for FlavorPriceCreateData
-- derive Deserialize for UserBudgetCreateData
-- derive FromRow for Flavor and make group_name field public
-- derive Deserialize for FlavorPriceModifyData
-- derive FromRow for ProjectBudget and UserBudget
-- derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
-- derive FromRow for FlavorQuota
-- derive FromRow for FlavorMinimal
-- move ServerStateListParams from lib to wire
-- move FlavorGroupListParams from lib to wire
-- move FlavorListParams from lib to wire
-- move FlavorQuotaListParams from lib to wire
-- move ProjectBudgetListParams from lib to wire
-- move UserBudgetListParams from lib to wire
+## [lrzcc-test-v0.2.1] - 2024-11-22
 
 ### Dependencies
+- bump wire from 1.2 to 1.3
+- bump api from 0.3 to 0.4
+- bump lib from 1.3 to 1.4
 - bump serde from 1.0.210 to 1.0.214
-- bump uuid from 1.10.0 to 1.11.0
+- bump serde_json from 1.0.128 to 1.0.133
+- bump tokio from 1.40.0 to 1.41.1
+- bump reqwest from 0.12.8 to 0.12.9
 
-## [lrzcc-lib-v1.4.0] - 2024-11-20
+## [lrzcc-cli-v1.3.1] - 2024-11-22
+
+### Dependencies
+- bump anyhow from 1.0.89 to 1.0.93
+- bump serde from 1.0.210 to 1.0.214
+- bump serde_json from 1.0.128 to 1.0.133
+
+## [lrzcc-lib-v1.4.0] - 2024-11-22
 
 ### Refactors
 - move ServerStateListParams from lib to wire
@@ -45,14 +41,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde_json from 1.0.128 to 1.0.133
 - bump thiserror from 1.0.64 to 2.0.0
 
-## [lrzcc-cli-v1.3.1] - 2024-11-20
-
-### Dependencies
-- bump anyhow from 1.0.89 to 1.0.93
-- bump serde from 1.0.210 to 1.0.214
-- bump serde_json from 1.0.128 to 1.0.133
-
-## [lrzcc-api-v0.4.0] - 2024-11-20
+## [lrzcc-api-v0.4.0] - 2024-11-22
 
 ### Features
 
@@ -136,6 +125,28 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump thiserror from 1.0.64 to 2.0.0
 - bump tokio from 1.40.0 to 1.41.1
 - bump tracing-actix-web from 0.7.13 to 0.7.15
+
+## [lrzcc-wire-v1.3.0] - 2024-11-22
+
+### Features
+- derive Deserialize for FlavorPriceCreateData
+- derive Deserialize for UserBudgetCreateData
+- derive FromRow for Flavor and make group_name field public
+- derive Deserialize for FlavorPriceModifyData
+- derive FromRow for ProjectBudget and UserBudget
+- derive Deserialize for ProjectBudgetModifyData and UserBudgetModifyData
+- derive FromRow for FlavorQuota
+- derive FromRow for FlavorMinimal
+- move ServerStateListParams from lib to wire
+- move FlavorGroupListParams from lib to wire
+- move FlavorListParams from lib to wire
+- move FlavorQuotaListParams from lib to wire
+- move ProjectBudgetListParams from lib to wire
+- move UserBudgetListParams from lib to wire
+
+### Dependencies
+- bump serde from 1.0.210 to 1.0.214
+- bump uuid from 1.10.0 to 1.11.0
 
 ## [lrzcc-cli-v1.3.0] - 2024-10-08
 
