@@ -1,3 +1,4 @@
+use super::assert_equal_server_states;
 use chrono::{DateTime, FixedOffset, Utc};
 use lrzcc::{Api, Token};
 use lrzcc_test::{random_alphanumeric_string, random_uuid, spawn_app};
@@ -236,15 +237,7 @@ async fn e2e_lib_server_state_create_and_get_works() {
 
         // act and assert 2 - get
         let retrieved = client.server_state.get(created.id).unwrap();
-        assert_eq!(retrieved.id, created.id);
-        assert!((retrieved.begin - created.begin).num_milliseconds() < 1);
-        assert_eq!(retrieved.instance_id, created.instance_id);
-        assert_eq!(retrieved.instance_name, created.instance_name);
-        assert_eq!(retrieved.flavor, created.flavor);
-        assert_eq!(retrieved.flavor_name, created.flavor_name);
-        assert_eq!(retrieved.status, created.status);
-        assert_eq!(retrieved.user, created.user);
-        assert_eq!(retrieved.username, created.username);
+        assert_equal_server_states(&retrieved, &created);
     })
     .await
     .unwrap();
@@ -308,16 +301,7 @@ async fn e2e_lib_server_state_create_and_list_works() {
         // act and assert 2 - list
         let server_states = client.server_state.list().all().send().unwrap();
         assert_eq!(server_states.len(), 1);
-        let retrieved = &server_states[0];
-        assert_eq!(retrieved.id, created.id);
-        assert!((retrieved.begin - created.begin).num_milliseconds() < 1);
-        assert_eq!(retrieved.instance_id, created.instance_id);
-        assert_eq!(retrieved.instance_name, created.instance_name);
-        assert_eq!(retrieved.flavor, created.flavor);
-        assert_eq!(retrieved.flavor_name, created.flavor_name);
-        assert_eq!(retrieved.status, created.status);
-        assert_eq!(retrieved.user, created.user);
-        assert_eq!(retrieved.username, created.username);
+        assert_equal_server_states(&server_states[0], &created);
     })
     .await
     .unwrap();
