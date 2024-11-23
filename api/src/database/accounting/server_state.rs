@@ -1,7 +1,9 @@
-use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 use anyhow::Context;
 use chrono::{DateTime, Utc};
-use lrzcc_wire::accounting::ServerState;
+use lrzcc_wire::accounting::{ServerState, ServerStateCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[derive(FromRow)]
@@ -323,4 +325,88 @@ pub async fn select_server_states_by_server_from_db(
         })
         .collect::<Vec<_>>();
     Ok(rows)
+}
+
+pub struct NewServerState {
+    pub begin: DateTime<Utc>,
+    pub end: Option<DateTime<Utc>>,
+    pub instance_id: String, // UUIDv4
+    pub instance_name: String,
+    pub flavor: u32,
+    // TODO we need an enum here
+    pub status: String,
+    pub user: u32,
+}
+
+// TODO really validate data
+impl TryFrom<ServerStateCreateData> for NewServerState {
+    type Error = String;
+
+    fn try_from(data: ServerStateCreateData) -> Result<Self, Self::Error> {
+        Ok(Self {
+            begin: data.begin.to_utc(),
+            end: data.end.map(|d| d.to_utc()),
+            instance_id: data.instance_id,
+            instance_name: data.instance_name,
+            flavor: data.flavor,
+            status: data.status,
+            user: data.user,
+        })
+    }
+}
+
+#[tracing::instrument(
+    name = "insert_server_state_into_db",
+    skip(new_server_state, transaction)
+)]
+pub async fn insert_server_state_into_db(
+    transaction: &mut Transaction<'_, MySql>,
+    new_server_state: &NewServerState,
+) -> Result<u64, MinimalApiError> {
+    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
+    let query1 = sqlx::query!(
+        r#"
+        INSERT IGNORE INTO accounting_state (begin, end)
+        VALUES (?, ?)
+        "#,
+        new_server_state.begin,
+        new_server_state.end,
+    );
+    let result1 = transaction
+        .execute(query1)
+        .await
+        .context("Failed to execute insert query")?;
+    if result1.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            "Failed to insert new state, a conflicting entry exists"
+                .to_string(),
+        ));
+    }
+    let id = result1.last_insert_id();
+    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
+    let query2 = sqlx::query!(
+        r#"
+        INSERT IGNORE INTO accounting_serverstate (
+            state_ptr_id, instance_id, instance_name, status, flavor_id, user_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        "#,
+        id,
+        new_server_state.instance_id,
+        new_server_state.instance_name,
+        new_server_state.status,
+        new_server_state.flavor,
+        new_server_state.user
+    );
+    let result2 = transaction
+        .execute(query2)
+        .await
+        .context("Failed to execute insert query")?;
+    if result2.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            "Failed to insert new server state, a conflicting entry exists"
+                .to_string(),
+        ));
+    }
+    Ok(id)
 }
