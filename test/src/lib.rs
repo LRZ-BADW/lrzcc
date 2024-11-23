@@ -1,7 +1,10 @@
+use anyhow::Context;
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
+use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
+use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
-use lrzcc_wire::resources::Flavor;
+use lrzcc_wire::resources::{Flavor, FlavorCreateData};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use rand::distributions::Alphanumeric;
@@ -191,23 +194,34 @@ impl TestApp {
         Ok(test_project)
     }
 
-    pub async fn setup_test_flavor(&self) -> Result<Flavor, sqlx::Error> {
+    pub async fn setup_test_flavor(&self) -> Result<Flavor, MinimalApiError> {
         let mut transaction = self
             .db_pool
             .begin()
             .await
             .expect("Failed to begin transaction.");
-        let mut flavor = Flavor {
-            id: 1,
-            name: random_alphanumeric_string(10),
-            openstack_id: random_uuid(),
+        let name = random_alphanumeric_string(10);
+        let openstack_id = random_uuid();
+        let flavor_create = FlavorCreateData {
+            name: name.clone(),
+            openstack_id: openstack_id.clone(),
+            group: None,
+            weight: None,
+        };
+        let flavor_id = insert_flavor_into_db(&mut transaction, &flavor_create)
+            .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor = Flavor {
+            id: flavor_id,
+            name,
+            openstack_id,
             group: None,
             group_name: None,
             weight: 0,
         };
-        flavor.id =
-            insert_flavor_into_db(&mut transaction, &flavor).await? as u32;
-        transaction.commit().await?;
         Ok(flavor)
     }
 }
@@ -335,31 +349,6 @@ pub async fn insert_user_into_db(
         user.role,
         user.is_staff,
         user.is_active,
-    );
-    transaction
-        .execute(query)
-        .await
-        .map(|result| result.last_insert_id())
-}
-
-pub async fn insert_flavor_into_db(
-    transaction: &mut Transaction<'static, MySql>,
-    flavor: &Flavor,
-) -> Result<u64, sqlx::Error> {
-    let query = sqlx::query!(
-        r#"
-            INSERT INTO resources_flavor (
-            name,
-            openstack_id,
-            group_id,
-            weight
-            )
-            VALUES (?, ?, ?, ?)
-        "#,
-        flavor.name,
-        flavor.openstack_id,
-        flavor.group,
-        flavor.weight,
     );
     transaction
         .execute(query)
