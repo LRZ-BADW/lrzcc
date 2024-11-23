@@ -1745,6 +1745,7 @@ dependencies = [
 name = "lrzcc-test"
 version = "0.2.1"
 dependencies = [
+ "anyhow",
  "cargo-husky",
  "chrono",
  "lrzcc",
