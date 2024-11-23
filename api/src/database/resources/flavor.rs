@@ -1,7 +1,9 @@
-use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 use anyhow::Context;
 use lrzcc_wire::resources::{
-    Flavor, FlavorDetailed, FlavorGroupMinimal, FlavorMinimal,
+    Flavor, FlavorCreateData, FlavorDetailed, FlavorGroupMinimal, FlavorMinimal,
 };
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
@@ -278,4 +280,38 @@ pub async fn select_flavors_by_flavor_group_from_db(
         .collect::<Result<Vec<_>, _>>()
         .context("Failed to convert row to flavor")?;
     Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "insert_flavor_into_db",
+    skip(new_flavor, transaction)
+)]
+pub async fn insert_flavor_into_db(
+    transaction: &mut Transaction<'_, MySql>,
+    new_flavor: &FlavorCreateData,
+) -> Result<u64, MinimalApiError> {
+    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
+    let query = sqlx::query!(
+        r#"
+        INSERT IGNORE INTO resources_flavor (name, openstack_id, weight, group_id)
+        VALUES (?, ?, ?, ?)
+        "#,
+        new_flavor.name,
+        new_flavor.openstack_id,
+        new_flavor.weight,
+        new_flavor.group,
+    );
+    let result = transaction
+        .execute(query)
+        .await
+        .context("Failed to execute insert query")?;
+    // TODO: what about non-existing project_id?
+    if result.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            "Failed to insert new flavor group, a conflicting entry exists"
+                .to_string(),
+        ));
+    }
+    let id = result.last_insert_id();
+    Ok(id)
 }
