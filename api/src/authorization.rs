@@ -1,6 +1,8 @@
 use crate::error::AuthOnlyError;
 use lrzcc_wire::user::User;
 
+// TODO: maybe we need alternative calls that return a not found error to not leak information
+
 pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
     if !user.is_staff {
         return Err(AuthOnlyError::AuthorizationError(
