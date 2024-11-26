@@ -74,3 +74,4 @@ user_budget_modify
 {server_state_id}
 {user_budget_id}
 select_project_budgets_by_project_from_db
+_not_found
