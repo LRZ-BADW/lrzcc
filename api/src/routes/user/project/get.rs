@@ -1,5 +1,5 @@
 use super::ProjectIdParam;
-use crate::authorization::require_admin_user;
+use crate::authorization::require_admin_user_or_return_not_found;
 use crate::database::resources::flavor_group::select_minimal_flavor_groups_by_project_id_from_db;
 use crate::database::user::project::select_project_from_db;
 use crate::database::user::user::select_minimal_users_by_project_id_from_db;
@@ -19,7 +19,7 @@ pub async fn project_get(
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
     if params.project_id != project.id {
-        require_admin_user(&user)?;
+        require_admin_user_or_return_not_found(&user)?;
     }
     let mut transaction = db_pool
         .begin()

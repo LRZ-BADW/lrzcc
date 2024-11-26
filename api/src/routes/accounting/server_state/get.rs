@@ -32,9 +32,7 @@ pub async fn server_state_get(
         .await
         .context("Failed to commit transaction")?;
     if server_state.user != user.id && !user.is_staff {
-        return Err(OptionApiError::NotFoundError(
-            "Server state not found".to_string(),
-        ));
+        return Err(OptionApiError::NotFoundError);
     }
     Ok(HttpResponse::Ok()
         .content_type("application/json")
