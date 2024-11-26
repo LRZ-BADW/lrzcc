@@ -1,6 +1,7 @@
 use super::ServerStateIdParam;
-use crate::authorization::require_admin_user;
+use crate::authorization::require_master_user_or_return_not_found;
 use crate::database::accounting::server_state::select_server_state_from_db;
+use crate::database::user::user::select_user_from_db;
 use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
@@ -17,7 +18,6 @@ pub async fn server_state_get(
     params: Path<ServerStateIdParam>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
@@ -27,12 +27,17 @@ pub async fn server_state_get(
         params.server_state_id as u64,
     )
     .await?;
+    let server_state_user =
+        select_user_from_db(&mut transaction, server_state.user as u64).await?;
     transaction
         .commit()
         .await
         .context("Failed to commit transaction")?;
-    if server_state.user != user.id && !user.is_staff {
-        return Err(OptionApiError::NotFoundError);
+    if server_state.user != user.id {
+        require_master_user_or_return_not_found(
+            &user,
+            server_state_user.project,
+        )?;
     }
     Ok(HttpResponse::Ok()
         .content_type("application/json")
