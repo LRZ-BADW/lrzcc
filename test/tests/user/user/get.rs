@@ -75,7 +75,7 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
         )
         .unwrap();
 
-        for user in vec![&user2, &user3] {
+        for user in [&user2, &user3] {
             // act
             let get = client.user.get(user.id);
 
