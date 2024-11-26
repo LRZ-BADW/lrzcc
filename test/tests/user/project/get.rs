@@ -73,10 +73,8 @@ async fn e2e_lib_user_cannot_get_other_project() {
 
         // assert
         assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
+        // TODO: can be also check the HTTP status code?
+        assert_eq!(get.unwrap_err().to_string(), format!("Resource not found"));
     })
     .await
     .unwrap();
