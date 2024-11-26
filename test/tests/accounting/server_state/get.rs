@@ -1,3 +1,4 @@
+use super::assert_equal_server_states;
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
 use std::str::FromStr;
@@ -46,7 +47,7 @@ async fn e2e_lib_normal_user_can_get_own_server_state() {
         let retrieved = client.server_state.get(server_state.id).unwrap();
 
         // assert
-        assert_eq!(&retrieved, &server_state);
+        assert_equal_server_states(&retrieved, &server_state);
     })
     .await
     .unwrap();
@@ -103,7 +104,7 @@ async fn e2e_lib_normal_user_cannot_get_other_server_state() {
             assert!(get.is_err());
             assert_eq!(
                 get.unwrap_err().to_string(),
-                format!("Admin or master user privileges for respective project required")
+                "Resource not found".to_string()
             );
         }
     })
@@ -154,8 +155,8 @@ async fn e2e_lib_master_user_can_get_own_projects_server_states() {
         let retrieved2 = client.server_state.get(server_state_2.id).unwrap();
 
         // assert
-        assert_eq!(&retrieved1, &server_state_1);
-        assert_eq!(&retrieved2, &server_state_2);
+        assert_equal_server_states(&retrieved1, &server_state_1);
+        assert_equal_server_states(&retrieved2, &server_state_2);
     })
     .await
     .unwrap();
@@ -206,8 +207,7 @@ async fn e2e_lib_master_user_cannot_get_other_projects_server_states() {
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
-            // TODO: should'nt these cases return a non found error?
-            format!("Admin or master user privileges for respective project required")
+            "Resource not found".to_string()
         );
     })
     .await
@@ -267,9 +267,9 @@ async fn e2e_lib_admin_can_get_all_kinds_of_users() {
         let retrieved3 = client.server_state.get(server_state_3.id).unwrap();
 
         // assert
-        assert_eq!(retrieved1, server_state_1);
-        assert_eq!(retrieved2, server_state_2);
-        assert_eq!(retrieved3, server_state_3);
+        assert_equal_server_states(&retrieved1, &server_state_1);
+        assert_equal_server_states(&retrieved2, &server_state_2);
+        assert_equal_server_states(&retrieved3, &server_state_3);
     })
     .await
     .unwrap();
