@@ -326,6 +326,48 @@ impl From<AuthOnlyError> for NormalApiError {
 }
 
 #[derive(thiserror::Error)]
+pub enum NotFoundOnlyError {
+    // NOTE: Do not change this string, because different not found messages
+    // messages can lead to information leakage
+    #[error("Resource not found")]
+    NotFoundError,
+}
+
+impl std::fmt::Debug for NotFoundOnlyError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
+impl ResponseError for NotFoundOnlyError {
+    fn error_response(&self) -> HttpResponse<BoxBody> {
+        let (status_code, message) = match self {
+            NotFoundOnlyError::NotFoundError => {
+                (StatusCode::NOT_FOUND, self.to_string())
+            }
+        };
+        HttpResponse::build(status_code)
+            .insert_header((
+                CONTENT_TYPE,
+                HeaderValue::from_static("application/json"),
+            ))
+            // TODO: handle unwrap
+            .body(
+                serde_json::to_string(&ErrorResponse { detail: message })
+                    .unwrap(),
+            )
+    }
+}
+
+impl From<NotFoundOnlyError> for OptionApiError {
+    fn from(value: NotFoundOnlyError) -> Self {
+        match value {
+            NotFoundOnlyError::NotFoundError => Self::NotFoundError,
+        }
+    }
+}
+
+#[derive(thiserror::Error)]
 pub enum UnexpectedOnlyError {
     #[error(transparent)]
     UnexpectedError(#[from] anyhow::Error),
