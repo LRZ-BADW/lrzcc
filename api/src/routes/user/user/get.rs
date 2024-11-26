@@ -28,6 +28,7 @@ pub async fn user_get(
         .await
         .context("Failed to commit transaction")?;
     if user2.id != user.id {
+        // TODO: replace by _not_found variant of function
         require_master_user(&user, user2.project.id)?;
     }
 
