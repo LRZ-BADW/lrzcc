@@ -138,7 +138,7 @@ async fn e2e_lib_server_state_delete_works() {
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
-            format!("Server state with given ID not found")
+            "Resource not found".to_string()
         );
     })
     .await
