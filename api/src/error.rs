@@ -54,8 +54,10 @@ pub async fn not_found() -> Result<HttpResponse, actix_web::Error> {
 pub enum OptionApiError {
     #[error("{0}")]
     ValidationError(String),
-    #[error("{0}")]
-    NotFoundError(String),
+    // NOTE: Do not change this string, because different not found
+    // messages can lead to information leakage
+    #[error("Resource not found")]
+    NotFoundError,
     #[error("{0}")]
     AuthorizationError(String),
     #[error(transparent)]
@@ -74,8 +76,8 @@ impl ResponseError for OptionApiError {
             OptionApiError::ValidationError(message) => {
                 (StatusCode::BAD_REQUEST, message.clone())
             }
-            OptionApiError::NotFoundError(message) => {
-                (StatusCode::NOT_FOUND, message.clone())
+            OptionApiError::NotFoundError => {
+                (StatusCode::NOT_FOUND, self.to_string())
             }
             OptionApiError::AuthorizationError(message) => {
                 (StatusCode::FORBIDDEN, message.clone())
@@ -131,9 +133,7 @@ impl From<MinimalApiError> for OptionApiError {
 impl From<NotFoundOrUnexpectedApiError> for OptionApiError {
     fn from(value: NotFoundOrUnexpectedApiError) -> Self {
         match value {
-            NotFoundOrUnexpectedApiError::NotFoundError(message) => {
-                Self::NotFoundError(message)
-            }
+            NotFoundOrUnexpectedApiError::NotFoundError => Self::NotFoundError,
             NotFoundOrUnexpectedApiError::UnexpectedError(error) => {
                 Self::UnexpectedError(error)
             }
@@ -244,8 +244,10 @@ impl std::fmt::Debug for MinimalApiError {
 
 #[derive(thiserror::Error)]
 pub enum NotFoundOrUnexpectedApiError {
-    #[error("{0}")]
-    NotFoundError(String),
+    // NOTE: Do not change this string, because different not found
+    // messages can lead to information leakage
+    #[error("Resource not found")]
+    NotFoundError,
     #[error(transparent)]
     UnexpectedError(#[from] anyhow::Error),
 }
@@ -259,8 +261,8 @@ impl std::fmt::Debug for NotFoundOrUnexpectedApiError {
 impl ResponseError for NotFoundOrUnexpectedApiError {
     fn error_response(&self) -> HttpResponse<BoxBody> {
         let (status_code, message) = match self {
-            NotFoundOrUnexpectedApiError::NotFoundError(message) => {
-                (StatusCode::NOT_FOUND, message.clone())
+            NotFoundOrUnexpectedApiError::NotFoundError => {
+                (StatusCode::NOT_FOUND, self.to_string())
             }
             NotFoundOrUnexpectedApiError::UnexpectedError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
