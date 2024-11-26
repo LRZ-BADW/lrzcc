@@ -1,4 +1,3 @@
-
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
 use std::str::FromStr;
@@ -73,7 +72,10 @@ async fn e2e_lib_normal_user_cannot_get_other_server_state() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
-    let flavor = server.setup_test_flavor().await.expect("Failed to setup test flavor");
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
     let server_state_2 = server
         .setup_test_server_state(&flavor, &user2)
         .await
@@ -93,7 +95,7 @@ async fn e2e_lib_normal_user_cannot_get_other_server_state() {
         )
         .unwrap();
 
-        for server_state in vec![&server_state_2, &server_state_3] {
+        for server_state in [&server_state_2, &server_state_3] {
             // act
             let get = client.server_state.get(server_state.id);
 
@@ -232,7 +234,10 @@ async fn e2e_lib_admin_can_get_all_kinds_of_users() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
-    let flavor = server.setup_test_flavor().await.expect("Failed to setup test flavor");
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
     let server_state_1 = server
         .setup_test_server_state(&flavor, &user)
         .await
