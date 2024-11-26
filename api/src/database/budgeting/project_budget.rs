@@ -45,9 +45,7 @@ pub async fn select_project_budget_from_db(
 ) -> Result<ProjectBudget, NotFoundOrUnexpectedApiError> {
     select_maybe_project_budget_from_db(transaction, project_budget_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Project budget with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

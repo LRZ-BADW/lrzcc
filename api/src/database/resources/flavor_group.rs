@@ -48,9 +48,7 @@ pub async fn select_flavor_group_name_from_db(
 ) -> Result<String, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_group_name_from_db(transaction, flavor_group_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor group with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[derive(Clone, Debug, PartialEq, FromRow)]
@@ -129,9 +127,7 @@ pub async fn select_flavor_group_from_db(
 ) -> Result<FlavorGroup, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_group_from_db(transaction, flavor_group_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor group with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

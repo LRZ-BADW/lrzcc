@@ -53,9 +53,7 @@ pub async fn select_flavor_quota_from_db(
 ) -> Result<FlavorQuota, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_quota_from_db(transaction, flavor_quota_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor quota with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

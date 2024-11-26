@@ -45,9 +45,7 @@ pub async fn select_user_name_from_db(
 ) -> Result<String, NotFoundOrUnexpectedApiError> {
     select_maybe_user_name_from_db(transaction, user_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(name = "select_all_users_from_db", skip(transaction))]
@@ -199,9 +197,7 @@ pub async fn select_user_detail_from_db(
 ) -> Result<UserDetailed, NotFoundOrUnexpectedApiError> {
     select_maybe_user_detail_from_db(transaction, user_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID or linked project not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(name = "select_maybe_user_from_db", skip(transaction))]
@@ -246,9 +242,7 @@ pub async fn select_user_from_db(
 ) -> Result<User, NotFoundOrUnexpectedApiError> {
     select_maybe_user_from_db(transaction, user_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

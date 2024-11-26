@@ -89,9 +89,7 @@ pub async fn select_server_state_from_db(
 ) -> Result<ServerState, NotFoundOrUnexpectedApiError> {
     select_maybe_server_state_from_db(transaction, server_state_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Server state with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

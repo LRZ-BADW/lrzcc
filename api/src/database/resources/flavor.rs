@@ -49,9 +49,7 @@ pub async fn select_flavor_name_from_db(
 ) -> Result<String, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_name_from_db(transaction, flavor_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "User with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(name = "select_maybe_flavor_from_db", skip(transaction))]
@@ -89,9 +87,7 @@ pub async fn select_flavor_from_db(
 ) -> Result<Flavor, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_from_db(transaction, flavor_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor  with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(
@@ -184,9 +180,7 @@ pub async fn select_flavor_detail_from_db(
 ) -> Result<FlavorDetailed, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_detail_from_db(transaction, user_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor with given ID or linked project not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(name = "select_all_flavors_from_db", skip(transaction))]
