@@ -325,6 +325,68 @@ pub async fn select_server_states_by_server_from_db(
     Ok(rows)
 }
 
+#[tracing::instrument(
+    name = "select_server_states_by_server_and_project_from_db",
+    skip(transaction)
+)]
+pub async fn select_server_states_by_server_and_project_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    server_id: String,
+    project_id: u64,
+) -> Result<Vec<ServerState>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            s.id as id,
+            s.begin as begin,
+            s.end as end,
+            ss.instance_id as instance_id,
+            ss.instance_name as instance_name,
+            f.id as flavor,
+            f.name as flavor_name,
+            ss.status as status,
+            u.id as user,
+            u.name as username
+        FROM
+            accounting_state as s,
+            accounting_serverstate as ss,
+            resources_flavor as f,
+            user_user as u
+        WHERE
+            ss.flavor_id = f.id AND
+            ss.user_id = u.id AND
+            ss.state_ptr_id = s.id AND
+            ss.instance_id = ? AND
+            u.project_id = ?
+        "#,
+        server_id,
+        project_id
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| ServerStateRow::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to server state")?
+        .into_iter()
+        .map(|r| ServerState {
+            id: r.id,
+            begin: r.begin.fixed_offset(),
+            end: r.end.map(|end| end.fixed_offset()),
+            instance_id: r.instance_id,
+            instance_name: r.instance_name,
+            flavor: r.flavor,
+            flavor_name: r.flavor_name,
+            status: r.status,
+            user: r.user,
+            username: r.username,
+        })
+        .collect::<Vec<_>>();
+    Ok(rows)
+}
+
 pub struct NewServerState {
     pub begin: DateTime<Utc>,
     pub end: Option<DateTime<Utc>>,
