@@ -1,6 +1,7 @@
 mod create;
 mod delete;
 mod get;
+mod list;
 
 use lrzcc_wire::accounting::ServerState;
 
