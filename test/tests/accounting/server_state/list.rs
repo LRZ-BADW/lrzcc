@@ -378,9 +378,6 @@ async fn e2e_lib_server_state_list_server_filter_works_across_projects_for_admin
     .unwrap();
 }
 
-// TODO master user can combine server and user/project filters
-// TODO admin can combine server and user/project filters
-
 #[tokio::test]
 async fn e2e_lib_admin_user_can_use_any_user_list_filters() {
     // arrange
@@ -472,6 +469,94 @@ async fn e2e_lib_admin_user_can_use_any_user_list_filters() {
         assert_contains_server_state(&server_states5, &server_state3);
         assert_contains_server_state(&server_states5, &server_state4);
         assert_contains_server_state(&server_states5, &server_state5);
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn e2e_lib_master_user_can_combine_server_state_list_filters() {
+    // arrange
+    let server = spawn_app().await;
+    let test_project = server
+        .setup_test_project(0, 1, 1)
+        .await
+        .expect("Failed to setup test project");
+    let user = test_project.masters[0].user.clone();
+    let token = test_project.masters[0].token.clone();
+    let project = test_project.project.clone();
+    let user2 = test_project.normals[0].user.clone();
+    let test_project2 = server
+        .setup_test_project(0, 0, 1)
+        .await
+        .expect("Failed to setup test project");
+    let user3 = test_project2.normals[0].user.clone();
+    server
+        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mount(&server.keystone_server)
+        .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_id = random_uuid();
+    let server_state1 = server
+        .setup_test_server_state_with_server_id(&flavor, &user, &server_id)
+        .await
+        .expect("Failed to setup test server state 1");
+    let server_state2 = server
+        .setup_test_server_state_with_server_id(&flavor, &user2, &server_id)
+        .await
+        .expect("Failed to setup test server state 2");
+    let _server_state3 = server
+        .setup_test_server_state_with_server_id(&flavor, &user3, &server_id)
+        .await
+        .expect("Failed to setup test server state 3");
+    let _server_state4 = server
+        .setup_test_server_state(&flavor, &user)
+        .await
+        .expect("Failed to setup test server state 4");
+    let _server_state5 = server
+        .setup_test_server_state(&flavor, &user2)
+        .await
+        .expect("Failed to setup test server state 5");
+    let _server_state6 = server
+        .setup_test_server_state(&flavor, &user3)
+        .await
+        .expect("Failed to setup test server state 6");
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let server_states1 = client
+            .server_state
+            .list()
+            .project(project.id)
+            .server(&server_id)
+            .send()
+            .unwrap();
+        let server_states2 = client
+            .server_state
+            .list()
+            .user(user.id)
+            .server(&server_id)
+            .send()
+            .unwrap();
+
+        // assert
+        assert_eq!(server_states1.len(), 2);
+        assert_contains_server_state(&server_states1, &server_state1);
+        assert_contains_server_state(&server_states1, &server_state2);
+        assert_eq!(server_states2.len(), 1);
+        assert_contains_server_state(&server_states2, &server_state1);
     })
     .await
     .unwrap();
