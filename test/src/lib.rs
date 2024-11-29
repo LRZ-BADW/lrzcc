@@ -269,6 +269,49 @@ impl TestApp {
         };
         Ok(server_state)
     }
+
+    pub async fn setup_test_server_state_with_server_id(
+        &self,
+        flavor: &Flavor,
+        user: &User,
+        server_id: &str,
+    ) -> Result<ServerState, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let begin = DateTime::<FixedOffset>::from(Utc::now());
+        let new_server_state = NewServerState {
+            begin: begin.to_utc(),
+            end: None,
+            instance_id: server_id.to_string(),
+            instance_name: random_alphanumeric_string(10),
+            flavor: flavor.id,
+            status: "ACTIVE".to_string(),
+            user: user.id,
+        };
+        let server_state_id =
+            insert_server_state_into_db(&mut transaction, &new_server_state)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let server_state = ServerState {
+            id: server_state_id,
+            begin,
+            end: None,
+            instance_id: new_server_state.instance_id,
+            instance_name: new_server_state.instance_name,
+            flavor: new_server_state.flavor,
+            flavor_name: flavor.name.clone(),
+            status: new_server_state.status,
+            user: user.id,
+            username: user.name.clone(),
+        };
+        Ok(server_state)
+    }
 }
 
 pub async fn spawn_app() -> TestApp {
