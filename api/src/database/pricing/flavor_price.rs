@@ -68,9 +68,7 @@ pub async fn select_flavor_price_from_db(
 ) -> Result<FlavorPrice, NotFoundOrUnexpectedApiError> {
     select_maybe_flavor_price_from_db(transaction, flavor_price_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Flavor price with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(

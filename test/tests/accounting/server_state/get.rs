@@ -1,16 +1,17 @@
+use super::assert_equal_server_states;
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
 use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 // Permission matrix:
-//                     own user     user from own project      other user
+//                     own state    state from own project     other state
 //      admin user     X            X                          X
 //      master user    X            X                          -
 //      normal user    X            -                          -
 
 #[tokio::test]
-async fn e2e_lib_normal_user_can_get_own_user() {
+async fn e2e_lib_normal_user_can_get_own_server_state() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -23,6 +24,14 @@ async fn e2e_lib_normal_user_can_get_own_user() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_state = server
+        .setup_test_server_state(&flavor, &user)
+        .await
+        .expect("Failed to setup test server state");
 
     spawn_blocking(move || {
         // arrange
@@ -35,17 +44,17 @@ async fn e2e_lib_normal_user_can_get_own_user() {
         .unwrap();
 
         // act
-        let detailed = client.user.get(user.id).unwrap();
+        let retrieved = client.server_state.get(server_state.id).unwrap();
 
         // assert
-        assert_eq!(&detailed, &user);
+        assert_equal_server_states(&retrieved, &server_state);
     })
     .await
     .unwrap();
 }
 
 #[tokio::test]
-async fn e2e_lib_normal_user_cannot_get_other_users() {
+async fn e2e_lib_normal_user_cannot_get_other_server_state() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -64,6 +73,18 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_state_2 = server
+        .setup_test_server_state(&flavor, &user2)
+        .await
+        .expect("Failed to setup test server state 1");
+    let server_state_3 = server
+        .setup_test_server_state(&flavor, &user3)
+        .await
+        .expect("Failed to setup test server state 2");
 
     spawn_blocking(move || {
         // arrange
@@ -75,9 +96,9 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
         )
         .unwrap();
 
-        for user in [&user2, &user3] {
+        for server_state in [&server_state_2, &server_state_3] {
             // act
-            let get = client.user.get(user.id);
+            let get = client.server_state.get(server_state.id);
 
             // assert
             assert!(get.is_err());
@@ -92,7 +113,7 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
 }
 
 #[tokio::test]
-async fn e2e_lib_master_user_can_get_own_projects_users() {
+async fn e2e_lib_master_user_can_get_own_projects_server_states() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -106,6 +127,18 @@ async fn e2e_lib_master_user_can_get_own_projects_users() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_state_1 = server
+        .setup_test_server_state(&flavor, &user)
+        .await
+        .expect("Failed to setup test server state 1");
+    let server_state_2 = server
+        .setup_test_server_state(&flavor, &user2)
+        .await
+        .expect("Failed to setup test server state 2");
 
     spawn_blocking(move || {
         // arrange
@@ -118,19 +151,19 @@ async fn e2e_lib_master_user_can_get_own_projects_users() {
         .unwrap();
 
         // act
-        let detailed = client.user.get(user.id).unwrap();
-        let detailed2 = client.user.get(user2.id).unwrap();
+        let retrieved1 = client.server_state.get(server_state_1.id).unwrap();
+        let retrieved2 = client.server_state.get(server_state_2.id).unwrap();
 
         // assert
-        assert_eq!(&detailed, &user);
-        assert_eq!(&detailed2, &user2);
+        assert_equal_server_states(&retrieved1, &server_state_1);
+        assert_equal_server_states(&retrieved2, &server_state_2);
     })
     .await
     .unwrap();
 }
 
 #[tokio::test]
-async fn e2e_lib_master_user_cannot_get_other_projects_users() {
+async fn e2e_lib_master_user_cannot_get_other_projects_server_states() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -148,6 +181,14 @@ async fn e2e_lib_master_user_cannot_get_other_projects_users() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_state = server
+        .setup_test_server_state(&flavor, &user2)
+        .await
+        .expect("Failed to setup test server state");
 
     spawn_blocking(move || {
         // arrange
@@ -160,7 +201,7 @@ async fn e2e_lib_master_user_cannot_get_other_projects_users() {
         .unwrap();
 
         // act
-        let get = client.user.get(user2.id);
+        let get = client.server_state.get(server_state.id);
 
         // assert
         assert!(get.is_err());
@@ -193,6 +234,22 @@ async fn e2e_lib_admin_can_get_all_kinds_of_users() {
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_state_1 = server
+        .setup_test_server_state(&flavor, &user)
+        .await
+        .expect("Failed to setup test server state 1");
+    let server_state_2 = server
+        .setup_test_server_state(&flavor, &user2)
+        .await
+        .expect("Failed to setup test server state 2");
+    let server_state_3 = server
+        .setup_test_server_state(&flavor, &user3)
+        .await
+        .expect("Failed to setup test server state 3");
 
     spawn_blocking(move || {
         // arrange
@@ -205,14 +262,14 @@ async fn e2e_lib_admin_can_get_all_kinds_of_users() {
         .unwrap();
 
         // act
-        let detailed = client.user.get(user.id).unwrap();
-        let detailed2 = client.user.get(user2.id).unwrap();
-        let detailed3 = client.user.get(user3.id).unwrap();
+        let retrieved1 = client.server_state.get(server_state_1.id).unwrap();
+        let retrieved2 = client.server_state.get(server_state_2.id).unwrap();
+        let retrieved3 = client.server_state.get(server_state_3.id).unwrap();
 
         // assert
-        assert_eq!(detailed, user);
-        assert_eq!(detailed2, user2);
-        assert_eq!(detailed3, user3);
+        assert_equal_server_states(&retrieved1, &server_state_1);
+        assert_equal_server_states(&retrieved2, &server_state_2);
+        assert_equal_server_states(&retrieved3, &server_state_3);
     })
     .await
     .unwrap();

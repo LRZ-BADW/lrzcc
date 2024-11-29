@@ -40,9 +40,7 @@ pub async fn select_project_from_db(
 ) -> Result<Project, NotFoundOrUnexpectedApiError> {
     select_maybe_project_from_db(transaction, project_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Project with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(
@@ -84,9 +82,7 @@ pub async fn select_project_minimal_from_db(
 ) -> Result<ProjectMinimal, NotFoundOrUnexpectedApiError> {
     select_maybe_project_minimal_from_db(transaction, project_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Project with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(
@@ -132,9 +128,7 @@ pub async fn select_project_name_from_db(
 ) -> Result<String, NotFoundOrUnexpectedApiError> {
     select_maybe_project_name_from_db(transaction, project_id)
         .await?
-        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError(
-            "Project with given ID not found".to_string(),
-        ))
+        .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
 }
 
 #[tracing::instrument(name = "select_all_projects_from_db", skip(transaction))]

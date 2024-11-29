@@ -22,7 +22,6 @@ pub use user::*;
 // - pricing::flavor_price::modify
 // - quota::flavor_quota::modify
 // - accounting::server_state::modify
-// - accounting::server_state::get
 // - resources::flavor_group::get
 // - resources::flavor::get
 // - quota::flavor_quota::get

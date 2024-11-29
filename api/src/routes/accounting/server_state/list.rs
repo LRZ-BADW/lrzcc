@@ -1,11 +1,16 @@
-use crate::authorization::{require_admin_user, require_master_user};
+use crate::authorization::{
+    require_admin_user, require_master_user,
+    require_master_user_or_return_not_found,
+};
 use crate::database::accounting::server_state::{
     select_all_server_states_from_db, select_server_states_by_project_from_db,
+    select_server_states_by_server_and_project_from_db,
+    select_server_states_by_server_and_user_from_db,
     select_server_states_by_server_from_db,
     select_server_states_by_user_from_db,
 };
 use crate::database::user::user::select_user_from_db;
-use crate::error::NormalApiError;
+use crate::error::OptionApiError;
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -19,7 +24,7 @@ pub async fn server_state_list(
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Query<ServerStateListParams>,
-) -> Result<HttpResponse, NormalApiError> {
+) -> Result<HttpResponse, OptionApiError> {
     let mut transaction = db_pool
         .begin()
         .await
@@ -29,23 +34,52 @@ pub async fn server_state_list(
         select_all_server_states_from_db(&mut transaction).await?
     } else if let Some(project_id) = params.project {
         require_master_user(&user, project_id)?;
-        select_server_states_by_project_from_db(
-            &mut transaction,
-            project_id as u64,
-        )
-        .await?
+        if let Some(server_id) = params.server.clone() {
+            select_server_states_by_server_and_project_from_db(
+                &mut transaction,
+                server_id,
+                project_id as u64,
+            )
+            .await?
+        } else {
+            select_server_states_by_project_from_db(
+                &mut transaction,
+                project_id as u64,
+            )
+            .await?
+        }
     } else if let Some(user_id) = params.user {
-        let user = select_user_from_db(&mut transaction, user_id as u64)
+        let user1 = select_user_from_db(&mut transaction, user_id as u64)
             .await
             .context("Failed to select user")?;
-        require_master_user(&user, user.project)?;
-        select_server_states_by_user_from_db(&mut transaction, user.id as u64)
+        require_master_user_or_return_not_found(&user, user1.project)?;
+        if let Some(server_id) = params.server.clone() {
+            select_server_states_by_server_and_user_from_db(
+                &mut transaction,
+                server_id,
+                user1.id as u64,
+            )
             .await?
+        } else {
+            select_server_states_by_user_from_db(
+                &mut transaction,
+                user1.id as u64,
+            )
+            .await?
+        }
     } else if let Some(server_id) = params.server.clone() {
-        // TODO: can we make this master user accessible?
-        require_admin_user(&user)?;
-        select_server_states_by_server_from_db(&mut transaction, server_id)
+        if require_admin_user(&user).is_ok() {
+            select_server_states_by_server_from_db(&mut transaction, server_id)
+                .await?
+        } else {
+            require_master_user(&user, project.id)?;
+            select_server_states_by_server_and_project_from_db(
+                &mut transaction,
+                server_id,
+                project.id as u64,
+            )
             .await?
+        }
     } else {
         select_server_states_by_user_from_db(&mut transaction, user.id as u64)
             .await?

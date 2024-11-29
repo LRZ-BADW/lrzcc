@@ -1,6 +1,15 @@
+use anyhow::Context;
+use chrono::{DateTime, FixedOffset, Utc};
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
+use lrzcc_api::database::accounting::server_state::{
+    insert_server_state_into_db, NewServerState,
+};
+use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
+use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
+use lrzcc_wire::accounting::ServerState;
+use lrzcc_wire::resources::{Flavor, FlavorCreateData};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use rand::distributions::Alphanumeric;
@@ -188,6 +197,120 @@ impl TestApp {
         transaction.commit().await?;
 
         Ok(test_project)
+    }
+
+    pub async fn setup_test_flavor(&self) -> Result<Flavor, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let flavor_create = FlavorCreateData {
+            name: random_alphanumeric_string(10),
+            openstack_id: random_uuid(),
+            group: None,
+            weight: None,
+        };
+        let flavor_id = insert_flavor_into_db(&mut transaction, &flavor_create)
+            .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor = Flavor {
+            id: flavor_id,
+            name: flavor_create.name,
+            openstack_id: flavor_create.openstack_id,
+            group: None,
+            group_name: None,
+            weight: 0,
+        };
+        Ok(flavor)
+    }
+
+    pub async fn setup_test_server_state(
+        &self,
+        flavor: &Flavor,
+        user: &User,
+    ) -> Result<ServerState, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let begin = DateTime::<FixedOffset>::from(Utc::now());
+        let new_server_state = NewServerState {
+            begin: begin.to_utc(),
+            end: None,
+            instance_id: random_uuid(),
+            instance_name: random_alphanumeric_string(10),
+            flavor: flavor.id,
+            status: "ACTIVE".to_string(),
+            user: user.id,
+        };
+        let server_state_id =
+            insert_server_state_into_db(&mut transaction, &new_server_state)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let server_state = ServerState {
+            id: server_state_id,
+            begin,
+            end: None,
+            instance_id: new_server_state.instance_id,
+            instance_name: new_server_state.instance_name,
+            flavor: new_server_state.flavor,
+            flavor_name: flavor.name.clone(),
+            status: new_server_state.status,
+            user: user.id,
+            username: user.name.clone(),
+        };
+        Ok(server_state)
+    }
+
+    pub async fn setup_test_server_state_with_server_id(
+        &self,
+        flavor: &Flavor,
+        user: &User,
+        server_id: &str,
+    ) -> Result<ServerState, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let begin = DateTime::<FixedOffset>::from(Utc::now());
+        let new_server_state = NewServerState {
+            begin: begin.to_utc(),
+            end: None,
+            instance_id: server_id.to_string(),
+            instance_name: random_alphanumeric_string(10),
+            flavor: flavor.id,
+            status: "ACTIVE".to_string(),
+            user: user.id,
+        };
+        let server_state_id =
+            insert_server_state_into_db(&mut transaction, &new_server_state)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let server_state = ServerState {
+            id: server_state_id,
+            begin,
+            end: None,
+            instance_id: new_server_state.instance_id,
+            instance_name: new_server_state.instance_name,
+            flavor: new_server_state.flavor,
+            flavor_name: flavor.name.clone(),
+            status: new_server_state.status,
+            user: user.id,
+            username: user.name.clone(),
+        };
+        Ok(server_state)
     }
 }
 

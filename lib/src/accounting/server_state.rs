@@ -236,7 +236,7 @@ impl ServerStateApi {
 
     pub fn modify(&self, id: u32) -> ServerStateModifyRequest {
         // TODO use Url.join
-        let url = format!("{}/{}", self.url, id);
+        let url = format!("{}/{}/", self.url, id);
         ServerStateModifyRequest::new(url.as_ref(), &self.client, id)
     }
 

@@ -3,7 +3,83 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
 
-...
+### lrzcc-api
+
+#### Dependencies
+- run cargo update
+
+#### Database
+- move insert_flavor_into_db to database module
+- move insert_server_state_into_db to database module
+- add missing sqlx try_froms to ServerStateRow id fields
+- adjust all getters for new NotFoundErrors
+- add select_server_states_by_server_and_project_from_db
+- add select_server_states_by_server_and_user_from_db
+
+#### Error
+- match messages for all NotFoundError variants
+- add NotFoundOnlyError with impls
+
+#### Endpoints
+- revise getters for new NotFoundErrors
+- remove done todo comment
+- use require_master_user_or_return_not_found in user_get
+- correct authorization check in server_state_get
+- homogenize errors of server_state_list
+- complete server_state_list endpoint
+
+#### Authorization
+- add require_*_or_return_not_found functions
+
+### lrzcc-test
+
+#### Dependencies
+- add chrono dependency
+- add anyhow dependency
+- run cargo update
+
+#### Tests
+- add TestApp.setup_test_flavor
+- add server state create tests
+- reuse api::database::insert_flavor_into_db in test
+- add TestApp.setup_test_server_state
+- add server state delete tests
+- add helper assert_equal_server_states
+- use assert_equal_server_states in server state create tests
+- add server_state_get tests
+- fix some linting issues in server_state_get test
+- adjust tests for new NotFoundErrors
+- fix minor linting issues
+- correct expected not found message in server_state_delete test
+- use assert_equal_server_states in server_state_get tests
+- revise expected not found error messages
+- add equal_server_states and (assert_)contains_server_state
+- add first few server_state_list tests
+- add server_state_modify tests
+- add TestApp.setup_test_server_state_with_server_id
+- add e2e_lib_server_state_list_server_filter_works_across_projects_for_admin_user
+- add e2e_lib_server_state_list_server_filter_stays_within_project_for_master_user
+- e2e_lib_master_user_can_combine_server_state_list_filters
+- e2e_lib_admin_user_can_combine_server_state_list_filters
+
+### lrzcc-lib
+
+#### Dependencies
+- run cargo update
+
+#### Fixes
+- add missing trailing slash in server_state_modify url
+
+### lrzcc-wire
+
+#### Dependencies
+- run cargo update
+
+### lrzcc-cli
+
+#### Dependencies
+- run cargo update
+
 
 ## [lrzcc-test-v0.2.1] - 2024-11-22
 

@@ -148,10 +148,7 @@ async fn e2e_lib_user_create_get_delete_get_works() {
         // act and assert 4 - get
         let get = client.user.get(created.id);
         assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            format!("User with given ID or linked project not found")
-        );
+        assert_eq!(get.unwrap_err().to_string(), format!("Resource not found"));
     })
     .await
     .unwrap();

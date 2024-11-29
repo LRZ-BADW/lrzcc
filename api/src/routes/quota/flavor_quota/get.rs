@@ -32,9 +32,7 @@ pub async fn flavor_quota_get(
         .await
         .context("Failed to commit transaction")?;
     if flavor_quota.user != user.id && !user.is_staff {
-        return Err(OptionApiError::NotFoundError(
-            "Flavor quota not found".to_string(),
-        ));
+        return Err(OptionApiError::NotFoundError);
     }
     Ok(HttpResponse::Ok()
         .content_type("application/json")

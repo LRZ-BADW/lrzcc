@@ -1,5 +1,5 @@
 use super::UserIdParam;
-use crate::authorization::require_master_user;
+use crate::authorization::require_master_user_or_return_not_found;
 use crate::database::user::user::select_user_detail_from_db;
 use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
@@ -28,7 +28,7 @@ pub async fn user_get(
         .await
         .context("Failed to commit transaction")?;
     if user2.id != user.id {
-        require_master_user(&user, user2.project.id)?;
+        require_master_user_or_return_not_found(&user, user2.project.id)?;
     }
 
     Ok(HttpResponse::Ok()

@@ -1,6 +1,7 @@
 use crate::authorization::require_admin_user;
+use crate::database::resources::flavor::insert_flavor_into_db;
 use crate::database::resources::flavor_group::select_flavor_group_name_from_db;
-use crate::error::{MinimalApiError, OptionApiError};
+use crate::error::OptionApiError;
 use actix_web::web::{Data, Json, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -8,7 +9,7 @@ use lrzcc_wire::resources::{
     FlavorCreateData, FlavorDetailed, FlavorGroupMinimal,
 };
 use lrzcc_wire::user::{Project, User};
-use sqlx::{Executor, MySql, MySqlPool, Transaction};
+use sqlx::MySqlPool;
 
 #[tracing::instrument(name = "flavor_create")]
 pub async fn flavor_create(
@@ -49,38 +50,4 @@ pub async fn flavor_create(
     Ok(HttpResponse::Created()
         .content_type("application/json")
         .json(flavor_created))
-}
-
-#[tracing::instrument(
-    name = "insert_flavor_into_db",
-    skip(new_flavor, transaction)
-)]
-pub async fn insert_flavor_into_db(
-    transaction: &mut Transaction<'_, MySql>,
-    new_flavor: &FlavorCreateData,
-) -> Result<u64, MinimalApiError> {
-    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
-    let query = sqlx::query!(
-        r#"
-        INSERT IGNORE INTO resources_flavor (name, openstack_id, weight, group_id)
-        VALUES (?, ?, ?, ?)
-        "#,
-        new_flavor.name,
-        new_flavor.openstack_id,
-        new_flavor.weight,
-        new_flavor.group,
-    );
-    let result = transaction
-        .execute(query)
-        .await
-        .context("Failed to execute insert query")?;
-    // TODO: what about non-existing project_id?
-    if result.rows_affected() == 0 {
-        return Err(MinimalApiError::ValidationError(
-            "Failed to insert new flavor group, a conflicting entry exists"
-                .to_string(),
-        ));
-    }
-    let id = result.last_insert_id();
-    Ok(id)
 }
