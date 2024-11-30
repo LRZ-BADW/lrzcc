@@ -1,14 +1,18 @@
 use anyhow::Context;
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::database::accounting::server_state::{
     insert_server_state_into_db, NewServerState,
+};
+use lrzcc_api::database::budgeting::user_budget::{
+    insert_user_budget_into_db, NewUserBudget,
 };
 use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
 use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
+use lrzcc_wire::budgeting::UserBudget;
 use lrzcc_wire::resources::{Flavor, FlavorCreateData};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
@@ -311,6 +315,37 @@ impl TestApp {
             username: user.name.clone(),
         };
         Ok(server_state)
+    }
+
+    pub async fn setup_test_user_budget(
+        &self,
+        user: &User,
+    ) -> Result<UserBudget, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_user_budget = NewUserBudget {
+            user_id: user.id as u64,
+            year: Utc::now().year() as u32,
+            amount: 0,
+        };
+        let user_budget_id =
+            insert_user_budget_into_db(&mut transaction, &new_user_budget)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let user_budget = UserBudget {
+            id: user_budget_id,
+            user: user.id,
+            username: user.name.clone(),
+            year: new_user_budget.year,
+            amount: new_user_budget.amount as u32,
+        };
+        Ok(user_budget)
     }
 }
 
