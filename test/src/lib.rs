@@ -4,6 +4,9 @@ use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::database::accounting::server_state::{
     insert_server_state_into_db, NewServerState,
 };
+use lrzcc_api::database::budgeting::project_budget::{
+    insert_project_budget_into_db, NewProjectBudget,
+};
 use lrzcc_api::database::budgeting::user_budget::{
     insert_user_budget_into_db, NewUserBudget,
 };
@@ -12,7 +15,7 @@ use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
-use lrzcc_wire::budgeting::UserBudget;
+use lrzcc_wire::budgeting::{ProjectBudget, UserBudget};
 use lrzcc_wire::resources::{Flavor, FlavorCreateData};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
@@ -346,6 +349,39 @@ impl TestApp {
             amount: new_user_budget.amount as u32,
         };
         Ok(user_budget)
+    }
+
+    pub async fn setup_test_project_budget(
+        &self,
+        project: &Project,
+    ) -> Result<ProjectBudget, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_project_budget = NewProjectBudget {
+            project_id: project.id as u64,
+            year: Utc::now().year() as u32,
+            amount: 0,
+        };
+        let project_budget_id = insert_project_budget_into_db(
+            &mut transaction,
+            &new_project_budget,
+        )
+        .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let project_budget = ProjectBudget {
+            id: project_budget_id,
+            project: project.id,
+            project_name: project.name.clone(),
+            year: new_project_budget.year,
+            amount: new_project_budget.amount as u32,
+        };
+        Ok(project_budget)
     }
 }
 
