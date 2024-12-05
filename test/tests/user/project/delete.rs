@@ -144,3 +144,5 @@ async fn e2e_lib_project_create_get_delete_get_works() {
     .await
     .unwrap();
 }
+
+// TODO: test what happens when deleting non-empty project
