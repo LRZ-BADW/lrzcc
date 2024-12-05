@@ -11,12 +11,15 @@ use lrzcc_api::database::budgeting::user_budget::{
     insert_user_budget_into_db, NewUserBudget,
 };
 use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
+use lrzcc_api::database::resources::flavor_group::insert_flavor_group_into_db;
 use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
 use lrzcc_wire::budgeting::{ProjectBudget, UserBudget};
-use lrzcc_wire::resources::{Flavor, FlavorCreateData};
+use lrzcc_wire::resources::{
+    Flavor, FlavorCreateData, FlavorGroup, FlavorGroupCreateData,
+};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use rand::distributions::Alphanumeric;
@@ -204,6 +207,38 @@ impl TestApp {
         transaction.commit().await?;
 
         Ok(test_project)
+    }
+
+    pub async fn setup_test_flavor_group(
+        &self,
+        project_id: u32,
+    ) -> Result<FlavorGroup, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let flavor_group_create = FlavorGroupCreateData {
+            name: random_alphanumeric_string(10),
+            flavors: Vec::new(),
+        };
+        let flavor_group_id = insert_flavor_group_into_db(
+            &mut transaction,
+            &flavor_group_create,
+            project_id as u64,
+        )
+        .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor = FlavorGroup {
+            id: flavor_group_id,
+            name: flavor_group_create.name,
+            project: project_id,
+            flavors: flavor_group_create.flavors,
+        };
+        Ok(flavor)
     }
 
     pub async fn setup_test_flavor(&self) -> Result<Flavor, MinimalApiError> {
