@@ -20,7 +20,7 @@ async fn e2e_lib_flavor_delete_denies_access_to_normal_user() {
     let flavor = server
         .setup_test_flavor()
         .await
-        .expect("Failed to setup test user budget");
+        .expect("Failed to setup test flavor");
 
     spawn_blocking(move || {
         // arrange
@@ -63,7 +63,7 @@ async fn e2e_lib_flavor_delete_denies_access_to_master_user() {
     let flavor = server
         .setup_test_flavor()
         .await
-        .expect("Failed to setup test user budget");
+        .expect("Failed to setup test flavor");
 
     spawn_blocking(move || {
         // arrange
@@ -106,7 +106,7 @@ async fn e2e_lib_flavor_delete_works() {
     let flavor = server
         .setup_test_flavor()
         .await
-        .expect("Failed to setup test user budget");
+        .expect("Failed to setup test flavor");
 
     spawn_blocking(move || {
         // arrange
