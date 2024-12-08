@@ -10,6 +10,9 @@ use lrzcc_api::database::budgeting::project_budget::{
 use lrzcc_api::database::budgeting::user_budget::{
     insert_user_budget_into_db, NewUserBudget,
 };
+use lrzcc_api::database::pricing::flavor_price::{
+    insert_flavor_price_into_db, NewFlavorPrice,
+};
 use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
 use lrzcc_api::database::resources::flavor_group::insert_flavor_group_into_db;
 use lrzcc_api::error::MinimalApiError;
@@ -17,6 +20,7 @@ use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
 use lrzcc_wire::budgeting::{ProjectBudget, UserBudget};
+use lrzcc_wire::pricing::FlavorPrice;
 use lrzcc_wire::resources::{
     Flavor, FlavorCreateData, FlavorGroup, FlavorGroupCreateData,
 };
@@ -417,6 +421,40 @@ impl TestApp {
             amount: new_project_budget.amount as u32,
         };
         Ok(project_budget)
+    }
+
+    pub async fn setup_test_flavor_price(
+        &self,
+        flavor: &Flavor,
+    ) -> Result<FlavorPrice, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let start_time = DateTime::<FixedOffset>::from(Utc::now());
+        let new_flavor_price = NewFlavorPrice {
+            flavor_id: flavor.id as u64,
+            user_class: random_number(1..6),
+            unit_price: random_number(1..1000) as f64,
+            start_time: start_time.to_utc(),
+        };
+        let flavor_price_id =
+            insert_flavor_price_into_db(&mut transaction, &new_flavor_price)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor_price = FlavorPrice {
+            id: flavor_price_id,
+            flavor: flavor.id,
+            flavor_name: flavor.name.clone(),
+            user_class: new_flavor_price.user_class,
+            unit_price: new_flavor_price.unit_price,
+            start_time,
+        };
+        Ok(flavor_price)
     }
 }
 
