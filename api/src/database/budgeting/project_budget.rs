@@ -1,6 +1,9 @@
-use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 use anyhow::Context;
-use lrzcc_wire::budgeting::ProjectBudget;
+use chrono::{Datelike, Utc};
+use lrzcc_wire::budgeting::{ProjectBudget, ProjectBudgetCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[tracing::instrument(
@@ -159,4 +162,54 @@ pub async fn select_project_budgets_by_year_from_db(
         .collect::<Result<Vec<_>, _>>()
         .context("Failed to convert row to project budget")?;
     Ok(rows)
+}
+
+pub struct NewProjectBudget {
+    pub project_id: u64,
+    pub year: u32,
+    pub amount: i64,
+}
+
+impl TryFrom<ProjectBudgetCreateData> for NewProjectBudget {
+    type Error = String;
+
+    fn try_from(data: ProjectBudgetCreateData) -> Result<Self, Self::Error> {
+        Ok(Self {
+            project_id: data.project as u64,
+            year: data.year.unwrap_or(Utc::now().year() as u32),
+            amount: data.amount.unwrap_or(0),
+        })
+    }
+}
+
+#[tracing::instrument(
+    name = "insert_project_budget_into_db",
+    skip(new_project_budget, transaction)
+)]
+pub async fn insert_project_budget_into_db(
+    transaction: &mut Transaction<'_, MySql>,
+    new_project_budget: &NewProjectBudget,
+) -> Result<u64, MinimalApiError> {
+    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
+    let query = sqlx::query!(
+        r#"
+        INSERT IGNORE INTO budgeting_projectbudget (year, amount, project_id)
+        VALUES (?, ?, ?)
+        "#,
+        new_project_budget.year,
+        new_project_budget.amount,
+        new_project_budget.project_id,
+    );
+    let result = transaction
+        .execute(query)
+        .await
+        .context("Failed to execute insert query")?;
+    if result.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            "Failed to insert new quota, a conflicting entry exists"
+                .to_string(),
+        ));
+    }
+    let id = result.last_insert_id();
+    Ok(id)
 }

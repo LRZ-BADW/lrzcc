@@ -1,6 +1,9 @@
-use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 use anyhow::Context;
-use lrzcc_wire::budgeting::UserBudget;
+use chrono::{Datelike, Utc};
+use lrzcc_wire::budgeting::{UserBudget, UserBudgetCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[tracing::instrument(
@@ -155,4 +158,54 @@ pub async fn select_user_budgets_by_year_from_db(
         .collect::<Result<Vec<_>, _>>()
         .context("Failed to convert row to user budget")?;
     Ok(rows)
+}
+
+pub struct NewUserBudget {
+    pub user_id: u64,
+    pub year: u32,
+    pub amount: i64,
+}
+
+impl TryFrom<UserBudgetCreateData> for NewUserBudget {
+    type Error = String;
+
+    fn try_from(data: UserBudgetCreateData) -> Result<Self, Self::Error> {
+        Ok(Self {
+            user_id: data.user as u64,
+            year: data.year.unwrap_or(Utc::now().year() as u32),
+            amount: data.amount.unwrap_or(0),
+        })
+    }
+}
+
+#[tracing::instrument(
+    name = "insert_user_budget_into_db",
+    skip(new_user_budget, transaction)
+)]
+pub async fn insert_user_budget_into_db(
+    transaction: &mut Transaction<'_, MySql>,
+    new_user_budget: &NewUserBudget,
+) -> Result<u64, MinimalApiError> {
+    // TODO: MariaDB 10.5 introduced INSERT ... RETURNING
+    let query = sqlx::query!(
+        r#"
+        INSERT IGNORE INTO budgeting_userbudget (year, amount, user_id)
+        VALUES (?, ?, ?)
+        "#,
+        new_user_budget.year,
+        new_user_budget.amount,
+        new_user_budget.user_id,
+    );
+    let result = transaction
+        .execute(query)
+        .await
+        .context("Failed to execute insert query")?;
+    if result.rows_affected() == 0 {
+        return Err(MinimalApiError::ValidationError(
+            "Failed to insert new quota, a conflicting entry exists"
+                .to_string(),
+        ));
+    }
+    let id = result.last_insert_id();
+    Ok(id)
 }
