@@ -13,6 +13,7 @@ use lrzcc_api::database::budgeting::user_budget::{
 use lrzcc_api::database::pricing::flavor_price::{
     insert_flavor_price_into_db, NewFlavorPrice,
 };
+use lrzcc_api::database::quota::flavor_quota::insert_flavor_quota_into_db;
 use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
 use lrzcc_api::database::resources::flavor_group::insert_flavor_group_into_db;
 use lrzcc_api::error::MinimalApiError;
@@ -21,6 +22,7 @@ use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
 use lrzcc_wire::budgeting::{ProjectBudget, UserBudget};
 use lrzcc_wire::pricing::FlavorPrice;
+use lrzcc_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
 use lrzcc_wire::resources::{
     Flavor, FlavorCreateData, FlavorGroup, FlavorGroupCreateData,
 };
@@ -455,6 +457,39 @@ impl TestApp {
             start_time,
         };
         Ok(flavor_price)
+    }
+
+    pub async fn setup_test_flavor_quota(
+        &self,
+        flavor_group: &FlavorGroup,
+        user: &User,
+    ) -> Result<FlavorQuota, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_flavor_quota = FlavorQuotaCreateData {
+            flavor_group: flavor_group.id,
+            user: user.id,
+            quota: random_number(1..1000) as i64,
+        };
+        let flavor_quota_id =
+            insert_flavor_quota_into_db(&mut transaction, &new_flavor_quota)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor_quota = FlavorQuota {
+            id: flavor_quota_id,
+            flavor_group: flavor_group.id,
+            flavor_group_name: flavor_group.name.clone(),
+            user: user.id,
+            username: user.name.clone(),
+            quota: new_flavor_quota.quota,
+        };
+        Ok(flavor_quota)
     }
 }
 
