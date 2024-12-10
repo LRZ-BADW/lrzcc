@@ -7,6 +7,10 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 #### Dependencies
 - run cargo update
+- bump tracing-subscriber from 0.3.18 to 0.3.19
+- bump tracing from 0.1.40 to 0.1.41
+- bump chrono from 0.4.38 to 0.4.39
+- bump thiserror from 2.0.4 to 2.0.6
 
 #### Database
 - move insert_flavor_into_db to database module
@@ -15,6 +19,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 - adjust all getters for new NotFoundErrors
 - add select_server_states_by_server_and_project_from_db
 - add select_server_states_by_server_and_user_from_db
+- move insert_flavor_quota_into_db into database module
+- move insert_flavor_price_into_db to database module
+- move insert_flavor_group_into_db to database module
+- move insert_project_budget_into_db to database module
+- move insert_user_budget_into_db to database module
 
 #### Error
 - match messages for all NotFoundError variants
@@ -36,6 +45,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 #### Dependencies
 - add chrono dependency
 - add anyhow dependency
+- bump chrono from 0.4.38 to 0.4.39
 - run cargo update
 
 #### Tests
@@ -61,10 +71,24 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add e2e_lib_server_state_list_server_filter_stays_within_project_for_master_user
 - e2e_lib_master_user_can_combine_server_state_list_filters
 - e2e_lib_admin_user_can_combine_server_state_list_filters
+- add flavor quota delete tests
+- add flavor price delete tests
+- add TestApp.setup_test_flavor_price function
+- add flavor group delete tests
+- fix typos in flavor delete test error messages
+- add TestApp.setup_test_flavor_group
+- add todo comment to project delete tests
+- add flavor_delete tests
+- add project_budget_delete tests
+- add TestApp.setup_test_project_budget
+- add user_budget_delete tests
+- add TestApp.setup_test_user_budget
 
 ### lrzcc-lib
 
 #### Dependencies
+- bump chrono from 0.4.38 to 0.4.39
+- bump thiserror from 2.0.4 to 2.0.6
 - run cargo update
 
 #### Fixes
@@ -73,12 +97,16 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### lrzcc-wire
 
 #### Dependencies
+- bump chrono from 0.4.38 to 0.4.39
 - run cargo update
 
 ### lrzcc-cli
 
 #### Dependencies
 - run cargo update
+- bump tabled from 0.16.0 to 0.17.0
+- bump clap from 4.5.22 to 4.5.23
+- bump chrono from 0.4.38 to 0.4.39
 
 
 ## [lrzcc-test-v0.2.1] - 2024-11-22
