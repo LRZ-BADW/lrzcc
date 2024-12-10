@@ -1,15 +1,31 @@
 use anyhow::Context;
-use chrono::{DateTime, FixedOffset, Utc};
+use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use lrzcc_api::configuration::{get_configuration, DatabaseSettings};
 use lrzcc_api::database::accounting::server_state::{
     insert_server_state_into_db, NewServerState,
 };
+use lrzcc_api::database::budgeting::project_budget::{
+    insert_project_budget_into_db, NewProjectBudget,
+};
+use lrzcc_api::database::budgeting::user_budget::{
+    insert_user_budget_into_db, NewUserBudget,
+};
+use lrzcc_api::database::pricing::flavor_price::{
+    insert_flavor_price_into_db, NewFlavorPrice,
+};
+use lrzcc_api::database::quota::flavor_quota::insert_flavor_quota_into_db;
 use lrzcc_api::database::resources::flavor::insert_flavor_into_db;
+use lrzcc_api::database::resources::flavor_group::insert_flavor_group_into_db;
 use lrzcc_api::error::MinimalApiError;
 use lrzcc_api::startup::{get_connection_pool, Application};
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
 use lrzcc_wire::accounting::ServerState;
-use lrzcc_wire::resources::{Flavor, FlavorCreateData};
+use lrzcc_wire::budgeting::{ProjectBudget, UserBudget};
+use lrzcc_wire::pricing::FlavorPrice;
+use lrzcc_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
+use lrzcc_wire::resources::{
+    Flavor, FlavorCreateData, FlavorGroup, FlavorGroupCreateData,
+};
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
 use rand::distributions::Alphanumeric;
@@ -199,6 +215,38 @@ impl TestApp {
         Ok(test_project)
     }
 
+    pub async fn setup_test_flavor_group(
+        &self,
+        project_id: u32,
+    ) -> Result<FlavorGroup, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let flavor_group_create = FlavorGroupCreateData {
+            name: random_alphanumeric_string(10),
+            flavors: Vec::new(),
+        };
+        let flavor_group_id = insert_flavor_group_into_db(
+            &mut transaction,
+            &flavor_group_create,
+            project_id as u64,
+        )
+        .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor = FlavorGroup {
+            id: flavor_group_id,
+            name: flavor_group_create.name,
+            project: project_id,
+            flavors: flavor_group_create.flavors,
+        };
+        Ok(flavor)
+    }
+
     pub async fn setup_test_flavor(&self) -> Result<Flavor, MinimalApiError> {
         let mut transaction = self
             .db_pool
@@ -311,6 +359,137 @@ impl TestApp {
             username: user.name.clone(),
         };
         Ok(server_state)
+    }
+
+    pub async fn setup_test_user_budget(
+        &self,
+        user: &User,
+    ) -> Result<UserBudget, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_user_budget = NewUserBudget {
+            user_id: user.id as u64,
+            year: Utc::now().year() as u32,
+            amount: 0,
+        };
+        let user_budget_id =
+            insert_user_budget_into_db(&mut transaction, &new_user_budget)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let user_budget = UserBudget {
+            id: user_budget_id,
+            user: user.id,
+            username: user.name.clone(),
+            year: new_user_budget.year,
+            amount: new_user_budget.amount as u32,
+        };
+        Ok(user_budget)
+    }
+
+    pub async fn setup_test_project_budget(
+        &self,
+        project: &Project,
+    ) -> Result<ProjectBudget, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_project_budget = NewProjectBudget {
+            project_id: project.id as u64,
+            year: Utc::now().year() as u32,
+            amount: 0,
+        };
+        let project_budget_id = insert_project_budget_into_db(
+            &mut transaction,
+            &new_project_budget,
+        )
+        .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let project_budget = ProjectBudget {
+            id: project_budget_id,
+            project: project.id,
+            project_name: project.name.clone(),
+            year: new_project_budget.year,
+            amount: new_project_budget.amount as u32,
+        };
+        Ok(project_budget)
+    }
+
+    pub async fn setup_test_flavor_price(
+        &self,
+        flavor: &Flavor,
+    ) -> Result<FlavorPrice, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let start_time = DateTime::<FixedOffset>::from(Utc::now());
+        let new_flavor_price = NewFlavorPrice {
+            flavor_id: flavor.id as u64,
+            user_class: random_number(1..6),
+            unit_price: random_number(1..1000) as f64,
+            start_time: start_time.to_utc(),
+        };
+        let flavor_price_id =
+            insert_flavor_price_into_db(&mut transaction, &new_flavor_price)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor_price = FlavorPrice {
+            id: flavor_price_id,
+            flavor: flavor.id,
+            flavor_name: flavor.name.clone(),
+            user_class: new_flavor_price.user_class,
+            unit_price: new_flavor_price.unit_price,
+            start_time,
+        };
+        Ok(flavor_price)
+    }
+
+    pub async fn setup_test_flavor_quota(
+        &self,
+        flavor_group: &FlavorGroup,
+        user: &User,
+    ) -> Result<FlavorQuota, MinimalApiError> {
+        let mut transaction = self
+            .db_pool
+            .begin()
+            .await
+            .expect("Failed to begin transaction.");
+        let new_flavor_quota = FlavorQuotaCreateData {
+            flavor_group: flavor_group.id,
+            user: user.id,
+            quota: random_number(1..1000) as i64,
+        };
+        let flavor_quota_id =
+            insert_flavor_quota_into_db(&mut transaction, &new_flavor_quota)
+                .await? as u32;
+        transaction
+            .commit()
+            .await
+            .context("Failed to commit transaction")?;
+        let flavor_quota = FlavorQuota {
+            id: flavor_quota_id,
+            flavor_group: flavor_group.id,
+            flavor_group_name: flavor_group.name.clone(),
+            user: user.id,
+            username: user.name.clone(),
+            quota: new_flavor_quota.quota,
+        };
+        Ok(flavor_quota)
     }
 }
 

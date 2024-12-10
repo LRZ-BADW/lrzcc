@@ -1,13 +1,10 @@
 use lrzcc::{Api, Token};
-use lrzcc_test::{
-    random_alphanumeric_string, random_number, random_uuid, spawn_app,
-};
-use lrzcc_wire::user::ProjectRetrieved;
+use lrzcc_test::spawn_app;
 use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]
-async fn e2e_lib_project_delete_denies_access_to_normal_user() {
+async fn e2e_lib_user_budget_delete_denies_access_to_normal_user() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -16,11 +13,14 @@ async fn e2e_lib_project_delete_denies_access_to_normal_user() {
         .expect("Failed to setup test project");
     let user = test_project.normals[0].user.clone();
     let token = test_project.normals[0].token.clone();
-    let project = test_project.project.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let user_budget = server
+        .setup_test_user_budget(&user)
+        .await
+        .expect("Failed to setup test user budget");
 
     spawn_blocking(move || {
         // arrange
@@ -33,7 +33,7 @@ async fn e2e_lib_project_delete_denies_access_to_normal_user() {
         .unwrap();
 
         // act
-        let delete = client.project.delete(project.id);
+        let delete = client.user_budget.delete(user_budget.id);
 
         // assert
         assert!(delete.is_err());
@@ -47,7 +47,7 @@ async fn e2e_lib_project_delete_denies_access_to_normal_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_project_delete_denies_access_to_master_user() {
+async fn e2e_lib_user_budget_delete_denies_access_to_master_user() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
@@ -56,11 +56,14 @@ async fn e2e_lib_project_delete_denies_access_to_master_user() {
         .expect("Failed to setup test project");
     let user = test_project.masters[0].user.clone();
     let token = test_project.masters[0].token.clone();
-    let project = test_project.project.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let user_budget = server
+        .setup_test_user_budget(&user)
+        .await
+        .expect("Failed to setup test user budget");
 
     spawn_blocking(move || {
         // arrange
@@ -73,7 +76,7 @@ async fn e2e_lib_project_delete_denies_access_to_master_user() {
         .unwrap();
 
         // act
-        let delete = client.project.delete(project.id);
+        let delete = client.user_budget.delete(user_budget.id);
 
         // assert
         assert!(delete.is_err());
@@ -87,17 +90,23 @@ async fn e2e_lib_project_delete_denies_access_to_master_user() {
 }
 
 #[tokio::test]
-async fn e2e_lib_project_create_get_delete_get_works() {
+async fn e2e_lib_user_budget_delete_works() {
     // arrange
     let server = spawn_app().await;
-    let (user, _project, token) = server
-        .setup_test_user_and_project(true)
+    let test_project = server
+        .setup_test_project(1, 0, 0)
         .await
-        .expect("Failed to setup test user and project.");
+        .expect("Failed to setup test project");
+    let user = test_project.admins[0].user.clone();
+    let token = test_project.admins[0].token.clone();
     server
         .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
+    let user_budget = server
+        .setup_test_user_budget(&user)
+        .await
+        .expect("Failed to setup test user budget");
 
     spawn_blocking(move || {
         // arrange
@@ -109,40 +118,17 @@ async fn e2e_lib_project_create_get_delete_get_works() {
         )
         .unwrap();
 
-        // act and assert 1 - create
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let created = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-        assert_eq!(name, created.name);
-        assert_eq!(openstack_id, created.openstack_id);
-        assert_eq!(user_class, created.user_class);
+        // act and assert 1 - delete
+        client.user_budget.delete(user_budget.id).unwrap();
 
         // act and assert 2 - get
-        let ProjectRetrieved::Detailed(detailed) =
-            client.project.get(created.id).unwrap()
-        else {
-            panic!("Expected ProjectDetailed")
-        };
-        assert_eq!(detailed, created);
-        assert_eq!(detailed.users.len(), 0);
-        assert_eq!(detailed.flavor_groups.len(), 0);
-
-        // act and assert 3 - delete
-        client.project.delete(created.id).unwrap();
-
-        // act and assert 4 - get
-        let get = client.project.get(created.id);
+        let get = client.user_budget.get(user_budget.id);
         assert!(get.is_err());
-        assert_eq!(get.unwrap_err().to_string(), format!("Resource not found"));
+        assert_eq!(
+            get.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
     })
     .await
     .unwrap();
 }
-
-// TODO: test what happens when deleting non-empty project
