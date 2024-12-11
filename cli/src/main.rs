@@ -25,6 +25,13 @@ mod user;
 
 use common::{Execute, Format, TableFormat};
 
+use accounting::ServerStateCommand;
+use budgeting::ProjectBudgetCommand;
+use budgeting::UserBudgetCommand;
+use pricing::FlavorPriceCommand;
+use quota::FlavorQuotaCommand;
+use resources::FlavorCommand;
+use resources::FlavorGroupCommand;
 use user::UserCommand;
 
 #[derive(Args, Debug)]
@@ -365,6 +372,44 @@ fn main() -> ExitCode {
                 | UserCommand::Modify { .. }
                 | UserCommand::Delete { .. }
                 | UserCommand::Me,
+        } => {
+            if cli.rust {
+                cli.rust_url
+            } else {
+                cli.url
+            }
+        }
+        Command::ServerState {
+            command:
+                ServerStateCommand::List { .. }
+                | ServerStateCommand::Get { .. }
+                | ServerStateCommand::Create { .. }
+                | ServerStateCommand::Modify { .. }
+                | ServerStateCommand::Delete { .. },
+        } => {
+            if cli.rust {
+                cli.rust_url
+            } else {
+                cli.url
+            }
+        }
+        Command::UserBudget {
+            command: UserBudgetCommand::Delete { .. },
+        }
+        | Command::ProjectBudget {
+            command: ProjectBudgetCommand::Delete { .. },
+        }
+        | Command::Flavor {
+            command: FlavorCommand::Delete { .. },
+        }
+        | Command::FlavorGroup {
+            command: FlavorGroupCommand::Delete { .. },
+        }
+        | Command::FlavorPrice {
+            command: FlavorPriceCommand::Delete { .. },
+        }
+        | Command::FlavorQuota {
+            command: FlavorQuotaCommand::Delete { .. },
         } => {
             if cli.rust {
                 cli.rust_url
