@@ -102,6 +102,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ### lrzcc-cli
 
+#### Features
+- route server-state crud and other delete commands to Rust API
+
 #### Dependencies
 - run cargo update
 - bump tabled from 0.16.0 to 0.17.0
