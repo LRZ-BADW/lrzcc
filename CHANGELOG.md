@@ -3,52 +3,20 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
 
-### lrzcc-api
+...
 
-#### Dependencies
-- run cargo update
-- bump tracing-subscriber from 0.3.18 to 0.3.19
-- bump tracing from 0.1.40 to 0.1.41
-- bump chrono from 0.4.38 to 0.4.39
-- bump thiserror from 2.0.4 to 2.0.6
+## [lrzcc-test-v0.3.0] - 2024-12-11
 
-#### Database
-- move insert_flavor_into_db to database module
-- move insert_server_state_into_db to database module
-- add missing sqlx try_froms to ServerStateRow id fields
-- adjust all getters for new NotFoundErrors
-- add select_server_states_by_server_and_project_from_db
-- add select_server_states_by_server_and_user_from_db
-- move insert_flavor_quota_into_db into database module
-- move insert_flavor_price_into_db to database module
-- move insert_flavor_group_into_db to database module
-- move insert_project_budget_into_db to database module
-- move insert_user_budget_into_db to database module
-
-#### Error
-- match messages for all NotFoundError variants
-- add NotFoundOnlyError with impls
-
-#### Endpoints
-- revise getters for new NotFoundErrors
-- remove done todo comment
-- use require_master_user_or_return_not_found in user_get
-- correct authorization check in server_state_get
-- homogenize errors of server_state_list
-- complete server_state_list endpoint
-
-#### Authorization
-- add require_*_or_return_not_found functions
-
-### lrzcc-test
-
-#### Dependencies
+### Dependencies
 - add chrono dependency
 - add anyhow dependency
 - bump chrono from 0.4.38 to 0.4.39
 - run cargo update
+- bump lrzcc-wire from 1.3 to 1.4
+- bump lrzcc-lib from 1.4 to 1.5
+- bump lrzcc-api from 0.4 to 0.5
 
-#### Tests
+### Tests
 - add TestApp.setup_test_flavor
 - add server state create tests
 - reuse api::database::insert_flavor_into_db in test
@@ -84,33 +52,73 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add user_budget_delete tests
 - add TestApp.setup_test_user_budget
 
-### lrzcc-lib
+## [lrzcc-cli-v1.4.0] - 2024-12-11
 
-#### Dependencies
-- bump chrono from 0.4.38 to 0.4.39
-- bump thiserror from 2.0.4 to 2.0.6
-- run cargo update
-
-#### Fixes
-- add missing trailing slash in server_state_modify url
-
-### lrzcc-wire
-
-#### Dependencies
-- bump chrono from 0.4.38 to 0.4.39
-- run cargo update
-
-### lrzcc-cli
-
-#### Features
+### Features
 - route server-state crud and other delete commands to Rust API
 
-#### Dependencies
+### Dependencies
 - run cargo update
 - bump tabled from 0.16.0 to 0.17.0
 - bump clap from 4.5.22 to 4.5.23
 - bump chrono from 0.4.38 to 0.4.39
+- bump lrzcc-lib from 1.4 to 1.5
+- bump lrzcc-wire from 1.3 to 1.4
 
+## [lrzcc-lib-v1.5.0] - 2024-12-11
+
+### Dependencies
+- bump chrono from 0.4.38 to 0.4.39
+- bump thiserror from 2.0.4 to 2.0.6
+- run cargo update
+- bump lrzcc-wire from 1.3 to 1.4
+
+### Fixes
+- add missing trailing slash in server_state_modify url
+
+## [lrzcc-api-v0.5.0] - 2024-12-11
+
+### Dependencies
+- run cargo update
+- bump tracing-subscriber from 0.3.18 to 0.3.19
+- bump tracing from 0.1.40 to 0.1.41
+- bump chrono from 0.4.38 to 0.4.39
+- bump thiserror from 2.0.4 to 2.0.6
+- bump lrzcc-wire from 1.3 to 1.4
+
+### Database
+- move insert_flavor_into_db to database module
+- move insert_server_state_into_db to database module
+- add missing sqlx try_froms to ServerStateRow id fields
+- adjust all getters for new NotFoundErrors
+- add select_server_states_by_server_and_project_from_db
+- add select_server_states_by_server_and_user_from_db
+- move insert_flavor_quota_into_db into database module
+- move insert_flavor_price_into_db to database module
+- move insert_flavor_group_into_db to database module
+- move insert_project_budget_into_db to database module
+- move insert_user_budget_into_db to database module
+
+### Error
+- match messages for all NotFoundError variants
+- add NotFoundOnlyError with impls
+
+### Endpoints
+- revise getters for new NotFoundErrors
+- remove done todo comment
+- use require_master_user_or_return_not_found in user_get
+- correct authorization check in server_state_get
+- homogenize errors of server_state_list
+- complete server_state_list endpoint
+
+### Authorization
+- add require_*_or_return_not_found functions
+
+## [lrzcc-wire-v1.4.0] - 2024-12-11
+
+### Dependencies
+- bump chrono from 0.4.38 to 0.4.39
+- run cargo update
 
 ## [lrzcc-test-v0.2.1] - 2024-11-22
 
