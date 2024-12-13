@@ -1,5 +1,7 @@
 name: labeler
-on: [pull_request_target]
+on: [pull_request]
+# NOTE: zizmor marks this as insecure, it's only necessary for forked PRs
+# on: [pull_request_target]
 
 jobs:
   label:
@@ -12,6 +14,8 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
     - name: Label the PR
       uses: actions/labeler@v5
       with:
