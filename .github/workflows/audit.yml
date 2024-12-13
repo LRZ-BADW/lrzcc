@@ -23,7 +23,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: check advisories
         run: cargo deny check advisories
 
@@ -33,7 +35,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: Scan for vulnerabilities
         run: cargo deny check bans
 
@@ -43,7 +47,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: check licenses
         run: cargo deny check licenses
 
@@ -53,6 +59,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
       - name: check sources
         run: cargo deny check sources
