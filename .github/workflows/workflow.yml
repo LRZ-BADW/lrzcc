@@ -1,0 +1,31 @@
+name: workflow
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    paths:
+      - '.github/*'
+      - '.github/workflows/*'
+    branches: [ main ]
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install the Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust Cache Action
+        uses: Swatinem/rust-cache@v2
+      - name: Install zizmor
+        run:
+          cargo install zizmor
+      - name: check workflows
+        run: zizmor .github/workflows
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
