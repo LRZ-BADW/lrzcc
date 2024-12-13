@@ -34,6 +34,8 @@ jobs:
           mysql root password: 'password'
       - name: Check out repository code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Install the Rust toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Rust Cache Action
@@ -62,6 +64,8 @@ jobs:
   #   steps:
   #     - name: checkout
   #       uses: actions/checkout@v4
+  #       with:
+  #         persist-credentials: false
   #     - name: install rust toolchain
   #       uses: dtolnay/rust-toolchain@stable
   #     - name: install rust cache

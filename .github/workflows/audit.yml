@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/install-action@cargo-deny
       - name: check advisories
         run: cargo deny check advisories
@@ -29,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/install-action@cargo-deny
       - name: Scan for vulnerabilities
         run: cargo deny check bans
@@ -37,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/install-action@cargo-deny
       - name: check licenses
         run: cargo deny check licenses
@@ -45,6 +51,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: taiki-e/install-action@cargo-deny
       - name: check sources
         run: cargo deny check sources
