@@ -59,11 +59,17 @@ pub async fn select_maybe_flavor_from_db(
 ) -> Result<Option<Flavor>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
-        SELECT f.id, f.name, f.openstack_id, f.weight, f.group_id, g.name as group_name
-        FROM resources_flavor as f, resources_flavorgroup as g
-        WHERE
-            f.group_id = g.id AND
-            f.id = ?
+        SELECT
+            f.id,
+            f.name,
+            f.openstack_id,
+            f.weight,
+            f.group_id,
+            g.name as group_name
+        FROM resources_flavor as f
+        LEFT JOIN resources_flavorgroup as g
+        ON f.group_id = g.id
+        WHERE f.id = ?
         "#,
         flavor_id
     );
@@ -127,7 +133,7 @@ pub async fn select_maybe_flavor_detail_from_db(
 ) -> Result<Option<FlavorDetailed>, UnexpectedOnlyError> {
     #[derive(FromRow)]
     pub struct FlavorDb {
-        pub id: u32,
+        pub id: i32,
         pub name: String,
         pub openstack_id: String, // UUIDv4
         pub group_id: Option<u32>,
@@ -143,10 +149,10 @@ pub async fn select_maybe_flavor_detail_from_db(
             g.id AS group_id,
             g.name AS group_name,
             f.weight AS weight
-        FROM resources_flavor AS f, resources_flavorgroup AS g
-        WHERE
-            f.group_id = g.id AND
-            f.id = ?
+        FROM resources_flavor AS f
+        LEFT JOIN resources_flavorgroup AS g
+        ON f.group_id = g.id
+        WHERE f.id = ?
         "#,
         flavor_id
     );
@@ -161,7 +167,7 @@ pub async fn select_maybe_flavor_detail_from_db(
         None => return Ok(None),
     };
     Ok(Some(FlavorDetailed {
-        id: flavor.id,
+        id: flavor.id as u32,
         name: flavor.name,
         openstack_id: flavor.openstack_id,
         group: match (flavor.group_id, flavor.group_name.clone()) {
