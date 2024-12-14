@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            f.id AS id,\n            f.name AS name,\n            f.openstack_id AS openstack_id,\n            g.id AS group_id,\n            g.name AS group_name,\n            f.weight AS weight\n        FROM resources_flavor AS f, resources_flavorgroup AS g\n        WHERE\n            f.group_id = g.id AND\n            f.id = ?\n        ",
+  "query": "\n        SELECT\n            f.id,\n            f.name,\n            f.openstack_id,\n            f.weight,\n            f.group_id,\n            g.name as group_name\n        FROM resources_flavor as f\n        LEFT JOIN resources_flavorgroup as g\n        ON f.group_id = g.id\n        WHERE f.id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -32,29 +32,29 @@
       },
       {
         "ordinal": 3,
-        "name": "group_id",
-        "type_info": {
-          "type": "LongLong",
-          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT",
-          "max_size": 20
-        }
-      },
-      {
-        "ordinal": 4,
-        "name": "group_name",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
-          "max_size": 256
-        }
-      },
-      {
-        "ordinal": 5,
         "name": "weight",
         "type_info": {
           "type": "Short",
           "flags": "NOT_NULL | UNSIGNED | NO_DEFAULT_VALUE",
           "max_size": 5
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "group_id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "MULTIPLE_KEY",
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "group_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 256
         }
       }
     ],
@@ -66,9 +66,9 @@
       false,
       false,
       false,
-      false,
-      false
+      true,
+      true
     ]
   },
-  "hash": "1df52138b4091c0c7562713fbbd6ddaefed7f9c34860a1f60fb0dd1948cd6d46"
+  "hash": "3ef543963798527ca07561f21f089e30f2f09120ad1da208e57076f972c246d1"
 }

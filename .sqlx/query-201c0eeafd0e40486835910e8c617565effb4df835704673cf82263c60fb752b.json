@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT f.id, f.name, f.openstack_id, f.weight, f.group_id, g.name as group_name\n        FROM resources_flavor as f, resources_flavorgroup as g\n        WHERE\n            f.group_id = g.id AND\n            f.id = ?\n        ",
+  "query": "\n        SELECT\n            f.id AS id,\n            f.name AS name,\n            f.openstack_id AS openstack_id,\n            g.id AS group_id,\n            g.name AS group_name,\n            f.weight AS weight\n        FROM resources_flavor AS f\n        LEFT JOIN resources_flavorgroup AS g\n        ON f.group_id = g.id\n        WHERE f.id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -32,29 +32,29 @@
       },
       {
         "ordinal": 3,
+        "name": "group_id",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "PRIMARY_KEY | AUTO_INCREMENT",
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "group_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 256
+        }
+      },
+      {
+        "ordinal": 5,
         "name": "weight",
         "type_info": {
           "type": "Short",
           "flags": "NOT_NULL | UNSIGNED | NO_DEFAULT_VALUE",
           "max_size": 5
-        }
-      },
-      {
-        "ordinal": 4,
-        "name": "group_id",
-        "type_info": {
-          "type": "LongLong",
-          "flags": "MULTIPLE_KEY",
-          "max_size": 20
-        }
-      },
-      {
-        "ordinal": 5,
-        "name": "group_name",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
-          "max_size": 256
         }
       }
     ],
@@ -65,10 +65,10 @@
       false,
       false,
       false,
-      false,
+      true,
       true,
       false
     ]
   },
-  "hash": "72fd0c10aed11a02b30b9e27637a551dc5f0b758d4e31b6786fe8d74fe809ddf"
+  "hash": "201c0eeafd0e40486835910e8c617565effb4df835704673cf82263c60fb752b"
 }
