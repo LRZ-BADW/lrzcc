@@ -134,7 +134,7 @@ async fn e2e_lib_flavor_price_delete_works() {
         client.flavor_price.delete(flavor_price.id).unwrap();
 
         // act and assert 2 - get
-        let get = client.flavor.get(flavor_price.id);
+        let get = client.flavor_price.get(flavor_price.id);
         assert!(get.is_err());
         assert_eq!(
             get.unwrap_err().to_string(),
