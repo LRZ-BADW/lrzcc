@@ -7,10 +7,12 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct Flavor {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
     #[tabled(display_with = "display_option")]
+    #[sqlx(rename = "group_id")]
     pub group: Option<u32>,
     #[tabled(display_with = "display_option")]
     pub group_name: Option<String>,
