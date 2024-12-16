@@ -12,7 +12,7 @@ LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 [![lint](https://github.com/LRZ-BADW/lrzcc/actions/workflows/lint.yml/badge.svg)](https://github.com/LRZ-BADW/lrzcc/actions/workflows/lint.yml)
 [![test](https://github.com/LRZ-BADW/lrzcc/actions/workflows/test.yml/badge.svg)](https://github.com/LRZ-BADW/lrzcc/actions/workflows/test.yml)
 
-![Crates.io](https://img.shields.io/crates/l/wikijs?link=https://crates.io/crates/lrzcc)
+![Crates.io](https://img.shields.io/crates/l/lrzcc?link=https://crates.io/crates/lrzcc)
 
 </div>
 
