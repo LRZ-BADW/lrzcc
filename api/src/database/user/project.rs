@@ -53,7 +53,10 @@ pub async fn select_maybe_project_minimal_from_db(
 ) -> Result<Option<ProjectMinimal>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
-        SELECT id, name
+        SELECT
+            id as project__id,
+            name as project__name,
+            user_class as project__user_class
         FROM user_project AS project
         WHERE project.id = ?
         "#,

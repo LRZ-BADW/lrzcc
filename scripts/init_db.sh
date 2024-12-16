@@ -21,8 +21,7 @@ DB_PASSWORD="${MARIADB_PASSWORD:=password}"
 DB_NAME="${MARIADB_DB:=lrzcc}"
 DB_PORT="${MARIADB_PORT:=3306}"
 
-if [[ -z "${SKIP_DOCKER}" ]]
-then
+if [[ -z "${SKIP_DOCKER}" ]]; then
     docker stop lrzcc-db || true
     docker rm lrzcc-db || true
     docker run \
@@ -40,8 +39,10 @@ done
 
 >&2 echo "MariaDB is up and running on ${DB_HOST} on port ${DB_PORT}!"
 
+mariadb -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASSWORD}" -D "" -e "SET GLOBAL max_connections := 1000"
+
 export DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 sqlx database create
 sqlx migrate run
 
->&2 echo "MariaDB has been migrated, ready to go!"
+>&2 echo "MariaDB has been configured and migrated, ready to go!"

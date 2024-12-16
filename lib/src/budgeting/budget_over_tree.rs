@@ -41,6 +41,11 @@ impl BudgetOverTreeRequest {
             params.push(("all", "1".to_string()));
         } else if let Some(project) = self.project {
             params.push(("project", project.to_string()));
+        } else if let Some(user) = self.user {
+            params.push(("user", user.to_string()));
+        }
+        if let Some(end) = self.end {
+            params.push(("end", end.to_string()));
         }
         params
     }

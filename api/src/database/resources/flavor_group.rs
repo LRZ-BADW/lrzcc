@@ -72,9 +72,9 @@ pub async fn select_maybe_flavor_group_from_db(
 ) -> Result<Option<FlavorGroup>, UnexpectedOnlyError> {
     #[derive(FromRow)]
     pub struct FlavorGroupDb {
-        pub id: u32,
+        pub id: i32,
         pub name: String,
-        pub project_id: u32,
+        pub project_id: i32,
     }
     let query1 = sqlx::query!(
         r#"
@@ -117,9 +117,9 @@ pub async fn select_maybe_flavor_group_from_db(
         .map(|row| row.id)
         .collect::<Vec<_>>();
     Ok(Some(FlavorGroup {
-        id: flavor_group.id,
+        id: flavor_group.id as u32,
         name: flavor_group.name,
-        project: flavor_group.project_id,
+        project: flavor_group.project_id as u32,
         flavors,
     }))
 }
