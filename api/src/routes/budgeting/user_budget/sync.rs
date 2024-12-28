@@ -14,7 +14,7 @@ pub async fn user_budget_sync(
     user: ReqData<User>,
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
-    // TODO: this can only be an auth or unexpeceted error, we need a type for that
+    // TODO: this can only be an authorization or unexpected error, we need a type for that
 ) -> Result<HttpResponse, NormalApiError> {
     require_admin_user(&user)?;
     let mut transaction = db_pool
