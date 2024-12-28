@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE\n            budgeting_userbudget AS c,\n            budgeting_userbudget AS n\n        SET n.amount = c.amount\n        WHERE c.user_id = n.user_id\n          AND c.year = ?\n          AND n.year = ?\n          AND c.amount != n.amount\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "46e3c0b0e81ae0a98157ced83a6565d7ccf616a0a2b0d445f1be759779ff2fad"
+}
