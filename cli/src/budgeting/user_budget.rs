@@ -132,6 +132,9 @@ pub(crate) enum UserBudgetCommand {
         )]
         detail: bool,
     },
+
+    #[clap(about = "Sync user budgets of next year to those to this one")]
+    Sync,
 }
 pub(crate) use UserBudgetCommand::*;
 
@@ -157,6 +160,7 @@ impl Execute for UserBudgetCommand {
                 combined,
                 detail,
             } => over(api, format, filter, *end, *combined, *detail),
+            Sync => sync(api, format),
         }
     }
 }
@@ -261,4 +265,8 @@ fn over(
         (false, true) => print_object_list(request.combined()?, format),
         (true, true) => print_object_list(request.combined_detail()?, format),
     }
+}
+
+fn sync(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.user_budget.sync()?, format)
 }
