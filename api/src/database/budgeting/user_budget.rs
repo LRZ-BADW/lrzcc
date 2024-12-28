@@ -209,3 +209,29 @@ pub async fn insert_user_budget_into_db(
     let id = result.last_insert_id();
     Ok(id)
 }
+
+#[tracing::instrument(name = "sync_user_budgets_in_db", skip(transaction))]
+pub async fn sync_user_budgets_in_db(
+    transaction: &mut Transaction<'_, MySql>,
+) -> Result<u64, MinimalApiError> {
+    let year = 2024;
+    let query = sqlx::query!(
+        r#"
+        UPDATE
+            budgeting_userbudget AS c,
+            budgeting_userbudget AS n
+        SET n.amount = c.amount
+        WHERE c.user_id = n.user_id
+          AND c.year = ?
+          AND n.year = ?
+          AND c.amount != n.amount
+        "#,
+        year,
+        year + 1
+    );
+    let result = transaction
+        .execute(query)
+        .await
+        .context("Failed to execute insert query")?;
+    Ok(result.rows_affected())
+}
