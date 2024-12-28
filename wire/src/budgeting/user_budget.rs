@@ -109,3 +109,8 @@ pub struct UserBudgetCombinedDetail {
     pub user_cost: f64,
     pub user_budget: u32,
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+pub struct UserBudgetSync {
+    pub updated_budget_count: u32,
+}

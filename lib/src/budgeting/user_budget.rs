@@ -5,7 +5,7 @@ use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
     UserBudget, UserBudgetCombined, UserBudgetCombinedDetail,
     UserBudgetCreateData, UserBudgetDetail, UserBudgetListParams,
-    UserBudgetModifyData, UserBudgetOver,
+    UserBudgetModifyData, UserBudgetOver, UserBudgetSync,
 };
 use reqwest::blocking::Client;
 use reqwest::Url;
@@ -353,5 +353,16 @@ impl UserBudgetApi {
     pub fn over(&self) -> UserBudgetOverRequest {
         let url = format!("{}/over/", self.url);
         UserBudgetOverRequest::new(url.as_ref(), &self.client)
+    }
+
+    pub fn sync(&self) -> Result<UserBudgetSync, ApiError> {
+        let url = format!("{}/sync/", self.url);
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
     }
 }
