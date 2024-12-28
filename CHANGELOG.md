@@ -2,8 +2,102 @@
 This is the combined changelog of all contained `lrzcc` crates.
 
 ## [Unreleased]
-
 ...
+
+## [lrzcc-cli-v1.5.0] - 2024-12-28
+
+### Features
+- add user-budget sync command to bugdgeting module
+
+### Dependencies
+- bump anyhow from 1.0.94 to 1.0.95
+- bump serde_json from 1.0.133 to 1.0.134
+- bump serde from 1.0.215 to 1.0.216
+- bump colored from 2.1.0 to 2.2.0
+
+## [lrzcc-lib-v1.6.0] - 2024-12-28
+
+### Features
+- add UserBudgetApi.sync function to budgeting module
+
+### Fixes
+- add user and end in BudgetOverTreeRequest.params in budgeting module
+
+### Dependencies
+- bump anyhow from 1.0.94 to 1.0.95
+- bump thiserror from 2.0.6 to 2.0.9
+- bump reqwest from 0.12.9 to 0.12.10
+- bump serde_json from 1.0.133 to 1.0.134
+- bump serde from 1.0.215 to 1.0.216
+
+## [lrzcc-api-v0.6.0] - 2024-12-28
+
+### Features
+- add user_budget_sync endpoint to budgeting module
+- add sync_user_budgets_in_db function to database module
+
+### Fixes
+- correct query in select_maybe_project_minimal_from_db
+- correct field types in select_maybe_flavor_group_from_db
+- use left join in flavor select functions
+
+### Dependencies
+- bump anyhow from 1.0.94 to 1.0.95
+- bump thiserror from 2.0.6 to 2.0.9
+- bump reqwest from 0.12.9 to 0.12.10
+- bump serde_json from 1.0.133 to 1.0.134
+- bump serde from 1.0.215 to 1.0.216
+- bump config from 0.14.1 to 0.15.4
+
+## [lrzcc-wire-v1.5.0] - 2024-12-28
+
+### Features
+- add UserBudgetSync struct to budgeting module
+
+### Fixes
+- add sqlx try_from and rename to Flavor fields in resource module
+
+### Dependencies
+- Bump serde from 1.0.215 to 1.0.216
+
+## [lrzcc-test-v0.4.0] - 2024-12-28
+
+### Tests
+- add flavor modify tests to resource module
+- add flavor modify tests to resources module
+
+### Fixes
+- correct get call in e2e_lib_flavor_price_delete_works in pricing module
+
+### Dependencies
+- bump anyhow from 1.0.94 to 1.0.95
+- bump reqwest from 0.12.9 to 0.12.10
+- bump serde_json from 1.0.133 to 1.0.134
+
+## Repository
+
+### Docs
+- add logo.png
+- update readme with logo and badges
+- remove version badge for test crate
+- fix crate name in version badge link
+
+### CI
+- add workflow running zizmor to check workflows
+- replace template injection by environment variable usage in test and lint workflows
+- specify complete version on install action step in audit workflow
+- replace install-action shorthand with full version in audit workflow
+- set persist-credentials: false on all checkout steps
+- change trigger from pull_request_target to pull_request in label workflow
+
+### Dependencies
+- bump taiki-e/install-action from 2.46.20 to 2.47.0
+- bump taiki-e/install-action from 2.46.9 to 2.46.20
+- bump taiki-e/install-action from 2.46.8 to 2.46.9
+
+### Misc
+- update sqlx offline query data
+- increase mariadb connection limit in init_db.sh script
 
 ## [lrzcc-test-v0.3.0] - 2024-12-11
 
