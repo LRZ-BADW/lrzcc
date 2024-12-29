@@ -79,16 +79,12 @@ jobs:
     name: spellcheck
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Install the Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-      - name: Install libclang-dev and hunspell
-        run: sudo apt update && sudo apt install libclang-dev hunspell -y
-      - name: Install cargo-spellcheck
-        run: cargo install cargo-spellcheck
+      - uses: taiki-e/install-action@v2.47.0
+        with:
+          tool: cargo-spellcheck
       - name: Check spelling
         run: cargo spellcheck --cfg=.spellcheck.toml --code 1
 
