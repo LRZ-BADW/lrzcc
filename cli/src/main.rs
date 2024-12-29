@@ -394,16 +394,19 @@ fn main() -> ExitCode {
             }
         }
         Command::UserBudget {
-            command: UserBudgetCommand::Delete { .. },
+            command:
+                UserBudgetCommand::Delete { .. } | UserBudgetCommand::Sync { .. },
         }
         | Command::ProjectBudget {
             command: ProjectBudgetCommand::Delete { .. },
         }
         | Command::Flavor {
-            command: FlavorCommand::Delete { .. },
+            command: FlavorCommand::Delete { .. } | FlavorCommand::Modify { .. },
         }
         | Command::FlavorGroup {
-            command: FlavorGroupCommand::Delete { .. },
+            command:
+                FlavorGroupCommand::Delete { .. }
+                | FlavorGroupCommand::Modify { .. },
         }
         | Command::FlavorPrice {
             command: FlavorPriceCommand::Delete { .. },
