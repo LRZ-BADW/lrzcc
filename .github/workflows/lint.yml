@@ -60,12 +60,12 @@ jobs:
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
       - name: Install sqlx-cli
-        run:
-          cargo install sqlx-cli
-          --version="${SQLX_VERSION}"
-          --features "${SQLX_FEATURES}"
-          --no-default-features
-          --locked
+        run: |
+            cargo install sqlx-cli \
+            --version="${SQLX_VERSION}" \
+            --features "${SQLX_FEATURES}" \
+            --no-default-features \
+            --locked
       - name: Install mariadb-client and mold
         run: sudo apt update && sudo apt install mariadb-client mold -y
       - name: Migrate database
