@@ -214,7 +214,7 @@ pub async fn insert_user_budget_into_db(
 pub async fn sync_user_budgets_in_db(
     transaction: &mut Transaction<'_, MySql>,
 ) -> Result<u64, MinimalApiError> {
-    let year = 2024;
+    let year = Utc::now().year();
     let query = sqlx::query!(
         r#"
         UPDATE
