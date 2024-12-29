@@ -11,6 +11,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ### Dependencies
 - bump lrzcc-wire from 1.4.0 to 1.5.0
+- bump lrzcc from 1.5.0 to 1.6.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump serde_json from 1.0.133 to 1.0.134
 - bump serde from 1.0.215 to 1.0.216
@@ -74,6 +75,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ### Dependencies
 - bump lrzcc-wire from 1.4.0 to 1.5.0
+- bump lrzcc from 1.5.0 to 1.6.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump reqwest from 0.12.9 to 0.12.10
 - bump serde_json from 1.0.133 to 1.0.134

@@ -15,7 +15,7 @@ name = "main"
 path = "tests/main.rs"
 
 [dependencies]
-lrzcc = { version = "1.5", path = "../lib" }
+lrzcc = { version = "1.6", path = "../lib" }
 lrzcc-api = { version = "0.5", path = "../api" }
 lrzcc-wire = { version = "1.5", path = "../wire" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
