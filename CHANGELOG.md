@@ -4,7 +4,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ## [Unreleased]
 ...
 
-## [lrzcc-cli-v1.5.0] - 2024-12-28
+## [lrzcc-cli-v1.5.0] - 2024-12-29
 
 ### Features
 - add user-budget sync command to bugdgeting module
@@ -17,7 +17,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde from 1.0.215 to 1.0.216
 - bump colored from 2.1.0 to 2.2.0
 
-## [lrzcc-lib-v1.6.0] - 2024-12-28
+## [lrzcc-lib-v1.6.0] - 2024-12-29
 
 ### Features
 - add UserBudgetApi.sync function to budgeting module
@@ -33,7 +33,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde_json from 1.0.133 to 1.0.134
 - bump serde from 1.0.215 to 1.0.216
 
-## [lrzcc-api-v0.6.0] - 2024-12-28
+## [lrzcc-api-v0.6.0] - 2024-12-29
 
 ### Features
 - add user_budget_sync endpoint to budgeting module
@@ -53,7 +53,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde from 1.0.215 to 1.0.216
 - bump config from 0.14.1 to 0.15.4
 
-## [lrzcc-wire-v1.5.0] - 2024-12-28
+## [lrzcc-wire-v1.5.0] - 2024-12-29
 
 ### Features
 - add UserBudgetSync struct to budgeting module
@@ -64,7 +64,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - Bump serde from 1.0.215 to 1.0.216
 
-## [lrzcc-test-v0.4.0] - 2024-12-28
+## [lrzcc-test-v0.4.0] - 2024-12-29
 
 ### Tests
 - add flavor modify tests to resource module
