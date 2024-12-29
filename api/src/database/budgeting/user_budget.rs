@@ -232,6 +232,6 @@ pub async fn sync_user_budgets_in_db(
     let result = transaction
         .execute(query)
         .await
-        .context("Failed to execute insert query")?;
+        .context("Failed to execute update query")?;
     Ok(result.rows_affected())
 }
