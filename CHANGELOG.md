@@ -4,6 +4,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 ## [Unreleased]
 ...
 
+## [lrzcc-cli-v1.5.1] - 2024-12-29
+
+### Fixes
+- route user-budget sync and flavor/flavor-group modify to rust api
+
 ## [lrzcc-cli-v1.5.0] - 2024-12-29
 
 ### Features
