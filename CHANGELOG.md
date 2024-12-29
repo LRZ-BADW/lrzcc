@@ -4,6 +4,11 @@ This is the combined changelog of all contained `lrzcc` crates.
 ## [Unreleased]
 ...
 
+## [lrzcc-api-v0.6.1] - 2024-12-29
+
+### Fixes
+- dynamically retrieve current year in sync_user_budgets_in_db
+
 ## [lrzcc-cli-v1.5.1] - 2024-12-29
 
 ### Fixes
