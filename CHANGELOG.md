@@ -10,6 +10,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add user-budget sync command to bugdgeting module
 
 ### Dependencies
+- bump lrzcc-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump serde_json from 1.0.133 to 1.0.134
 - bump serde from 1.0.215 to 1.0.216
@@ -24,6 +25,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add user and end in BudgetOverTreeRequest.params in budgeting module
 
 ### Dependencies
+- bump lrzcc-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump thiserror from 2.0.6 to 2.0.9
 - bump reqwest from 0.12.9 to 0.12.10
@@ -42,6 +44,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - use left join in flavor select functions
 
 ### Dependencies
+- bump lrzcc-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump thiserror from 2.0.6 to 2.0.9
 - bump reqwest from 0.12.9 to 0.12.10
@@ -70,6 +73,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - correct get call in e2e_lib_flavor_price_delete_works in pricing module
 
 ### Dependencies
+- bump lrzcc-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump reqwest from 0.12.9 to 0.12.10
 - bump serde_json from 1.0.133 to 1.0.134

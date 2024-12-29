@@ -48,7 +48,7 @@ serde-aux = "4"
 config = "0.15"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 jzon = "0.12"
-lrzcc-wire = { version = "1.4", path = "../wire" }
+lrzcc-wire = { version = "1.5", path = "../wire" }
 thiserror = "2.0"
 chrono = { version = "0.4", features = ["serde"] }
 
