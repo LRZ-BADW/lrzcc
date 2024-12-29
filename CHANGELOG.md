@@ -8,6 +8,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ### Fixes
 - dynamically retrieve current year in sync_user_budgets_in_db
+- correct typo in error message in sync_user_budgets_in_db
 
 ## [lrzcc-cli-v1.5.1] - 2024-12-29
 
