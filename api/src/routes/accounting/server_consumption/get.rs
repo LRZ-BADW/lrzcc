@@ -1,7 +1,8 @@
 use crate::error::OptionApiError;
-use actix_web::web::{Data, ReqData};
+use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
+use lrzcc_wire::accounting::ServerConsumptionParams;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
@@ -11,6 +12,7 @@ pub async fn server_consumption(
     // TODO: not necessary?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
+    params: Query<ServerConsumptionParams>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
     let mut _transaction = db_pool
