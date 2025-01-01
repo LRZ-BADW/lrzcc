@@ -31,8 +31,8 @@ impl ServerConsumptionRequest {
                 server: None,
                 user: None,
                 project: None,
-                all: false,
-                detail: false,
+                all: None,
+                detail: None,
             },
         }
     }
@@ -52,7 +52,6 @@ impl ServerConsumptionRequest {
         server: &str,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.server = Some(server.to_string());
-        self.params.detail = false;
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -74,7 +73,7 @@ impl ServerConsumptionRequest {
         server: &str,
     ) -> Result<ServerConsumptionServer, ApiError> {
         self.params.server = Some(server.to_string());
-        self.params.detail = true;
+        self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -96,7 +95,6 @@ impl ServerConsumptionRequest {
         user: u32,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.user = Some(user);
-        self.params.detail = false;
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -118,7 +116,7 @@ impl ServerConsumptionRequest {
         user: u32,
     ) -> Result<ServerConsumptionUser, ApiError> {
         self.params.user = Some(user);
-        self.params.detail = true;
+        self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -140,7 +138,6 @@ impl ServerConsumptionRequest {
         project: u32,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.project = Some(project);
-        self.params.detail = false;
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -162,7 +159,7 @@ impl ServerConsumptionRequest {
         project: u32,
     ) -> Result<ServerConsumptionProject, ApiError> {
         self.params.project = Some(project);
-        self.params.detail = true;
+        self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -180,8 +177,7 @@ impl ServerConsumptionRequest {
     }
 
     pub fn all(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
-        self.params.all = true;
-        self.params.detail = false;
+        self.params.all = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -199,8 +195,8 @@ impl ServerConsumptionRequest {
     }
 
     pub fn all_detail(&mut self) -> Result<ServerConsumptionAll, ApiError> {
-        self.params.all = true;
-        self.params.detail = true;
+        self.params.all = Some(true);
+        self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
@@ -235,7 +231,7 @@ impl ServerConsumptionRequest {
     }
 
     pub fn mine_detail(&mut self) -> Result<ServerConsumptionUser, ApiError> {
-        self.params.detail = true;
+        self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to envode URL parameters")?;
         let url = if params.is_empty() {
