@@ -31,6 +31,6 @@ pub struct ServerConsumptionParams {
     pub server: Option<String>,
     pub user: Option<u32>,
     pub project: Option<u32>,
-    pub all: bool,
-    pub detail: bool,
+    pub all: Option<bool>,
+    pub detail: Option<bool>,
 }
