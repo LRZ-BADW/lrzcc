@@ -9,8 +9,9 @@ use actix_web::HttpResponse;
 use anyhow::Context;
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use lrzcc_wire::accounting::{
-    ServerConsumptionFlavors, ServerConsumptionParams, ServerConsumptionServer,
-    ServerConsumptionUser, ServerState,
+    ServerConsumptionAll, ServerConsumptionFlavors, ServerConsumptionParams,
+    ServerConsumptionProject, ServerConsumptionServer, ServerConsumptionUser,
+    ServerState,
 };
 use lrzcc_wire::user::{Project, User};
 use serde::Serialize;
@@ -156,11 +157,60 @@ pub async fn calculate_server_consumption_for_user(
 
 #[derive(Serialize)]
 #[serde(untagged)]
+pub enum ServerConsumptionForProject {
+    Normal(ServerConsumptionFlavors),
+    Detail(ServerConsumptionProject),
+}
+
+pub async fn calculate_server_consumption_for_project(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    begin: Option<DateTime<Utc>>,
+    end: Option<DateTime<Utc>>,
+    detail: Option<bool>,
+) -> Result<ServerConsumptionForProject, UnexpectedOnlyError> {
+    let mut consumption = ServerConsumptionProject::default();
+
+    // TODO:
+
+    Ok(if detail.is_some() && detail.unwrap() {
+        ServerConsumptionForProject::Detail(consumption)
+    } else {
+        ServerConsumptionForProject::Normal(consumption.total)
+    })
+}
+
+#[derive(Serialize)]
+#[serde(untagged)]
+pub enum ServerConsumptionForAll {
+    Normal(ServerConsumptionFlavors),
+    Detail(ServerConsumptionAll),
+}
+
+pub async fn calculate_server_consumption_for_all(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: Option<DateTime<Utc>>,
+    end: Option<DateTime<Utc>>,
+    detail: Option<bool>,
+) -> Result<ServerConsumptionForAll, UnexpectedOnlyError> {
+    let mut consumption = ServerConsumptionAll::default();
+
+    // TODO:
+
+    Ok(if detail.is_some() && detail.unwrap() {
+        ServerConsumptionForAll::Detail(consumption)
+    } else {
+        ServerConsumptionForAll::Normal(consumption.total)
+    })
+}
+
+#[derive(Serialize)]
+#[serde(untagged)]
 pub enum ServerConsumption {
     Server(ServerConsumptionServer),
     User(ServerConsumptionForUser),
-    Project(ServerConsumptionForUser),
-    All(ServerConsumptionForUser),
+    Project(ServerConsumptionForProject),
+    All(ServerConsumptionForAll),
 }
 
 #[tracing::instrument(name = "server_consumption")]
@@ -184,9 +234,26 @@ pub async fn server_consumption(
         .await
         .context("Failed to begin transaction")?;
     let consumption = if params.all.unwrap_or(false) {
-        todo!()
-    } else if let Some(_project_id) = params.project {
-        todo!()
+        ServerConsumption::All(
+            calculate_server_consumption_for_all(
+                &mut transaction,
+                Some(begin.into()),
+                Some(end.into()),
+                params.detail,
+            )
+            .await?,
+        )
+    } else if let Some(project_id) = params.project {
+        ServerConsumption::Project(
+            calculate_server_consumption_for_project(
+                &mut transaction,
+                project_id as u64,
+                Some(begin.into()),
+                Some(end.into()),
+                params.detail,
+            )
+            .await?,
+        )
     } else if let Some(user_id) = params.user {
         ServerConsumption::User(
             calculate_server_consumption_for_user(
