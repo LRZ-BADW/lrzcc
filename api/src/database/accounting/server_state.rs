@@ -532,3 +532,329 @@ pub async fn insert_server_state_into_db(
     }
     Ok(id)
 }
+
+#[tracing::instrument(
+    name = "select_ordered_server_states_by_server_begin_and_end_from_db",
+    skip(transaction)
+)]
+pub async fn select_ordered_server_states_by_server_begin_and_end_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    server_id: String,
+    begin: Option<DateTime<Utc>>,
+    end: Option<DateTime<Utc>>,
+) -> Result<Vec<ServerState>, UnexpectedOnlyError> {
+    let result = match (begin, end) {
+        (None, None) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.instance_id = ?
+                ORDER BY s.id
+                "#,
+                server_id
+            );
+            transaction.fetch_all(query).await
+        }
+        (Some(begin), None) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.instance_id = ? AND
+                    (s.end > ? OR s.end IS NULL)
+                ORDER BY s.id
+                "#,
+                server_id,
+                begin
+            );
+            transaction.fetch_all(query).await
+        }
+        (None, Some(end)) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.instance_id = ? AND
+                    s.begin < ?
+                ORDER BY s.id
+                "#,
+                server_id,
+                end
+            );
+            transaction.fetch_all(query).await
+        }
+        (Some(begin), Some(end)) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.instance_id = ? AND
+                    (s.end > ? OR s.end IS NULL) AND
+                    s.begin < ?
+                ORDER BY s.id
+                "#,
+                server_id,
+                begin,
+                end
+            );
+            transaction.fetch_all(query).await
+        }
+    };
+    let rows = result
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| ServerStateRow::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to server state")?
+        .into_iter()
+        .map(|r| ServerState {
+            id: r.id,
+            begin: r.begin.fixed_offset(),
+            end: r.end.map(|end| end.fixed_offset()),
+            instance_id: r.instance_id,
+            instance_name: r.instance_name,
+            flavor: r.flavor,
+            flavor_name: r.flavor_name,
+            status: r.status,
+            user: r.user,
+            username: r.username,
+        })
+        .collect::<Vec<_>>();
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_ordered_server_states_by_user_begin_and_end_from_db",
+    skip(transaction)
+)]
+pub async fn select_ordered_server_states_by_user_begin_and_end_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    user_id: u64,
+    begin: Option<DateTime<Utc>>,
+    end: Option<DateTime<Utc>>,
+) -> Result<Vec<ServerState>, UnexpectedOnlyError> {
+    let result = match (begin, end) {
+        (None, None) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.user_id = ?
+                ORDER BY s.id
+                "#,
+                user_id
+            );
+            transaction.fetch_all(query).await
+        }
+        (Some(begin), None) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.user_id = ? AND
+                    (s.end > ? OR s.end IS NULL)
+                ORDER BY s.id
+                "#,
+                user_id,
+                begin
+            );
+            transaction.fetch_all(query).await
+        }
+        (None, Some(end)) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.user_id = ? AND
+                    s.begin < ?
+                ORDER BY s.id
+                "#,
+                user_id,
+                end
+            );
+            transaction.fetch_all(query).await
+        }
+        (Some(begin), Some(end)) => {
+            let query = sqlx::query!(
+                r#"
+                SELECT
+                    s.id as id,
+                    s.begin as begin,
+                    s.end as end,
+                    ss.instance_id as instance_id,
+                    ss.instance_name as instance_name,
+                    f.id as flavor,
+                    f.name as flavor_name,
+                    ss.status as status,
+                    u.id as user,
+                    u.name as username
+                FROM
+                    accounting_state as s,
+                    accounting_serverstate as ss,
+                    resources_flavor as f,
+                    user_user as u
+                WHERE
+                    ss.flavor_id = f.id AND
+                    ss.user_id = u.id AND
+                    ss.state_ptr_id = s.id AND
+                    ss.user_id = ? AND
+                    (s.end > ? OR s.end IS NULL) AND
+                    s.begin < ?
+                ORDER BY s.id
+                "#,
+                user_id,
+                begin,
+                end
+            );
+            transaction.fetch_all(query).await
+        }
+    };
+    let rows = result
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| ServerStateRow::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to server state")?
+        .into_iter()
+        .map(|r| ServerState {
+            id: r.id,
+            begin: r.begin.fixed_offset(),
+            end: r.end.map(|end| end.fixed_offset()),
+            instance_id: r.instance_id,
+            instance_name: r.instance_name,
+            flavor: r.flavor,
+            flavor_name: r.flavor_name,
+            status: r.status,
+            user: r.user,
+            username: r.username,
+        })
+        .collect::<Vec<_>>();
+    Ok(rows)
+}

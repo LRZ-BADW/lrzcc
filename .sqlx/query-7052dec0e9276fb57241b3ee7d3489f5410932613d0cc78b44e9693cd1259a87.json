@@ -1,0 +1,114 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                SELECT\n                    s.id as id,\n                    s.begin as begin,\n                    s.end as end,\n                    ss.instance_id as instance_id,\n                    ss.instance_name as instance_name,\n                    f.id as flavor,\n                    f.name as flavor_name,\n                    ss.status as status,\n                    u.id as user,\n                    u.name as username\n                FROM\n                    accounting_state as s,\n                    accounting_serverstate as ss,\n                    resources_flavor as f,\n                    user_user as u\n                WHERE\n                    ss.flavor_id = f.id AND\n                    ss.user_id = u.id AND\n                    ss.state_ptr_id = s.id AND\n                    ss.user_id = ? AND\n                    (s.end > ? OR s.end IS NULL)\n                ORDER BY s.id\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "begin",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "max_size": 26
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "end",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "BINARY",
+          "max_size": 26
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "instance_id",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 144
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "instance_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "flavor",
+        "type_info": {
+          "type": "LongLong",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT",
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "flavor_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 256
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "status",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 72
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "user",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "username",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 1020
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7052dec0e9276fb57241b3ee7d3489f5410932613d0cc78b44e9693cd1259a87"
+}
