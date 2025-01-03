@@ -3,6 +3,7 @@ use crate::database::accounting::server_state::{
     select_ordered_server_states_by_server_begin_and_end_from_db,
     select_ordered_server_states_by_user_begin_and_end_from_db,
 };
+use crate::database::user::project::select_all_projects_from_db;
 use crate::database::user::user::select_users_by_project_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Query, ReqData};
@@ -222,7 +223,33 @@ pub async fn calculate_server_consumption_for_all(
 ) -> Result<ServerConsumptionForAll, UnexpectedOnlyError> {
     let mut consumption = ServerConsumptionAll::default();
 
-    // TODO:
+    let projects = select_all_projects_from_db(transaction).await?;
+    for project in projects {
+        let project_consumption =
+            match calculate_server_consumption_for_project(
+                transaction,
+                project.id as u64,
+                begin,
+                end,
+                Some(true),
+            )
+            .await?
+            {
+                ServerConsumptionForProject::Normal(_normal) => unreachable!(),
+                ServerConsumptionForProject::Detail(detail) => detail,
+            };
+
+        for (flavor, value) in project_consumption.total.clone() {
+            if !consumption.total.contains_key(flavor.as_str()) {
+                consumption.total.insert(flavor.clone(), 0.0);
+            }
+            *consumption.total.get_mut(flavor.as_str()).unwrap() += value;
+        }
+
+        consumption
+            .projects
+            .insert(project.name.clone(), project_consumption);
+    }
 
     Ok(if detail.is_some() && detail.unwrap() {
         ServerConsumptionForAll::Detail(consumption)
