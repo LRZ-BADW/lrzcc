@@ -40,7 +40,7 @@ impl ServerStateListRequest {
 
     pub fn send(&self) -> Result<Vec<ServerState>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
