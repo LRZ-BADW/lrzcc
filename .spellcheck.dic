@@ -77,3 +77,5 @@ select_project_budgets_by_project_from_db
 _not_found
 Params
 inits
+server_consumption
+server_cost
