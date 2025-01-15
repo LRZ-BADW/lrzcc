@@ -53,7 +53,7 @@ impl ServerConsumptionRequest {
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.server = Some(server.to_string());
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -75,7 +75,7 @@ impl ServerConsumptionRequest {
         self.params.server = Some(server.to_string());
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -96,7 +96,7 @@ impl ServerConsumptionRequest {
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.user = Some(user);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -118,7 +118,7 @@ impl ServerConsumptionRequest {
         self.params.user = Some(user);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -139,7 +139,7 @@ impl ServerConsumptionRequest {
     ) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.project = Some(project);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -161,7 +161,7 @@ impl ServerConsumptionRequest {
         self.params.project = Some(project);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -179,7 +179,7 @@ impl ServerConsumptionRequest {
     pub fn all(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.all = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -198,7 +198,7 @@ impl ServerConsumptionRequest {
         self.params.all = Some(true);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -215,7 +215,7 @@ impl ServerConsumptionRequest {
 
     pub fn mine(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
@@ -233,7 +233,7 @@ impl ServerConsumptionRequest {
     pub fn mine_detail(&mut self) -> Result<ServerConsumptionUser, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
-            .context("Failed to envode URL parameters")?;
+            .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
             self.url.clone()
         } else {
