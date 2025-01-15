@@ -75,3 +75,5 @@ user_budget_modify
 {user_budget_id}
 select_project_budgets_by_project_from_db
 _not_found
+Params
+inits
