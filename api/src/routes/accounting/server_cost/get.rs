@@ -1,16 +1,76 @@
 use crate::authorization::require_admin_user;
+use crate::database::pricing::flavor_price::select_flavor_prices_for_period_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use lrzcc_wire::accounting::{
     ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
     ServerCostSimple, ServerCostUser,
 };
+use lrzcc_wire::pricing::FlavorPrice;
 use lrzcc_wire::user::{Project, User};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
+use std::collections::HashMap;
+
+#[derive(Hash, PartialEq, Eq, Clone)]
+enum UserClass {
+    UC1 = 1,
+    UC2 = 2,
+    UC3 = 3,
+    UC4 = 4,
+    UC5 = 5,
+    UC6 = 6,
+}
+
+impl UserClass {
+    fn from_u32(value: u32) -> Result<Self, UnexpectedOnlyError> {
+        match value {
+            1 => Ok(UserClass::UC1),
+            2 => Ok(UserClass::UC2),
+            3 => Ok(UserClass::UC3),
+            4 => Ok(UserClass::UC4),
+            5 => Ok(UserClass::UC5),
+            6 => Ok(UserClass::UC6),
+            _ => Err(anyhow!("Got non-existing user-class.").into()),
+        }
+    }
+}
+
+type PricesForPeriod = HashMap<UserClass, HashMap<String, Vec<FlavorPrice>>>;
+
+async fn get_flavor_prices_for_period(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<PricesForPeriod, UnexpectedOnlyError> {
+    let price_list =
+        select_flavor_prices_for_period_from_db(transaction, begin, end)
+            .await?;
+    let mut prices = HashMap::new();
+    for price in price_list {
+        let user_class = UserClass::from_u32(price.user_class)?;
+        let flavor_name = price.flavor_name.clone();
+        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
+        if !prices.contains_key(&user_class) {
+            prices.insert(user_class.clone(), HashMap::new());
+        }
+        let uprices = prices.get_mut(&user_class).unwrap();
+        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
+        if !uprices.contains_key(&flavor_name) {
+            uprices.insert(flavor_name.clone(), Vec::new());
+        }
+        prices
+            .get_mut(&user_class)
+            .unwrap()
+            .get_mut(&flavor_name)
+            .unwrap()
+            .push(price);
+    }
+    Ok(prices)
+}
 
 #[derive(Serialize)]
 #[serde(untagged)]
