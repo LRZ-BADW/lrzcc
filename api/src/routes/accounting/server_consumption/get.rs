@@ -276,6 +276,7 @@ pub async fn server_consumption(
     params: Query<ServerConsumptionParams>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
+    // TODO: add proper permission check
     require_admin_user(&user)?;
     let end = params.end.unwrap_or(Utc::now().fixed_offset());
     let begin = params.begin.unwrap_or(
