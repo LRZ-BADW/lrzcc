@@ -79,6 +79,7 @@ pub async fn calculate_server_consumption_for_server(
         }
     }
     for state in states {
+        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
         if !consumption.contains_key(&state.flavor_name) {
             consumption.insert(state.flavor_name.clone(), 0.0);
         }
@@ -117,6 +118,7 @@ pub async fn calculate_server_consumption_for_user(
     let mut server_state_map: HashMap<String, Vec<ServerState>> =
         HashMap::new();
     for state in states {
+        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
         if !server_state_map.contains_key(state.instance_id.as_str()) {
             server_state_map.insert(state.instance_id.clone(), Vec::new());
         }
@@ -143,6 +145,7 @@ pub async fn calculate_server_consumption_for_user(
 
     for server_consumption in consumption.servers.values() {
         for (flavor, value) in server_consumption {
+            // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
             if !consumption.total.contains_key(flavor.as_str()) {
                 consumption.total.insert(flavor.clone(), 0.0);
             }
@@ -190,6 +193,7 @@ pub async fn calculate_server_consumption_for_project(
         };
 
         for (flavor, value) in user_consumption.total.clone() {
+            // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
             if !consumption.total.contains_key(flavor.as_str()) {
                 consumption.total.insert(flavor.clone(), 0.0);
             }
@@ -240,6 +244,7 @@ pub async fn calculate_server_consumption_for_all(
             };
 
         for (flavor, value) in project_consumption.total.clone() {
+            // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
             if !consumption.total.contains_key(flavor.as_str()) {
                 consumption.total.insert(flavor.clone(), 0.0);
             }
