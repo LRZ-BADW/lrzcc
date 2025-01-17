@@ -51,23 +51,24 @@ async fn get_flavor_prices_for_period(
             .await?;
     let mut prices = HashMap::new();
     for price in price_list {
-        let user_class = UserClass::from_u32(price.user_class)?;
-        let flavor_name = price.flavor_name.clone();
-        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
-        if !prices.contains_key(&user_class) {
-            prices.insert(user_class.clone(), HashMap::new());
-        }
-        let uprices = prices.get_mut(&user_class).unwrap();
-        // TODO: this contains_key insert pattern can be replaced with entry().or_insert()
-        if !uprices.contains_key(&flavor_name) {
-            uprices.insert(flavor_name.clone(), Vec::new());
-        }
         prices
-            .get_mut(&user_class)
-            .unwrap()
-            .get_mut(&flavor_name)
-            .unwrap()
+            .entry(UserClass::from_u32(price.user_class)?)
+            .or_insert_with(HashMap::new)
+            .entry(price.flavor_name.clone())
+            .or_insert_with(Vec::new)
             .push(price);
+    }
+    for uprices in prices.values_mut() {
+        for fprices in uprices.values_mut() {
+            let mut i = fprices.len() - 1;
+            while i > 0 {
+                if fprices[i].start_time <= begin {
+                    *fprices = fprices.split_off(i);
+                    break;
+                }
+                i -= 1;
+            }
+        }
     }
     Ok(prices)
 }
