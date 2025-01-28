@@ -8,7 +8,9 @@ use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[derive(FromRow)]
 pub struct FlavorPriceRow {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
+    #[sqlx(try_from = "i32")]
     pub flavor: u32,
     pub flavor_name: String,
     pub user_class: u32,
