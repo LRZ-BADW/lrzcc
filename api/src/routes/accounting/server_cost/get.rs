@@ -279,8 +279,8 @@ pub enum ServerCostForUser {
 pub async fn calculate_server_cost_for_user(
     transaction: &mut Transaction<'_, MySql>,
     user_id: u64,
-    begin: Option<DateTime<Utc>>,
-    end: Option<DateTime<Utc>>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
     detail: Option<bool>,
 ) -> Result<ServerCostForUser, UnexpectedOnlyError> {
     todo!()
@@ -296,8 +296,8 @@ pub enum ServerCostForProject {
 pub async fn calculate_server_cost_for_project(
     transaction: &mut Transaction<'_, MySql>,
     project_id: u64,
-    begin: Option<DateTime<Utc>>,
-    end: Option<DateTime<Utc>>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
     detail: Option<bool>,
 ) -> Result<ServerCostForProject, UnexpectedOnlyError> {
     todo!()
@@ -312,8 +312,8 @@ pub enum ServerCostForAll {
 
 pub async fn calculate_server_cost_for_all(
     transaction: &mut Transaction<'_, MySql>,
-    begin: Option<DateTime<Utc>>,
-    end: Option<DateTime<Utc>>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
     detail: Option<bool>,
 ) -> Result<ServerCostForAll, UnexpectedOnlyError> {
     todo!()
@@ -328,7 +328,7 @@ pub enum ServerCost {
     All(ServerCostForAll),
 }
 
-#[tracing::instrument(name = "server_consumption")]
+#[tracing::instrument(name = "server_cost")]
 pub async fn server_cost(
     user: ReqData<User>,
     // TODO: not necessary?
@@ -353,8 +353,8 @@ pub async fn server_cost(
         ServerCost::All(
             calculate_server_cost_for_all(
                 &mut transaction,
-                Some(begin.into()),
-                Some(end.into()),
+                begin.into(),
+                end.into(),
                 params.detail,
             )
             .await?,
@@ -364,8 +364,8 @@ pub async fn server_cost(
             calculate_server_cost_for_project(
                 &mut transaction,
                 project_id as u64,
-                Some(begin.into()),
-                Some(end.into()),
+                begin.into(),
+                end.into(),
                 params.detail,
             )
             .await?,
@@ -375,8 +375,8 @@ pub async fn server_cost(
             calculate_server_cost_for_user(
                 &mut transaction,
                 user_id as u64,
-                Some(begin.into()),
-                Some(end.into()),
+                begin.into(),
+                end.into(),
                 params.detail,
             )
             .await?,
@@ -386,8 +386,8 @@ pub async fn server_cost(
             calculate_server_cost_for_server(
                 &mut transaction,
                 server_id.as_str(),
-                Some(begin.into()),
-                Some(end.into()),
+                begin.into(),
+                end.into(),
                 None,
             )
             .await?,
@@ -397,8 +397,8 @@ pub async fn server_cost(
             calculate_server_cost_for_user(
                 &mut transaction,
                 user.id as u64,
-                Some(begin.into()),
-                Some(end.into()),
+                begin.into(),
+                end.into(),
                 params.detail,
             )
             .await?,
