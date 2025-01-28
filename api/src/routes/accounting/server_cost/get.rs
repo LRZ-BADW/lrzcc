@@ -123,8 +123,10 @@ async fn get_flavor_price_periods(
         *current_prices
             .get_mut(&UserClass::from_u32(price.user_class)?)
             .unwrap()
-            .get_mut(&price.flavor_name)
-            .unwrap() = price.unit_price;
+            .entry(price.flavor_name.clone())
+            .or_insert(0.0) = price.unit_price;
+        // .get_mut(&price.flavor_name)
+        // .unwrap() = price.unit_price;
         i += 1;
     }
 
@@ -144,8 +146,10 @@ async fn get_flavor_price_periods(
             *current_prices
                 .get_mut(&UserClass::from_u32(price.user_class)?)
                 .unwrap()
-                .get_mut(&price.flavor_name)
-                .unwrap() = price.unit_price;
+                .entry(price.flavor_name.clone())
+                .or_insert(0.0) = price.unit_price;
+        // .get_mut(&price.flavor_name)
+        // .unwrap() = price.unit_price;
         } else {
             periods.insert(current_time, current_prices.clone());
             current_time = prices.get(i).unwrap().start_time.to_utc();
