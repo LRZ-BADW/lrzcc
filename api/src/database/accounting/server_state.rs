@@ -326,6 +326,46 @@ pub async fn select_server_states_by_server_from_db(
 }
 
 #[tracing::instrument(
+    name = "select_user_class_by_server_from_db",
+    skip(transaction)
+)]
+pub async fn select_user_class_by_server_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    server_id: String,
+) -> Result<Option<u64>, UnexpectedOnlyError> {
+    #[derive(FromRow)]
+    struct Row {
+        user_class: u64,
+    }
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            p.user_class as user_class
+        FROM
+            accounting_serverstate as ss,
+            user_user as u,
+            user_project as p
+        WHERE
+            ss.user_id = u.id AND
+            u.project_id = p.id AND
+            ss.instance_id = ?
+        LIMIT 1
+        "#,
+        server_id
+    );
+    let user_class = transaction
+        .fetch_optional(query)
+        .await
+        .context("Failed to execute select query")?
+        .map(|r| {
+            Row::from_row(&r).context("Failed to convert row to user class")
+        })
+        .map_or(Ok(None), |r| r.map(Some))?
+        .map(|r| r.user_class);
+    Ok(user_class)
+}
+
+#[tracing::instrument(
     name = "select_server_states_by_server_and_project_from_db",
     skip(transaction)
 )]
