@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT\n            p.user_class as user_class\n        FROM\n            accounting_serverstate as ss,\n            user_user as u,\n            user_project as p\n        WHERE\n            ss.user_id = u.id AND\n            u.project_id = p.id AND\n            ss.instance_id = ?\n        LIMIT 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_class",
+        "type_info": {
+          "type": "Short",
+          "flags": "NOT_NULL | UNSIGNED | NO_DEFAULT_VALUE",
+          "max_size": 5
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3ec341d034e02fdf6d6b6b4db7ac94cdd2f59445bcdf53a89f3a13c6e915b860"
+}
