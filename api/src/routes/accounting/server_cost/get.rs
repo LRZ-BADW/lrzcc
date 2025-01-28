@@ -155,6 +155,19 @@ async fn get_flavor_price_periods(
     Ok(periods)
 }
 
+fn calculate_flavor_consumption_cost(
+    flavor_consumption: f64,
+    prices: Prices,
+    user_class: UserClass,
+    flavor: String,
+) -> f64 {
+    let mut cost = 0.0;
+    if let Some(price) = prices.get(&user_class).unwrap().get(&flavor) {
+        cost = (flavor_consumption * price) / ((365 * 24 * 60 * 60) as f64);
+    }
+    cost
+}
+
 #[derive(Serialize)]
 #[serde(untagged)]
 pub enum ServerCostForServer {
