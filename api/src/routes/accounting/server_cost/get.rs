@@ -1,5 +1,6 @@
 use crate::authorization::require_admin_user;
 use crate::database::pricing::flavor_price::select_flavor_prices_for_period_from_db;
+use crate::database::resources::flavor::select_all_flavors_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
@@ -14,8 +15,9 @@ use lrzcc_wire::user::{Project, User};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 use std::collections::HashMap;
+use strum::{EnumIter, IntoEnumIterator};
 
-#[derive(Hash, PartialEq, Eq, Clone)]
+#[derive(Hash, PartialEq, Eq, Clone, EnumIter)]
 enum UserClass {
     UC1 = 1,
     UC2 = 2,
@@ -41,7 +43,7 @@ impl UserClass {
 
 type PricesForPeriod = HashMap<UserClass, HashMap<String, Vec<FlavorPrice>>>;
 
-async fn get_flavor_prices_for_period(
+async fn get_flavor_price_map_for_period(
     transaction: &mut Transaction<'_, MySql>,
     begin: DateTime<Utc>,
     end: DateTime<Utc>,
@@ -53,6 +55,7 @@ async fn get_flavor_prices_for_period(
     for price in price_list {
         prices
             .entry(UserClass::from_u32(price.user_class)?)
+            // TODO: .default() should work here, too
             .or_insert_with(HashMap::new)
             .entry(price.flavor_name.clone())
             .or_insert_with(Vec::new)
@@ -71,6 +74,85 @@ async fn get_flavor_prices_for_period(
         }
     }
     Ok(prices)
+}
+
+async fn get_flavor_prices_for_period(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<Vec<FlavorPrice>, UnexpectedOnlyError> {
+    let mut prices = get_flavor_price_map_for_period(transaction, begin, end)
+        .await?
+        .into_iter()
+        .flat_map(|(_, v)| v.into_iter().flat_map(|(_, w)| w))
+        .collect::<Vec<FlavorPrice>>();
+    prices.sort_by(|a, b| a.start_time.partial_cmp(&b.start_time).unwrap());
+    Ok(prices)
+}
+
+type Prices = HashMap<UserClass, HashMap<String, f64>>;
+type PricePeriods = HashMap<DateTime<Utc>, Prices>;
+
+async fn get_flavor_price_periods(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<PricePeriods, UnexpectedOnlyError> {
+    let flavors = select_all_flavors_from_db(transaction).await?;
+    let mut current_prices = Prices::new();
+    for user_class in UserClass::iter() {
+        for flavor in flavors.clone() {
+            current_prices
+                .entry(user_class.clone())
+                .or_default()
+                .entry(flavor.name.clone())
+                .or_insert(0.0);
+        }
+    }
+
+    let prices = get_flavor_prices_for_period(transaction, begin, end).await?;
+
+    let mut i = 0;
+    while i < prices.len() {
+        let price = prices.get(i).unwrap();
+        if price.start_time > begin {
+            break;
+        }
+        *current_prices
+            .get_mut(&UserClass::from_u32(price.user_class)?)
+            .unwrap()
+            .get_mut(&price.flavor_name)
+            .unwrap() = price.unit_price;
+        i += 1;
+    }
+
+    let mut periods = PricePeriods::new();
+
+    let mut current_time = begin;
+    periods.insert(current_time, current_prices.clone());
+
+    if i == prices.len() {
+        return Ok(periods);
+    }
+
+    current_time = prices.get(i).unwrap().start_time.to_utc();
+    while i < prices.len() {
+        let price = prices.get(i).unwrap();
+        if price.start_time.to_utc() == current_time {
+            *current_prices
+                .get_mut(&UserClass::from_u32(price.user_class)?)
+                .unwrap()
+                .get_mut(&price.flavor_name)
+                .unwrap() = price.unit_price;
+        } else {
+            periods.insert(current_time, current_prices.clone());
+            current_time = prices.get(i).unwrap().start_time.to_utc();
+        }
+        i += 1;
+    }
+    periods.insert(current_time, current_prices.clone());
+
+    Ok(periods)
 }
 
 #[derive(Serialize)]
