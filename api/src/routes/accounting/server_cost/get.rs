@@ -2,14 +2,17 @@ use crate::authorization::require_admin_user;
 use crate::database::accounting::server_state::select_user_class_by_server_from_db;
 use crate::database::pricing::flavor_price::select_flavor_prices_for_period_from_db;
 use crate::database::resources::flavor::select_all_flavors_from_db;
-use crate::database::user::project::select_user_class_by_project_from_db;
+use crate::database::user::project::{
+    select_all_projects_from_db, select_user_class_by_project_from_db,
+};
 use crate::database::user::user::select_user_class_by_user_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use crate::routes::accounting::server_consumption::get::{
+    calculate_server_consumption_for_all,
     calculate_server_consumption_for_project,
     calculate_server_consumption_for_server,
-    calculate_server_consumption_for_user, ServerConsumptionForProject,
-    ServerConsumptionForUser,
+    calculate_server_consumption_for_user, ServerConsumptionForAll,
+    ServerConsumptionForProject, ServerConsumptionForUser,
 };
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
@@ -195,16 +198,15 @@ pub async fn calculate_server_cost_for_server_normal(
     end: DateTime<Utc>,
 ) -> Result<ServerCostSimple, UnexpectedOnlyError> {
     let mut cost = ServerCostSimple { total: 0.0 };
-    let user_class = match select_user_class_by_server_from_db(
+    let Some(user_class) = select_user_class_by_server_from_db(
         transaction,
         server_uuid.to_string(),
     )
     .await?
     .map(|u| UserClass::from_u32(u as u32))
     .map_or(Ok(None), |r| r.map(Some))?
-    {
-        Some(user_class) => user_class,
-        None => return Ok(cost),
+    else {
+        return Ok(cost);
     };
     let price_periods =
         get_flavor_price_periods(transaction, begin, end).await?;
@@ -249,16 +251,15 @@ pub async fn calculate_server_cost_for_server_detail(
         total: 0.0,
         flavors: HashMap::new(),
     };
-    let user_class = match select_user_class_by_server_from_db(
+    let Some(user_class) = select_user_class_by_server_from_db(
         transaction,
         server_uuid.to_string(),
     )
     .await?
     .map(|u| UserClass::from_u32(u as u32))
     .map_or(Ok(None), |r| r.map(Some))?
-    {
-        Some(user_class) => user_class,
-        None => return Ok(cost),
+    else {
+        return Ok(cost);
     };
     let price_periods =
         get_flavor_price_periods(transaction, begin, end).await?;
@@ -337,15 +338,14 @@ pub async fn calculate_server_cost_for_user_normal(
     end: DateTime<Utc>,
 ) -> Result<ServerCostSimple, UnexpectedOnlyError> {
     let mut cost = ServerCostSimple { total: 0.0 };
-    let user_class =
-        match select_user_class_by_user_from_db(transaction, user_id)
+    let Some(user_class) =
+        select_user_class_by_user_from_db(transaction, user_id)
             .await?
             .map(UserClass::from_u32)
             .map_or(Ok(None), |r| r.map(Some))?
-        {
-            Some(user_class) => user_class,
-            None => return Ok(cost),
-        };
+    else {
+        return Ok(cost);
+    };
     let price_periods =
         get_flavor_price_periods(transaction, begin, end).await?;
 
@@ -437,15 +437,14 @@ pub async fn calculate_server_cost_for_project_normal(
     end: DateTime<Utc>,
 ) -> Result<ServerCostSimple, UnexpectedOnlyError> {
     let mut cost = ServerCostSimple { total: 0.0 };
-    let user_class =
-        match select_user_class_by_project_from_db(transaction, project_id)
+    let Some(user_class) =
+        select_user_class_by_project_from_db(transaction, project_id)
             .await?
             .map(UserClass::from_u32)
             .map_or(Ok(None), |r| r.map(Some))?
-        {
-            Some(user_class) => user_class,
-            None => return Ok(cost),
-        };
+    else {
+        return Ok(cost);
+    };
     let price_periods =
         get_flavor_price_periods(transaction, begin, end).await?;
 
@@ -531,13 +530,90 @@ pub enum ServerCostForAll {
     Detail(ServerCostAll),
 }
 
+// TODO: optimize/parallelize this and other functions
+pub async fn calculate_server_cost_for_all_normal(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<ServerCostSimple, UnexpectedOnlyError> {
+    let mut cost = ServerCostSimple { total: 0.0 };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    let projects = select_all_projects_from_db(transaction)
+        .await?
+        .into_iter()
+        .map(|p| (p.name.clone(), p))
+        .collect::<HashMap<_, _>>();
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let ServerConsumptionForAll::Detail(consumption) =
+            calculate_server_consumption_for_all(
+                transaction,
+                Some(*start_time),
+                Some(end_time),
+                Some(true),
+            )
+            .await?
+        else {
+            return Err(
+                anyhow!("Unexpected ServerConsumptionForAll variant").into()
+            );
+        };
+        for (project_name, project_consumption) in consumption.projects {
+            let Some(project) = projects.get(&project_name) else {
+                continue;
+            };
+            let Ok(user_class) = UserClass::from_u32(project.user_class) else {
+                continue;
+            };
+
+            for (flavor_name, flavor_consumption) in project_consumption.total {
+                if flavor_consumption > 0. {
+                    cost.total += calculate_flavor_consumption_cost(
+                        flavor_consumption,
+                        prices.clone(),
+                        user_class.clone(),
+                        flavor_name,
+                    );
+                }
+            }
+        }
+    }
+
+    Ok(cost)
+}
+
+// TODO: can we use macros to get rid of the code duplication here
+pub async fn calculate_server_cost_for_all_detail(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<ServerCostAll, UnexpectedOnlyError> {
+    todo!()
+}
+
 pub async fn calculate_server_cost_for_all(
     transaction: &mut Transaction<'_, MySql>,
     begin: DateTime<Utc>,
     end: DateTime<Utc>,
     detail: Option<bool>,
 ) -> Result<ServerCostForAll, UnexpectedOnlyError> {
-    todo!()
+    Ok(match detail {
+        Some(true) => ServerCostForAll::Detail(
+            calculate_server_cost_for_all_detail(transaction, begin, end)
+                .await?,
+        ),
+        _ => ServerCostForAll::Normal(
+            calculate_server_cost_for_all_normal(transaction, begin, end)
+                .await?,
+        ),
+    })
 }
 
 #[derive(Serialize)]
