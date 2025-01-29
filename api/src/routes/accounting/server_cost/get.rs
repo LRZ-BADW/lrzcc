@@ -231,13 +231,60 @@ pub async fn calculate_server_cost_for_server_normal(
     Ok(cost)
 }
 
+// TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_server_detail(
     transaction: &mut Transaction<'_, MySql>,
     server_uuid: &str,
     begin: DateTime<Utc>,
     end: DateTime<Utc>,
 ) -> Result<ServerCostServer, UnexpectedOnlyError> {
-    todo!()
+    let mut cost = ServerCostServer {
+        total: 0.0,
+        flavors: HashMap::new(),
+    };
+    let user_class = match select_user_class_by_server_from_db(
+        transaction,
+        server_uuid.to_string(),
+    )
+    .await?
+    .map(|u| UserClass::from_u32(u as u32))
+    .map_or(Ok(None), |r| r.map(Some))?
+    {
+        Some(user_class) => user_class,
+        None => return Ok(cost),
+    };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let consumption = calculate_server_consumption_for_server(
+            transaction,
+            server_uuid,
+            Some(*start_time),
+            Some(end_time),
+            None,
+        )
+        .await?;
+        for (flavor_name, flavor_consumption) in consumption {
+            if flavor_consumption > 0. {
+                let flavor_cost = calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name.clone(),
+                );
+                cost.total += flavor_cost;
+                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+            }
+        }
+    }
+
+    Ok(cost)
 }
 
 pub async fn calculate_server_cost_for_server(
@@ -388,7 +435,7 @@ pub async fn server_cost(
                 server_id.as_str(),
                 begin.into(),
                 end.into(),
-                None,
+                params.detail,
             )
             .await?,
         )
