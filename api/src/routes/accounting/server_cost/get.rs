@@ -2,11 +2,14 @@ use crate::authorization::require_admin_user;
 use crate::database::accounting::server_state::select_user_class_by_server_from_db;
 use crate::database::pricing::flavor_price::select_flavor_prices_for_period_from_db;
 use crate::database::resources::flavor::select_all_flavors_from_db;
+use crate::database::user::project::select_user_class_by_project_from_db;
 use crate::database::user::user::select_user_class_by_user_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use crate::routes::accounting::server_consumption::get::{
+    calculate_server_consumption_for_project,
     calculate_server_consumption_for_server,
-    calculate_server_consumption_for_user, ServerConsumptionForUser,
+    calculate_server_consumption_for_user, ServerConsumptionForProject,
+    ServerConsumptionForUser,
 };
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
@@ -427,6 +430,71 @@ pub enum ServerCostForProject {
     Detail(ServerCostProject),
 }
 
+pub async fn calculate_server_cost_for_project_normal(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<ServerCostSimple, UnexpectedOnlyError> {
+    let mut cost = ServerCostSimple { total: 0.0 };
+    let user_class =
+        match select_user_class_by_project_from_db(transaction, project_id)
+            .await?
+            .map(UserClass::from_u32)
+            .map_or(Ok(None), |r| r.map(Some))?
+        {
+            Some(user_class) => user_class,
+            None => return Ok(cost),
+        };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let ServerConsumptionForProject::Normal(consumption) =
+            calculate_server_consumption_for_project(
+                transaction,
+                project_id,
+                Some(*start_time),
+                Some(end_time),
+                None,
+            )
+            .await?
+        else {
+            return Err(anyhow!(
+                "Unexpected ServerConsumptionForProject variant"
+            )
+            .into());
+        };
+        for (flavor_name, flavor_consumption) in consumption {
+            if flavor_consumption > 0. {
+                cost.total += calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name,
+                );
+            }
+        }
+    }
+
+    Ok(cost)
+}
+
+// TODO: can we use macros to get rid of the code duplication here
+pub async fn calculate_server_cost_for_project_detail(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<ServerCostProject, UnexpectedOnlyError> {
+    todo!()
+}
+
 pub async fn calculate_server_cost_for_project(
     transaction: &mut Transaction<'_, MySql>,
     project_id: u64,
@@ -434,7 +502,26 @@ pub async fn calculate_server_cost_for_project(
     end: DateTime<Utc>,
     detail: Option<bool>,
 ) -> Result<ServerCostForProject, UnexpectedOnlyError> {
-    todo!()
+    Ok(match detail {
+        Some(true) => ServerCostForProject::Detail(
+            calculate_server_cost_for_project_detail(
+                transaction,
+                project_id,
+                begin,
+                end,
+            )
+            .await?,
+        ),
+        _ => ServerCostForProject::Normal(
+            calculate_server_cost_for_project_normal(
+                transaction,
+                project_id,
+                begin,
+                end,
+            )
+            .await?,
+        ),
+    })
 }
 
 #[derive(Serialize)]
