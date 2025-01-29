@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT p.user_class as user_class\n        FROM\n            user_user AS u,\n            user_project AS p\n        WHERE\n            u.project_id = p.id AND\n            u.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_class",
+        "type_info": {
+          "type": "Short",
+          "flags": "NOT_NULL | UNSIGNED | NO_DEFAULT_VALUE",
+          "max_size": 5
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "6d7a326f433782427a17ace8c9265a5cbb1df564a30ca5e0fb023a30bfa37c25"
+}
