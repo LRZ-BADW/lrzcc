@@ -217,3 +217,37 @@ pub async fn select_projects_by_id_from_db(
         .context("Failed to convert row to project")?;
     Ok(rows)
 }
+
+#[tracing::instrument(
+    name = "select_user_class_by_project_from_db",
+    skip(transaction)
+)]
+pub async fn select_user_class_by_project_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+) -> Result<Option<u32>, UnexpectedOnlyError> {
+    #[derive(FromRow)]
+    struct Row {
+        user_class: u32,
+    }
+    let query = sqlx::query!(
+        r#"
+        SELECT user_class
+        FROM user_project
+        WHERE id = ?
+        "#,
+        project_id
+    );
+    let row = transaction
+        .fetch_optional(query)
+        .await
+        .context("Failed to execute select query")?;
+    Ok(match row {
+        Some(row) => Some(
+            Row::from_row(&row)
+                .context("Failed to parse user class row")?
+                .user_class,
+        ),
+        None => None,
+    })
+}
