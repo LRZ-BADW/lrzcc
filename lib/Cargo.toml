@@ -20,7 +20,7 @@ path = "src/lib.rs"
 
 [features]
 default = ["all"]
-vendored-tls = ["reqwest/native-tls-vendored"]
+# vendored-tls = ["reqwest/native-tls-vendored"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
 accounting = ["lrzcc-wire/accounting"]
 budgeting = ["lrzcc-wire/budgeting"]
@@ -31,7 +31,7 @@ resources = ["lrzcc-wire/resources"]
 user = ["lrzcc-wire/user"]
 
 [dependencies]
-reqwest = { version = "0.12", features = ["json", "blocking"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_urlencoded = "0.7"
