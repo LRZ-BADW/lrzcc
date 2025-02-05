@@ -223,14 +223,19 @@ pub async fn calculate_server_cost_for_server_normal(
         )
         .await?;
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                cost.total += calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name,
-                );
+            if flavor_consumption <= 0. {
+                continue;
             }
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name,
+            );
+            if flavor_cost <= 0. {
+                continue;
+            }
+            cost.total += flavor_cost;
         }
     }
 
@@ -276,16 +281,17 @@ pub async fn calculate_server_cost_for_server_detail(
         )
         .await?;
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                let flavor_cost = calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name.clone(),
-                );
-                cost.total += flavor_cost;
-                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name.clone(),
+            );
+            *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+            if flavor_cost <= 0. {
+                continue;
             }
+            cost.total += flavor_cost;
         }
     }
 
