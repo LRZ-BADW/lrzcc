@@ -11,6 +11,8 @@ on:
       - '.github/workflows/*'
     branches: [ main ]
 
+permissions: {}
+
 jobs:
   zizmor:
     runs-on: ubuntu-latest
