@@ -729,14 +729,19 @@ pub async fn calculate_server_cost_for_all_normal(
             };
 
             for (flavor_name, flavor_consumption) in project_consumption.total {
-                if flavor_consumption > 0. {
-                    cost.total += calculate_flavor_consumption_cost(
-                        flavor_consumption,
-                        prices.clone(),
-                        user_class.clone(),
-                        flavor_name,
-                    );
+                if flavor_consumption == 0. {
+                    continue;
                 }
+                let flavor_cost = calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name,
+                );
+                if flavor_cost <= 0. {
+                    continue;
+                }
+                cost.total += flavor_cost;
             }
         }
     }
