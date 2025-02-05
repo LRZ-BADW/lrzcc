@@ -14,6 +14,10 @@ path = "src/lib.rs"
 name = "main"
 path = "tests/main.rs"
 
+[[bench]]
+name = "main"
+harness = false
+
 [dependencies]
 lrzcc = { version = "1.6", path = "../lib" }
 lrzcc-api = { version = "0.6", path = "../api" }
