@@ -223,14 +223,19 @@ pub async fn calculate_server_cost_for_server_normal(
         )
         .await?;
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                cost.total += calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name,
-                );
+            if flavor_consumption <= 0. {
+                continue;
             }
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name,
+            );
+            if flavor_cost <= 0. {
+                continue;
+            }
+            cost.total += flavor_cost;
         }
     }
 
@@ -276,16 +281,17 @@ pub async fn calculate_server_cost_for_server_detail(
         )
         .await?;
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                let flavor_cost = calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name.clone(),
-                );
-                cost.total += flavor_cost;
-                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name.clone(),
+            );
+            *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+            if flavor_cost <= 0. {
+                continue;
             }
+            cost.total += flavor_cost;
         }
     }
 
@@ -367,14 +373,16 @@ pub async fn calculate_server_cost_for_user_normal(
             );
         };
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                cost.total += calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name,
-                );
+            if flavor_consumption <= 0. {
+                continue;
             }
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name,
+            );
+            cost.total += flavor_cost;
         }
     }
 
@@ -383,12 +391,75 @@ pub async fn calculate_server_cost_for_user_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_user_detail(
-    _transaction: &mut Transaction<'_, MySql>,
-    _user_id: u64,
-    _begin: DateTime<Utc>,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    user_id: u64,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
 ) -> Result<ServerCostUser, UnexpectedOnlyError> {
-    todo!()
+    let mut cost = ServerCostUser {
+        total: 0.0,
+        flavors: HashMap::new(),
+        servers: HashMap::new(),
+    };
+    let Some(user_class) =
+        select_user_class_by_user_from_db(transaction, user_id)
+            .await?
+            .map(UserClass::from_u32)
+            .map_or(Ok(None), |r| r.map(Some))?
+    else {
+        return Ok(cost);
+    };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let ServerConsumptionForUser::Detail(consumption) =
+            calculate_server_consumption_for_user(
+                transaction,
+                user_id,
+                Some(*start_time),
+                Some(end_time),
+                Some(true),
+            )
+            .await?
+        else {
+            return Err(
+                anyhow!("Unexpected ServerConsumptionForUser variant").into()
+            );
+        };
+        for (server_uuid, server_consumption) in consumption.servers {
+            let server_cost = cost
+                .servers
+                .entry(server_uuid.clone())
+                .or_insert(ServerCostServer {
+                    total: 0.0,
+                    flavors: HashMap::new(),
+                });
+            for (flavor_name, flavor_consumption) in server_consumption {
+                let flavor_cost = calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name.clone(),
+                );
+                *server_cost.flavors.entry(flavor_name.clone()).or_default() +=
+                    flavor_cost;
+                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+                if flavor_cost <= 0. {
+                    continue;
+                }
+                server_cost.total += flavor_cost;
+                cost.total += flavor_cost;
+            }
+        }
+    }
+
+    Ok(cost)
 }
 
 pub async fn calculate_server_cost_for_user(
@@ -467,14 +538,19 @@ pub async fn calculate_server_cost_for_project_normal(
             .into());
         };
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                cost.total += calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name,
-                );
+            if flavor_consumption <= 0. {
+                continue;
             }
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name,
+            );
+            if flavor_cost <= 0. {
+                continue;
+            }
+            cost.total += flavor_cost;
         }
     }
 
@@ -483,12 +559,94 @@ pub async fn calculate_server_cost_for_project_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_project_detail(
-    _transaction: &mut Transaction<'_, MySql>,
-    _project_id: u64,
-    _begin: DateTime<Utc>,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
 ) -> Result<ServerCostProject, UnexpectedOnlyError> {
-    todo!()
+    let mut cost = ServerCostProject {
+        total: 0.0,
+        flavors: HashMap::new(),
+        users: HashMap::new(),
+    };
+    let Some(user_class) =
+        select_user_class_by_project_from_db(transaction, project_id)
+            .await?
+            .map(UserClass::from_u32)
+            .map_or(Ok(None), |r| r.map(Some))?
+    else {
+        return Ok(cost);
+    };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let ServerConsumptionForProject::Detail(consumption) =
+            calculate_server_consumption_for_project(
+                transaction,
+                project_id,
+                Some(*start_time),
+                Some(end_time),
+                Some(true),
+            )
+            .await?
+        else {
+            return Err(anyhow!(
+                "Unexpected ServerConsumptionForProject variant"
+            )
+            .into());
+        };
+        for (user_name, user_consumption) in consumption.users {
+            let user_cost =
+                cost.users
+                    .entry(user_name.clone())
+                    .or_insert(ServerCostUser {
+                        total: 0.0,
+                        flavors: HashMap::new(),
+                        servers: HashMap::new(),
+                    });
+            for (server_uuid, server_consumption) in user_consumption.servers {
+                let server_cost = user_cost
+                    .servers
+                    .entry(server_uuid.clone())
+                    .or_insert(ServerCostServer {
+                        total: 0.0,
+                        flavors: HashMap::new(),
+                    });
+                for (flavor_name, flavor_consumption) in server_consumption {
+                    let flavor_cost = calculate_flavor_consumption_cost(
+                        flavor_consumption,
+                        prices.clone(),
+                        user_class.clone(),
+                        flavor_name.clone(),
+                    );
+                    *server_cost
+                        .flavors
+                        .entry(flavor_name.clone())
+                        .or_default() += flavor_cost;
+                    *user_cost
+                        .flavors
+                        .entry(flavor_name.clone())
+                        .or_default() += flavor_cost;
+                    *cost.flavors.entry(flavor_name).or_default() +=
+                        flavor_cost;
+                    if flavor_cost <= 0. {
+                        continue;
+                    }
+                    server_cost.total += flavor_cost;
+                    user_cost.total += flavor_cost;
+                    cost.total += flavor_cost;
+                }
+            }
+        }
+    }
+
+    Ok(cost)
 }
 
 pub async fn calculate_server_cost_for_project(
@@ -571,14 +729,19 @@ pub async fn calculate_server_cost_for_all_normal(
             };
 
             for (flavor_name, flavor_consumption) in project_consumption.total {
-                if flavor_consumption > 0. {
-                    cost.total += calculate_flavor_consumption_cost(
-                        flavor_consumption,
-                        prices.clone(),
-                        user_class.clone(),
-                        flavor_name,
-                    );
+                if flavor_consumption == 0. {
+                    continue;
                 }
+                let flavor_cost = calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name,
+                );
+                if flavor_cost <= 0. {
+                    continue;
+                }
+                cost.total += flavor_cost;
             }
         }
     }
@@ -588,11 +751,114 @@ pub async fn calculate_server_cost_for_all_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_all_detail(
-    _transaction: &mut Transaction<'_, MySql>,
-    _begin: DateTime<Utc>,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
 ) -> Result<ServerCostAll, UnexpectedOnlyError> {
-    todo!()
+    let mut cost = ServerCostAll {
+        total: 0.0,
+        flavors: HashMap::new(),
+        projects: HashMap::new(),
+    };
+    let price_periods =
+        get_flavor_price_periods(transaction, begin, end).await?;
+
+    let mut end_times =
+        price_periods.keys().skip(1).cloned().collect::<Vec<_>>();
+    end_times.push(end);
+
+    let projects = select_all_projects_from_db(transaction)
+        .await?
+        .into_iter()
+        .map(|p| (p.name.clone(), p))
+        .collect::<HashMap<_, _>>();
+
+    for ((start_time, prices), end_time) in price_periods.iter().zip(end_times)
+    {
+        let ServerConsumptionForAll::Detail(consumption) =
+            calculate_server_consumption_for_all(
+                transaction,
+                Some(*start_time),
+                Some(end_time),
+                Some(true),
+            )
+            .await?
+        else {
+            return Err(
+                anyhow!("Unexpected ServerConsumptionForAll variant").into()
+            );
+        };
+        for (project_name, project_consumption) in consumption.projects {
+            let Some(project) = projects.get(&project_name) else {
+                continue;
+            };
+            let Ok(user_class) = UserClass::from_u32(project.user_class) else {
+                continue;
+            };
+            let project_cost = cost
+                .projects
+                .entry(project_name.clone())
+                .or_insert(ServerCostProject {
+                    total: 0.0,
+                    flavors: HashMap::new(),
+                    users: HashMap::new(),
+                });
+
+            for (user_name, user_consumption) in project_consumption.users {
+                let user_cost = project_cost
+                    .users
+                    .entry(user_name.clone())
+                    .or_insert(ServerCostUser {
+                        total: 0.0,
+                        flavors: HashMap::new(),
+                        servers: HashMap::new(),
+                    });
+                for (server_uuid, server_consumption) in
+                    user_consumption.servers
+                {
+                    let server_cost = user_cost
+                        .servers
+                        .entry(server_uuid.clone())
+                        .or_insert(ServerCostServer {
+                            total: 0.0,
+                            flavors: HashMap::new(),
+                        });
+                    for (flavor_name, flavor_consumption) in server_consumption
+                    {
+                        let flavor_cost = calculate_flavor_consumption_cost(
+                            flavor_consumption,
+                            prices.clone(),
+                            user_class.clone(),
+                            flavor_name.clone(),
+                        );
+                        *server_cost
+                            .flavors
+                            .entry(flavor_name.clone())
+                            .or_default() += flavor_cost;
+                        *user_cost
+                            .flavors
+                            .entry(flavor_name.clone())
+                            .or_default() += flavor_cost;
+                        *project_cost
+                            .flavors
+                            .entry(flavor_name.clone())
+                            .or_default() += flavor_cost;
+                        *cost.flavors.entry(flavor_name).or_default() +=
+                            flavor_cost;
+                        if flavor_cost <= 0. {
+                            continue;
+                        }
+                        server_cost.total += flavor_cost;
+                        user_cost.total += flavor_cost;
+                        project_cost.total += flavor_cost;
+                        cost.total += flavor_cost;
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(cost)
 }
 
 pub async fn calculate_server_cost_for_all(
