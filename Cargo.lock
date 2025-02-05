@@ -1672,6 +1672,7 @@ dependencies = [
  "cargo-husky",
  "chrono",
  "config",
+ "indexmap",
  "jzon",
  "lrzcc-test",
  "lrzcc-wire",
