@@ -28,8 +28,8 @@ use lrzcc_wire::resources::{
 };
 use lrzcc_wire::user::{Project, User};
 use once_cell::sync::Lazy;
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
+use rand::distr::Alphanumeric;
+use rand::{rng, Rng};
 use serde_json::json;
 use sqlx::{
     Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
@@ -628,7 +628,7 @@ pub fn random_uuid() -> String {
 }
 
 pub fn random_alphanumeric_string(length: usize) -> String {
-    thread_rng()
+    rng()
         .sample_iter(&Alphanumeric)
         .take(length)
         .map(char::from)
@@ -636,9 +636,9 @@ pub fn random_alphanumeric_string(length: usize) -> String {
 }
 
 pub fn random_number(range: Range<u32>) -> u32 {
-    thread_rng().gen_range(range)
+    rng().random_range(range)
 }
 
 pub fn random_bool() -> bool {
-    thread_rng().gen_bool(0.5)
+    rng().random_bool(0.5)
 }
