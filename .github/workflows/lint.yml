@@ -19,6 +19,8 @@ on:
       - 'docker-compose.yml'
       - '.github/workflows/lint.yml'
 
+permissions: {}
+
 env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: "0.8.3"
