@@ -13,7 +13,7 @@ use crate::resources::flavor::find_id as flavor_find_id;
 
 #[derive(Subcommand, Debug)]
 pub(crate) enum FlavorPriceCommand {
-    #[clap(about = "List users")]
+    #[clap(about = "List flavor prices")]
     List,
 
     #[clap(visible_alias = "show", about = "Show flavor price with given ID")]
