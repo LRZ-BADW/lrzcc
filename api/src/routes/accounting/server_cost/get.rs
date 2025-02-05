@@ -373,14 +373,16 @@ pub async fn calculate_server_cost_for_user_normal(
             );
         };
         for (flavor_name, flavor_consumption) in consumption {
-            if flavor_consumption > 0. {
-                cost.total += calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name,
-                );
+            if flavor_consumption <= 0. {
+                continue;
             }
+            let flavor_cost = calculate_flavor_consumption_cost(
+                flavor_consumption,
+                prices.clone(),
+                user_class.clone(),
+                flavor_name,
+            );
+            cost.total += flavor_cost;
         }
     }
 
@@ -431,30 +433,28 @@ pub async fn calculate_server_cost_for_user_detail(
             );
         };
         for (server_uuid, server_consumption) in consumption.servers {
+            let server_cost = cost
+                .servers
+                .entry(server_uuid.clone())
+                .or_insert(ServerCostServer {
+                    total: 0.0,
+                    flavors: HashMap::new(),
+                });
             for (flavor_name, flavor_consumption) in server_consumption {
-                if flavor_consumption > 0. {
-                    let flavor_cost = calculate_flavor_consumption_cost(
-                        flavor_consumption,
-                        prices.clone(),
-                        user_class.clone(),
-                        flavor_name.clone(),
-                    );
-                    let server_cost = cost
-                        .servers
-                        .entry(server_uuid.clone())
-                        .or_insert(ServerCostServer {
-                            total: 0.0,
-                            flavors: HashMap::new(),
-                        });
-                    *server_cost
-                        .flavors
-                        .entry(flavor_name.clone())
-                        .or_default() += flavor_cost;
-                    server_cost.total += flavor_cost;
-                    *cost.flavors.entry(flavor_name).or_default() +=
-                        flavor_cost;
-                    cost.total += flavor_cost;
+                let flavor_cost = calculate_flavor_consumption_cost(
+                    flavor_consumption,
+                    prices.clone(),
+                    user_class.clone(),
+                    flavor_name.clone(),
+                );
+                *server_cost.flavors.entry(flavor_name.clone()).or_default() +=
+                    flavor_cost;
+                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
+                if flavor_cost <= 0. {
+                    continue;
                 }
+                server_cost.total += flavor_cost;
+                cost.total += flavor_cost;
             }
         }
     }
