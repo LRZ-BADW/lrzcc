@@ -383,10 +383,10 @@ pub async fn calculate_server_cost_for_user_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_user_detail(
-    transaction: &mut Transaction<'_, MySql>,
-    user_id: u64,
-    begin: DateTime<Utc>,
-    end: DateTime<Utc>,
+    _transaction: &mut Transaction<'_, MySql>,
+    _user_id: u64,
+    _begin: DateTime<Utc>,
+    _end: DateTime<Utc>,
 ) -> Result<ServerCostUser, UnexpectedOnlyError> {
     todo!()
 }
@@ -483,10 +483,10 @@ pub async fn calculate_server_cost_for_project_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_project_detail(
-    transaction: &mut Transaction<'_, MySql>,
-    project_id: u64,
-    begin: DateTime<Utc>,
-    end: DateTime<Utc>,
+    _transaction: &mut Transaction<'_, MySql>,
+    _project_id: u64,
+    _begin: DateTime<Utc>,
+    _end: DateTime<Utc>,
 ) -> Result<ServerCostProject, UnexpectedOnlyError> {
     todo!()
 }
@@ -588,9 +588,9 @@ pub async fn calculate_server_cost_for_all_normal(
 
 // TODO: can we use macros to get rid of the code duplication here
 pub async fn calculate_server_cost_for_all_detail(
-    transaction: &mut Transaction<'_, MySql>,
-    begin: DateTime<Utc>,
-    end: DateTime<Utc>,
+    _transaction: &mut Transaction<'_, MySql>,
+    _begin: DateTime<Utc>,
+    _end: DateTime<Utc>,
 ) -> Result<ServerCostAll, UnexpectedOnlyError> {
     todo!()
 }
