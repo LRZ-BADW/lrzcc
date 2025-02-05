@@ -1,22 +1,41 @@
 use crate::common::display_option;
 use crate::resources::FlavorGroupMinimal;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{mysql::MySqlRow, FromRow, Row};
 use std::fmt::Display;
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct Flavor {
-    #[sqlx(try_from = "i32")]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
     #[tabled(display_with = "display_option")]
-    #[sqlx(rename = "group_id")]
     pub group: Option<u32>,
     #[tabled(display_with = "display_option")]
     pub group_name: Option<String>,
     pub weight: u32,
+}
+
+impl<'r> FromRow<'r, MySqlRow> for Flavor {
+    fn from_row(row: &'r MySqlRow) -> Result<Self, sqlx::Error> {
+        let id: u32 = row.try_get::<i32, _>("id")?.try_into().unwrap();
+        let name: String = row.try_get("name")?;
+        let openstack_id: String = row.try_get("openstack_id")?;
+        let group: Option<u32> = row
+            .try_get::<Option<i32>, _>("group_id")?
+            .map(|g| g.try_into().unwrap());
+        let group_name: Option<String> = row.try_get("group_name")?;
+        let weight: u32 = row.try_get("weight")?;
+        Ok(Flavor {
+            id,
+            name,
+            openstack_id,
+            group,
+            group_name,
+            weight,
+        })
+    }
 }
 
 impl Display for Flavor {

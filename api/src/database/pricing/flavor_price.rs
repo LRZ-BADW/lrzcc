@@ -8,7 +8,9 @@ use sqlx::{Executor, FromRow, MySql, Transaction};
 
 #[derive(FromRow)]
 pub struct FlavorPriceRow {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
+    #[sqlx(try_from = "i32")]
     pub flavor: u32,
     pub flavor_name: String,
     pub user_class: u32,
@@ -95,6 +97,54 @@ pub async fn select_all_flavor_prices_from_db(
         WHERE
             p.flavor_id = f.id
         "#,
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| FlavorPriceRow::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to flavor price")?
+        .into_iter()
+        .map(|row| FlavorPrice {
+            id: row.id,
+            flavor: row.flavor,
+            flavor_name: row.flavor_name,
+            user_class: row.user_class,
+            unit_price: row.unit_price,
+            start_time: row.start_time.fixed_offset(),
+        })
+        .collect();
+    Ok(rows)
+}
+
+#[tracing::instrument(
+    name = "select_flavor_prices_for_period_from_db",
+    skip(transaction)
+)]
+pub async fn select_flavor_prices_for_period_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    begin: DateTime<Utc>,
+    end: DateTime<Utc>,
+) -> Result<Vec<FlavorPrice>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT
+            p.id,
+            p.flavor_id as flavor,
+            f.name as flavor_name, 
+            p.user_class as user_class,
+            p.unit_price as unit_price,
+            p.start_time as start_time
+        FROM
+            pricing_flavorprice as p,
+            resources_flavor as f
+        WHERE
+            p.flavor_id = f.id AND
+            p.start_time <= ?
+        "#,
+        end,
     );
     let rows = transaction
         .fetch_all(query)

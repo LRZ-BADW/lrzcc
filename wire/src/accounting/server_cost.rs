@@ -1,3 +1,4 @@
+use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -33,4 +34,15 @@ pub struct ServerCostAll {
     pub total: f64,
     pub flavors: HashMap<String, f64>,
     pub projects: HashMap<String, ServerCostProject>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ServerCostParams {
+    pub begin: Option<DateTime<FixedOffset>>,
+    pub end: Option<DateTime<FixedOffset>>,
+    pub server: Option<String>,
+    pub user: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+    pub detail: Option<bool>,
 }
