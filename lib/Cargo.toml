@@ -9,7 +9,7 @@ repository = "https://github.com/LRZ-BADW/lrzcc"
 exclude = []
 readme = "README.md"
 license = "MIT"
-version = "1.6.0"
+version = "1.7.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -20,7 +20,6 @@ path = "src/lib.rs"
 
 [features]
 default = ["all"]
-# vendored-tls = ["reqwest/native-tls-vendored"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
 accounting = ["lrzcc-wire/accounting"]
 budgeting = ["lrzcc-wire/budgeting"]
@@ -39,7 +38,7 @@ thiserror = "2"
 anyhow = "1"
 chrono = { version = "0.4", features = ["serde"] }
 jzon = "0.12"
-lrzcc-wire = { version = "1.5", path = "../wire" }
+lrzcc-wire = { version = "1.6", path = "../wire" }
 
 [dev-dependencies]
 cargo-husky = { workspace = true }
