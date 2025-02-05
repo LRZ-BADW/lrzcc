@@ -43,3 +43,4 @@ features = [
 
 [dev-dependencies]
 cargo-husky = { workspace = true }
+bencher = "0.1"
