@@ -18,6 +18,7 @@ use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
 use anyhow::{anyhow, Context};
 use chrono::{DateTime, Datelike, TimeZone, Utc};
+use indexmap::IndexMap;
 use lrzcc_wire::accounting::{
     ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
     ServerCostSimple, ServerCostUser,
@@ -103,7 +104,7 @@ async fn get_flavor_prices_for_period(
 }
 
 type Prices = HashMap<UserClass, HashMap<String, f64>>;
-type PricePeriods = HashMap<DateTime<Utc>, Prices>;
+type PricePeriods = IndexMap<DateTime<Utc>, Prices>;
 
 async fn get_flavor_price_periods(
     transaction: &mut Transaction<'_, MySql>,
