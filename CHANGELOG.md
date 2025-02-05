@@ -4,6 +4,114 @@ This is the combined changelog of all contained `lrzcc` crates.
 ## [Unreleased]
 ...
 
+## Repository
+
+### Documentation
+- fix typo in crates list in readme
+
+### CI
+- bump taiki-e/install-action from 2.47.0 to 2.47.12
+- bump sqlx version to 8.3
+- configure empty permissions in workflows
+
+### Miscellaneous
+- add Zlib license allowance in deny configuration
+
+## [lrzcc-api-v0.7.0] - 2025-02-05
+
+### Database
+- add select_user_class_by_project_from_db
+- add select_user_class_by_user_from_db
+- add select_user_class_by_server_from_db
+- add sqlx try_froms to FlavorPriceRow
+- add select_flavor_prices_for_period_from_db
+- add select_ordered_server_states_by_user_begin_and_end_from_db
+- add select_ordered_server_states_by_server_begin_and_end_from_db
+
+### Documentation
+- add development section with local api run and call guide to readme
+
+### Features
+- add server-cost endpoint and implement for server, user, project, all, and normal, detail
+- add server-consumption endpoint and implement for server, user, project and all
+
+### Dependencies
+- add indexmap dependency
+- add strum dependency
+- bump lrzcc-wire from 1.5 to 1.6
+- bump config from 0.15.4 to 0.15.7
+- bump sqlx from 0.8.2 to 0.8.3
+- bump reqwest from 0.12.10 to 0.12.12
+- bump serde from 1.0.216 to 1.0.217
+- bump serde_json from 1.0.134 to 1.0.138
+- bump thiserror from 2.0.9 to 2.0.11
+- bump tokio from 1.42.0 to 1.43.0
+
+## [lrzcc-cli-v1.5.2] - 2025-02-05
+
+### Fixes
+- correct typo in flavor-price list help message
+
+### Dependencies
+- bump lrzcc-wire from 1.5 to 1.6
+- bump lrzcc-lib from 1.6 to 1.7
+- bump clap from 4.5.23 to 4.5.28
+- bump colored from 2.2.0 to 3.0.0
+- bump serde from 1.0.216 to 1.0.217
+- bump serde_json from 1.0.134 to 1.0.138
+
+## [lrzcc-lib-v1.7.0] - 2025-02-05
+- use ServerCostParams in ServerCostRequest
+- revise ServerConsumptionRequest to use ServerConsumptionParams
+- revise for optional ServerConsumptionParams fields
+
+### Fixes
+- correct "Failed to envode..." typo in error messages
+
+### Dependencies
+- force reqwest to use rustls
+- bump lrzcc-wire from 1.5 to 1.6
+- bump config from 0.15.4 to 0.15.7
+- bump reqwest from 0.12.10 to 0.12.12
+- bump serde from 1.0.216 to 1.0.217
+- bump serde_json from 1.0.134 to 1.0.138
+- bump thiserror from 2.0.9 to 2.0.11
+
+## [lrzcc-wire-v1.6.0] - 2025-02-05
+
+### Features
+- add ServerCostParams, ServerConsumptionParams
+- derive Default for ServerConsumption structs
+- make ServerConsumptionParams.all/detail Options
+
+### Fixes
+- manually implement FromRow for Flavor
+
+### Dependencies
+- bump sqlx from 0.8.2 to 0.8.3
+- bump serde from 1.0.216 to 1.0.217
+
+## [lrzcc-test-v0.5.0] - 2025-02-05
+
+### Features
+- add rudimentary bench
+
+### Fixes
+- revise for new rand api
+
+### Dependencies
+- force reqwest to use rustls
+- add bencher dependency
+- bump lrzcc-lib from 1.6 to 1.7
+- bump lrzcc-api from 0.6 to 0.7
+- bump lrzcc-wire from 1.5 to 1.6
+- bump rand from 0.8.5 to 0.9.0
+- bump sqlx from 0.8.2 to 0.8.3
+- bump reqwest from 0.12.10 to 0.12.12
+- bump serde_json from 1.0.134 to 1.0.138
+- bump tokio from 1.42.0 to 1.43.0
+- bump uuid from 1.11.0 to 1.12.1
+
 ## [lrzcc-api-v0.6.1] - 2024-12-29
 
 ### Fixes
