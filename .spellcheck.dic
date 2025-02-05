@@ -79,3 +79,4 @@ Params
 inits
 server_consumption
 server_cost
+parallelize
