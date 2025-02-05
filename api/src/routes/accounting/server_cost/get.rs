@@ -424,19 +424,6 @@ pub async fn calculate_server_cost_for_user_detail(
                 anyhow!("Unexpected ServerConsumptionForUser variant").into()
             );
         };
-        // TODO: do we really want to calculate this separately
-        for (flavor_name, flavor_consumption) in consumption.total {
-            if flavor_consumption > 0. {
-                let flavor_cost = calculate_flavor_consumption_cost(
-                    flavor_consumption,
-                    prices.clone(),
-                    user_class.clone(),
-                    flavor_name.clone(),
-                );
-                *cost.flavors.entry(flavor_name).or_default() += flavor_cost;
-                cost.total += flavor_cost;
-            }
-        }
         for (server_uuid, server_consumption) in consumption.servers {
             for (flavor_name, flavor_consumption) in server_consumption {
                 if flavor_consumption > 0. {
@@ -458,6 +445,9 @@ pub async fn calculate_server_cost_for_user_detail(
                         .entry(flavor_name.clone())
                         .or_default() += flavor_cost;
                     server_cost.total += flavor_cost;
+                    *cost.flavors.entry(flavor_name).or_default() +=
+                        flavor_cost;
+                    cost.total += flavor_cost;
                 }
             }
         }
