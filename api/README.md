@@ -5,9 +5,16 @@ system.
 
 ## Development
 
-### Running the API server locally
+### Requirements
+To work with the API locally you need Docker as well as the MariaDB client.
+The `init.sh` script is then used to setup and migrate a database for you.
 ```bash
 scripts/init.sh
+```
+This is required prior to both `cargo test` and running the API locally.
+
+### Running the API server locally
+```bash
 source admin-openrc.sh
 source scripts/config_env.sh
 
