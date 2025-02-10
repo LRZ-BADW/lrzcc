@@ -51,7 +51,7 @@ jzon = "0.12"
 lrzcc-wire = { version = "1.6", path = "../wire" }
 thiserror = "2.0"
 chrono = { version = "0.4", features = ["serde"] }
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27", features = ["derive"] }
 indexmap = "2.7"
 
 [dependencies.sqlx]
