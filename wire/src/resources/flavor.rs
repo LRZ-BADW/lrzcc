@@ -10,9 +10,9 @@ pub struct Flavor {
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub group: Option<u32>,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub group_name: Option<String>,
     pub weight: u32,
 }
@@ -62,9 +62,9 @@ pub struct FlavorDetailed {
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub group: Option<FlavorGroupMinimal>,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub group_name: Option<String>,
     pub weight: u32,
 }
@@ -140,9 +140,9 @@ pub struct FlavorUsage {
     pub user_name: String,
     pub flavor_id: u32,
     pub flavor_name: String,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub flavorgroup_id: Option<u32>,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub flavorgroup_name: Option<String>,
     pub count: u32,
     pub usage: u32,
@@ -152,9 +152,9 @@ pub struct FlavorUsage {
 pub struct FlavorUsageAggregate {
     pub flavor_id: u32,
     pub flavor_name: String,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub flavorgroup_id: Option<u32>,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub flavorgroup_name: Option<String>,
     pub count: u32,
     pub usage: u32,

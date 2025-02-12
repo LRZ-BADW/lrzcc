@@ -8,7 +8,7 @@ use tabled::Tabled;
 pub struct ServerState {
     pub id: u32,
     pub begin: DateTime<FixedOffset>,
-    #[tabled(display_with = "display_option")]
+    #[tabled(display = "display_option")]
     pub end: Option<DateTime<FixedOffset>>,
     pub instance_id: String, // UUIDv4
     pub instance_name: String,
