@@ -16,6 +16,21 @@ pub use quota::*;
 pub use resources::*;
 pub use user::*;
 
+// TODO: missing endpoints
+// - resources::flavor::import
+// - resources::flavor::usage
+// - resources::flavor_group::initialize
+// - resources::flavor_group::usage
+// - resources::usage
+// - pricing::flavor_price::initialize
+// - quota::flavor_quota::check
+// - user::import
+// - accounting::server_state::import
+// - budgeting::project::over
+// - budgeting::user::over
+// - budgeting::budget_over_tree
+// - budgeting::budget_bulk_create
+
 // TODO: improve the following endpoints
 // - budgeting::project_budget::modify
 // - budgeting::user_budget::modify
