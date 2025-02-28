@@ -26,8 +26,8 @@ pub use user::*;
 // - quota::flavor_quota::check
 // - user::import
 // - accounting::server_state::import
-// - budgeting::project::over
-// - budgeting::user::over
+// - budgeting::project_budget::over
+// - budgeting::user_budget::over
 // - budgeting::budget_over_tree
 // - budgeting::budget_bulk_create
 
