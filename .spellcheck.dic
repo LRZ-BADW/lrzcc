@@ -80,3 +80,5 @@ inits
 server_consumption
 server_cost
 parallelize
+budget_over_tree
+budget_bulk_create
