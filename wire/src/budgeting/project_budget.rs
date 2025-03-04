@@ -77,7 +77,7 @@ impl ProjectBudgetModifyData {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct ProjectBudgetOver {
+pub struct ProjectBudgetOverSimple {
     pub budget_id: u32,
     pub project_id: u32,
     pub project_name: String,
@@ -85,7 +85,7 @@ pub struct ProjectBudgetOver {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct ProjectBudgetDetail {
+pub struct ProjectBudgetOverDetail {
     pub budget_id: u32,
     pub project_id: u32,
     pub project_name: String,

@@ -3,9 +3,9 @@ use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
-    ProjectBudget, ProjectBudgetCreateData, ProjectBudgetDetail,
-    ProjectBudgetListParams, ProjectBudgetModifyData, ProjectBudgetOver,
-    ProjectBudgetOverParams,
+    ProjectBudget, ProjectBudgetCreateData, ProjectBudgetListParams,
+    ProjectBudgetModifyData, ProjectBudgetOverDetail, ProjectBudgetOverParams,
+    ProjectBudgetOverSimple,
 };
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
@@ -195,7 +195,7 @@ impl ProjectBudgetOverRequest {
         self
     }
 
-    pub fn normal(&mut self) -> Result<Vec<ProjectBudgetOver>, ApiError> {
+    pub fn normal(&mut self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
         self.params.detail = Some(false);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -213,7 +213,7 @@ impl ProjectBudgetOverRequest {
         )
     }
 
-    pub fn detail(&mut self) -> Result<Vec<ProjectBudgetDetail>, ApiError> {
+    pub fn detail(&mut self) -> Result<Vec<ProjectBudgetOverDetail>, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
