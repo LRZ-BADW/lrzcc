@@ -1,4 +1,5 @@
 use crate::common::is_false;
+use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::fmt::Display;
@@ -25,6 +26,15 @@ pub struct ProjectBudgetListParams {
     pub project: Option<u32>,
     pub all: Option<bool>,
     pub year: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ProjectBudgetOverParams {
+    pub end: Option<DateTime<FixedOffset>>,
+    pub budget: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+    pub detail: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -67,7 +77,7 @@ impl ProjectBudgetModifyData {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct ProjectBudgetOver {
+pub struct ProjectBudgetOverSimple {
     pub budget_id: u32,
     pub project_id: u32,
     pub project_name: String,
@@ -75,7 +85,7 @@ pub struct ProjectBudgetOver {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct ProjectBudgetDetail {
+pub struct ProjectBudgetOverDetail {
     pub budget_id: u32,
     pub project_id: u32,
     pub project_name: String,
