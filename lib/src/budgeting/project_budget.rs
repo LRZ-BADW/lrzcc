@@ -3,11 +3,11 @@ use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
-    ProjectBudget, ProjectBudgetCreateData, ProjectBudgetDetail,
-    ProjectBudgetListParams, ProjectBudgetModifyData, ProjectBudgetOver,
+    ProjectBudget, ProjectBudgetCreateData, ProjectBudgetListParams,
+    ProjectBudgetModifyData, ProjectBudgetOverDetail, ProjectBudgetOverParams,
+    ProjectBudgetOverSimple,
 };
 use reqwest::blocking::Client;
-use reqwest::Url;
 use reqwest::{Method, StatusCode};
 use std::rc::Rc;
 
@@ -156,11 +156,7 @@ pub struct ProjectBudgetOverRequest {
     url: String,
     client: Rc<Client>,
 
-    end: Option<DateTime<FixedOffset>>,
-    budget: Option<u32>,
-    project: Option<u32>,
-    all: bool,
-    detail: bool,
+    params: ProjectBudgetOverParams,
 }
 
 impl ProjectBudgetOverRequest {
@@ -169,56 +165,45 @@ impl ProjectBudgetOverRequest {
             url: url.to_string(),
             client: Rc::clone(client),
 
-            end: None,
-            budget: None,
-            project: None,
-            all: false,
-            detail: false,
+            params: ProjectBudgetOverParams {
+                end: None,
+                budget: None,
+                project: None,
+                all: None,
+                detail: None,
+            },
         }
-    }
-
-    fn params(&self) -> Vec<(&str, String)> {
-        let mut params = Vec::new();
-        if let Some(end) = self.end {
-            params.push(("end", end.to_rfc3339()));
-        }
-        if let Some(budget) = self.budget {
-            params.push(("budget", budget.to_string()));
-        } else if let Some(project) = self.project {
-            params.push(("project", project.to_string()));
-        } else if self.all {
-            params.push(("all", "1".to_string()));
-        }
-        if self.detail {
-            params.push(("detail", "1".to_string()));
-        }
-        params
     }
 
     pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
-        self.end = Some(end);
+        self.params.end = Some(end);
         self
     }
 
     pub fn budget(&mut self, budget: u32) -> &mut Self {
-        self.budget = Some(budget);
+        self.params.budget = Some(budget);
         self
     }
 
     pub fn project(&mut self, project: u32) -> &mut Self {
-        self.project = Some(project);
+        self.params.project = Some(project);
         self
     }
 
     pub fn all(&mut self) -> &mut Self {
-        self.all = true;
+        self.params.all = Some(true);
         self
     }
 
-    pub fn normal(&mut self) -> Result<Vec<ProjectBudgetOver>, ApiError> {
-        self.detail = false;
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+    pub fn normal(&mut self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
+        self.params.detail = Some(false);
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to encode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,
@@ -228,10 +213,15 @@ impl ProjectBudgetOverRequest {
         )
     }
 
-    pub fn detail(&mut self) -> Result<Vec<ProjectBudgetDetail>, ApiError> {
-        self.detail = true;
-        let url = Url::parse_with_params(self.url.as_str(), self.params())
-            .context("Could not parse URL GET parameters.")?;
+    pub fn detail(&mut self) -> Result<Vec<ProjectBudgetOverDetail>, ApiError> {
+        self.params.detail = Some(true);
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to encode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
         request(
             &self.client,
             Method::GET,

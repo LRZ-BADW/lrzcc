@@ -52,6 +52,59 @@ pub async fn select_project_budget_from_db(
 }
 
 #[tracing::instrument(
+    name = "select_maybe_project_budget_by_project_and_year_from_db",
+    skip(transaction)
+)]
+pub async fn select_maybe_project_budget_by_project_and_year_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    year: u32,
+) -> Result<Option<ProjectBudget>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT b.id, p.id as project, p.name as project_name, b.year, b.amount
+        FROM budgeting_projectbudget as b, user_project as p
+        WHERE
+            b.project_id = p.id AND
+            b.project_id = ? AND
+            b.year = ?
+        "#,
+        project_id,
+        year,
+    );
+    let row = transaction
+        .fetch_optional(query)
+        .await
+        .context("Failed to execute select query")?;
+    // TODO: isn't there a nicer way to write this?
+    Ok(match row {
+        Some(row) => Some(
+            ProjectBudget::from_row(&row)
+                .context("Failed to parse project_budget row")?,
+        ),
+        None => None,
+    })
+}
+
+#[tracing::instrument(
+    name = "select_project_budget_by_project_and_year_from_db",
+    skip(transaction)
+)]
+pub async fn select_project_budget_by_project_and_year_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    year: u32,
+) -> Result<ProjectBudget, NotFoundOrUnexpectedApiError> {
+    select_maybe_project_budget_by_project_and_year_from_db(
+        transaction,
+        project_id,
+        year,
+    )
+    .await?
+    .ok_or(NotFoundOrUnexpectedApiError::NotFoundError)
+}
+
+#[tracing::instrument(
     name = "select_all_project_budgets_from_db",
     skip(transaction)
 )]
