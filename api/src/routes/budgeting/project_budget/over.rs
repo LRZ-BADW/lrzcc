@@ -62,11 +62,43 @@ pub async fn calculate_project_budget_over_for_budget_normal(
 }
 
 pub async fn calculate_project_budget_over_for_budget_detail(
-    _transaction: &mut Transaction<'_, MySql>,
-    _budget_id: u64,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    budget_id: u64,
+    end: DateTime<Utc>,
 ) -> Result<Vec<ProjectBudgetOverDetail>, UnexpectedOnlyError> {
-    todo!();
+    let mut overs = vec![];
+    let Some(budget) =
+        select_maybe_project_budget_from_db(transaction, budget_id).await?
+    else {
+        return Ok(overs);
+    };
+    let year = budget.year;
+    if year != end.year() as u32 {
+        return Ok(overs);
+    }
+    // TODO: outsource into function
+    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let ServerCostForProject::Normal(cost) = calculate_server_cost_for_project(
+        transaction,
+        budget.project as u64,
+        begin,
+        end,
+        None,
+    )
+    .await?
+    else {
+        return Err(anyhow!("Unexpected ServerCostForProject variant.").into());
+    };
+    let over = ProjectBudgetOverDetail {
+        budget_id: budget_id as u32,
+        project_id: budget.project,
+        project_name: budget.project_name,
+        over: cost.total >= budget.amount as f64,
+        cost: cost.total,
+        budget: budget.amount,
+    };
+    overs.push(over);
+    Ok(overs)
 }
 
 pub async fn calculate_project_budget_over_for_budget(
