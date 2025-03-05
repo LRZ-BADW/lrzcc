@@ -334,6 +334,7 @@ pub enum ServerCostForUser {
     Detail(ServerCostUser),
 }
 
+// TODO: shouldn't this return not found, when the user doesn't exist?
 pub async fn calculate_server_cost_for_user_normal(
     transaction: &mut Transaction<'_, MySql>,
     user_id: u64,
@@ -428,9 +429,10 @@ pub async fn calculate_server_cost_for_user_detail(
             )
             .await?
         else {
-            return Err(
-                anyhow!("Unexpected ServerConsumptionForUser variant").into()
-            );
+            return Err(anyhow!(
+                "Unexpected ServerConsumptionForUser variant."
+            )
+            .into());
         };
         for (server_uuid, server_consumption) in consumption.servers {
             let server_cost = cost

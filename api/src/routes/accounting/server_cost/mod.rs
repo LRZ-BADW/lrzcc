@@ -1,7 +1,7 @@
 use actix_web::web::{get, scope};
 use actix_web::Scope;
 
-mod get;
+pub(crate) mod get;
 use get::server_cost;
 
 pub fn server_cost_scope() -> Scope {
