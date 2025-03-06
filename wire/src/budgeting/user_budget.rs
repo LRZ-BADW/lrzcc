@@ -1,4 +1,5 @@
 use crate::common::is_false;
+use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::fmt::Display;
@@ -25,6 +26,17 @@ pub struct UserBudgetListParams {
     pub project: Option<u32>,
     pub all: Option<bool>,
     pub year: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UserBudgetOverParams {
+    pub end: Option<DateTime<FixedOffset>>,
+    pub budget: Option<u32>,
+    pub user: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+    pub combined: Option<bool>,
+    pub detail: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
