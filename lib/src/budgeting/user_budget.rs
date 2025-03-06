@@ -3,9 +3,10 @@ use crate::error::ApiError;
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
-    UserBudget, UserBudgetCombined, UserBudgetCombinedDetail,
-    UserBudgetCreateData, UserBudgetDetail, UserBudgetListParams,
-    UserBudgetModifyData, UserBudgetOver, UserBudgetOverParams, UserBudgetSync,
+    UserBudget, UserBudgetCreateData, UserBudgetListParams,
+    UserBudgetModifyData, UserBudgetOver, UserBudgetOverCombined,
+    UserBudgetOverCombinedDetail, UserBudgetOverDetail, UserBudgetOverParams,
+    UserBudgetSync,
 };
 use reqwest::blocking::Client;
 use reqwest::{Method, StatusCode};
@@ -236,7 +237,9 @@ impl UserBudgetOverRequest {
         )
     }
 
-    pub fn combined(&mut self) -> Result<Vec<UserBudgetCombined>, ApiError> {
+    pub fn combined(
+        &mut self,
+    ) -> Result<Vec<UserBudgetOverCombined>, ApiError> {
         self.params.combined = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -254,7 +257,7 @@ impl UserBudgetOverRequest {
         )
     }
 
-    pub fn detail(&mut self) -> Result<Vec<UserBudgetDetail>, ApiError> {
+    pub fn detail(&mut self) -> Result<Vec<UserBudgetOverDetail>, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -274,7 +277,7 @@ impl UserBudgetOverRequest {
 
     pub fn combined_detail(
         &mut self,
-    ) -> Result<Vec<UserBudgetCombinedDetail>, ApiError> {
+    ) -> Result<Vec<UserBudgetOverCombinedDetail>, ApiError> {
         self.params.combined = Some(true);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)

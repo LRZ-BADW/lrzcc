@@ -87,7 +87,7 @@ pub struct UserBudgetOver {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetCombined {
+pub struct UserBudgetOverCombined {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
@@ -98,7 +98,7 @@ pub struct UserBudgetCombined {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetDetail {
+pub struct UserBudgetOverDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
@@ -108,7 +108,7 @@ pub struct UserBudgetDetail {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetCombinedDetail {
+pub struct UserBudgetOverCombinedDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
