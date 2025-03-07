@@ -4,8 +4,8 @@ use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::budgeting::{
     UserBudget, UserBudgetCreateData, UserBudgetListParams,
-    UserBudgetModifyData, UserBudgetOver, UserBudgetOverCombined,
-    UserBudgetOverCombinedDetail, UserBudgetOverDetail, UserBudgetOverParams,
+    UserBudgetModifyData, UserBudgetOverCombined, UserBudgetOverCombinedDetail,
+    UserBudgetOverDetail, UserBudgetOverParams, UserBudgetOverSimple,
     UserBudgetSync,
 };
 use reqwest::blocking::Client;
@@ -178,7 +178,7 @@ impl UserBudgetOverRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<UserBudgetOver>, ApiError> {
+    pub fn send(&self) -> Result<Vec<UserBudgetOverSimple>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -220,7 +220,7 @@ impl UserBudgetOverRequest {
         self
     }
 
-    pub fn normal(&mut self) -> Result<Vec<UserBudgetOver>, ApiError> {
+    pub fn normal(&mut self) -> Result<Vec<UserBudgetOverSimple>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
