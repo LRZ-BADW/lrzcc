@@ -79,7 +79,7 @@ impl UserBudgetModifyData {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetOver {
+pub struct UserBudgetOverSimple {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
