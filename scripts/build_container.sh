@@ -3,8 +3,8 @@
 VERSION=0.7.0
 
 docker build \
-    --tag "gierens/lrzcc:v${VERSION}" \
-    --tag "gierens/lrzcc:latest" \
+    --tag "lrzcc-api/lrzcc:v${VERSION}" \
+    --tag "lrzcc-api/lrzcc:latest" \
     --file Dockerfile \
     .
 
@@ -17,6 +17,6 @@ fi
 read -p "Publish container? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker push "gierens/lrzcc:v${VERSION}"
-    docker push "gierens/lrzcc:latest"
+    docker push "lrzcc-api/lrzcc:v${VERSION}"
+    docker push "lrzcc-api/lrzcc:latest"
 fi
