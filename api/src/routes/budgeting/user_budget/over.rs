@@ -23,43 +23,284 @@ pub enum UserBudgetOver {
     CombinedDetail(Vec<UserBudgetOverCombinedDetail>),
 }
 
-pub async fn calculate_user_budget_over_for_budget(
+pub async fn calculate_user_budget_over_for_budget_normal(
     _transaction: &mut Transaction<'_, MySql>,
     _budget_id: u64,
     _end: DateTime<Utc>,
-    _combined: Option<bool>,
-    _detail: Option<bool>,
+) -> Result<Vec<UserBudgetOverSimple>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_budget_combined(
+    _transaction: &mut Transaction<'_, MySql>,
+    _budget_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_budget_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _budget_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverDetail>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_budget_combined_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _budget_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombinedDetail>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_budget(
+    transaction: &mut Transaction<'_, MySql>,
+    budget_id: u64,
+    end: DateTime<Utc>,
+    combined: Option<bool>,
+    detail: Option<bool>,
 ) -> Result<UserBudgetOver, UnexpectedOnlyError> {
+    Ok(match (combined, detail) {
+        (Some(true), Some(true)) => UserBudgetOver::CombinedDetail(
+            calculate_user_budget_over_for_budget_combined_detail(
+                transaction,
+                budget_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), Some(true)) => UserBudgetOver::Detail(
+            calculate_user_budget_over_for_budget_detail(
+                transaction,
+                budget_id,
+                end,
+            )
+            .await?,
+        ),
+        (Some(true), None | Some(false)) => UserBudgetOver::Combined(
+            calculate_user_budget_over_for_budget_combined(
+                transaction,
+                budget_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), None | Some(false)) => UserBudgetOver::Normal(
+            calculate_user_budget_over_for_budget_normal(
+                transaction,
+                budget_id,
+                end,
+            )
+            .await?,
+        ),
+    })
+}
+
+pub async fn calculate_user_budget_over_for_user_normal(
+    _transaction: &mut Transaction<'_, MySql>,
+    _user_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverSimple>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_user_combined(
+    _transaction: &mut Transaction<'_, MySql>,
+    _user_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_user_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _user_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverDetail>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_user_combined_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _user_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombinedDetail>, UnexpectedOnlyError> {
     todo!()
 }
 
 pub async fn calculate_user_budget_over_for_user(
-    _transaction: &mut Transaction<'_, MySql>,
-    _user_id: u64,
-    _end: DateTime<Utc>,
-    _combined: Option<bool>,
-    _detail: Option<bool>,
+    transaction: &mut Transaction<'_, MySql>,
+    user_id: u64,
+    end: DateTime<Utc>,
+    combined: Option<bool>,
+    detail: Option<bool>,
 ) -> Result<UserBudgetOver, UnexpectedOnlyError> {
+    Ok(match (combined, detail) {
+        (Some(true), Some(true)) => UserBudgetOver::CombinedDetail(
+            calculate_user_budget_over_for_user_combined_detail(
+                transaction,
+                user_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), Some(true)) => UserBudgetOver::Detail(
+            calculate_user_budget_over_for_user_detail(
+                transaction,
+                user_id,
+                end,
+            )
+            .await?,
+        ),
+        (Some(true), None | Some(false)) => UserBudgetOver::Combined(
+            calculate_user_budget_over_for_user_combined(
+                transaction,
+                user_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), None | Some(false)) => UserBudgetOver::Normal(
+            calculate_user_budget_over_for_user_normal(
+                transaction,
+                user_id,
+                end,
+            )
+            .await?,
+        ),
+    })
+}
+
+pub async fn calculate_user_budget_over_for_project_normal(
+    _transaction: &mut Transaction<'_, MySql>,
+    _project_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverSimple>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_project_combined(
+    _transaction: &mut Transaction<'_, MySql>,
+    _project_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_project_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _project_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverDetail>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_project_combined_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _project_id: u64,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombinedDetail>, UnexpectedOnlyError> {
     todo!()
 }
 
 pub async fn calculate_user_budget_over_for_project(
-    _transaction: &mut Transaction<'_, MySql>,
-    _project_id: u64,
-    _end: DateTime<Utc>,
-    _combined: Option<bool>,
-    _detail: Option<bool>,
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    end: DateTime<Utc>,
+    combined: Option<bool>,
+    detail: Option<bool>,
 ) -> Result<UserBudgetOver, UnexpectedOnlyError> {
+    Ok(match (combined, detail) {
+        (Some(true), Some(true)) => UserBudgetOver::CombinedDetail(
+            calculate_user_budget_over_for_project_combined_detail(
+                transaction,
+                project_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), Some(true)) => UserBudgetOver::Detail(
+            calculate_user_budget_over_for_project_detail(
+                transaction,
+                project_id,
+                end,
+            )
+            .await?,
+        ),
+        (Some(true), None | Some(false)) => UserBudgetOver::Combined(
+            calculate_user_budget_over_for_project_combined(
+                transaction,
+                project_id,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), None | Some(false)) => UserBudgetOver::Normal(
+            calculate_user_budget_over_for_project_normal(
+                transaction,
+                project_id,
+                end,
+            )
+            .await?,
+        ),
+    })
+}
+
+pub async fn calculate_user_budget_over_for_all_normal(
+    _transaction: &mut Transaction<'_, MySql>,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverSimple>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_all_combined(
+    _transaction: &mut Transaction<'_, MySql>,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_all_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverDetail>, UnexpectedOnlyError> {
+    todo!()
+}
+
+pub async fn calculate_user_budget_over_for_all_combined_detail(
+    _transaction: &mut Transaction<'_, MySql>,
+    _end: DateTime<Utc>,
+) -> Result<Vec<UserBudgetOverCombinedDetail>, UnexpectedOnlyError> {
     todo!()
 }
 
 pub async fn calculate_user_budget_over_for_all(
-    _transaction: &mut Transaction<'_, MySql>,
-    _end: DateTime<Utc>,
-    _combined: Option<bool>,
-    _detail: Option<bool>,
+    transaction: &mut Transaction<'_, MySql>,
+    end: DateTime<Utc>,
+    combined: Option<bool>,
+    detail: Option<bool>,
 ) -> Result<UserBudgetOver, UnexpectedOnlyError> {
-    todo!()
+    Ok(match (combined, detail) {
+        (Some(true), Some(true)) => UserBudgetOver::CombinedDetail(
+            calculate_user_budget_over_for_all_combined_detail(
+                transaction,
+                end,
+            )
+            .await?,
+        ),
+        (None | Some(false), Some(true)) => UserBudgetOver::Detail(
+            calculate_user_budget_over_for_all_detail(transaction, end).await?,
+        ),
+        (Some(true), None | Some(false)) => UserBudgetOver::Combined(
+            calculate_user_budget_over_for_all_combined(transaction, end)
+                .await?,
+        ),
+        (None | Some(false), None | Some(false)) => UserBudgetOver::Normal(
+            calculate_user_budget_over_for_all_normal(transaction, end).await?,
+        ),
+    })
 }
 
 #[tracing::instrument(name = "user_budget_over")]
