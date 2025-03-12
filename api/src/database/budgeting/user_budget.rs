@@ -102,6 +102,38 @@ pub async fn select_user_budget_by_user_and_year_from_db(
 }
 
 #[tracing::instrument(
+    name = "select_user_budgets_by_project_and_year_from_db",
+    skip(transaction)
+)]
+pub async fn select_user_budgets_by_project_and_year_from_db(
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    year: u32,
+) -> Result<Vec<UserBudget>, UnexpectedOnlyError> {
+    let query = sqlx::query!(
+        r#"
+        SELECT b.id, u.id as user, u.name as username, b.year, b.amount
+        FROM budgeting_userbudget as b, user_user as u
+        WHERE
+            b.user_id = u.id AND
+            u.project_id = ? AND
+            b.year = ?
+        "#,
+        project_id,
+        year
+    );
+    let rows = transaction
+        .fetch_all(query)
+        .await
+        .context("Failed to execute select query")?
+        .into_iter()
+        .map(|r| UserBudget::from_row(&r))
+        .collect::<Result<Vec<_>, _>>()
+        .context("Failed to convert row to user budget")?;
+    Ok(rows)
+}
+
+#[tracing::instrument(
     name = "select_all_user_budgets_from_db",
     skip(transaction)
 )]
