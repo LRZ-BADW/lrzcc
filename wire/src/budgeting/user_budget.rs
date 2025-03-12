@@ -114,7 +114,8 @@ pub struct UserBudgetOverCombinedDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    pub project_budget_id: u32,
+    #[tabled(display = "display_option")]
+    pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
