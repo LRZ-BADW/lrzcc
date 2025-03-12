@@ -1,9 +1,13 @@
 use crate::authorization::require_admin_user;
+use crate::database::budgeting::user_budget::select_maybe_user_budget_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
+use crate::routes::accounting::server_cost::get::{
+    calculate_server_cost_for_user, ServerCostForUser,
+};
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
-use anyhow::Context;
-use chrono::{DateTime, Utc};
+use anyhow::{anyhow, Context};
+use chrono::{DateTime, Datelike, TimeZone, Utc};
 use lrzcc_wire::budgeting::{
     UserBudgetOverCombined, UserBudgetOverCombinedDetail, UserBudgetOverDetail,
     UserBudgetOverParams, UserBudgetOverSimple,
@@ -24,11 +28,41 @@ pub enum UserBudgetOver {
 }
 
 pub async fn calculate_user_budget_over_for_budget_normal(
-    _transaction: &mut Transaction<'_, MySql>,
-    _budget_id: u64,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    budget_id: u64,
+    end: DateTime<Utc>,
 ) -> Result<Vec<UserBudgetOverSimple>, UnexpectedOnlyError> {
-    todo!()
+    let mut overs = vec![];
+    let Some(budget) =
+        select_maybe_user_budget_from_db(transaction, budget_id).await?
+    else {
+        return Ok(overs);
+    };
+    let year = budget.year;
+    if year != end.year() as u32 {
+        return Ok(overs);
+    }
+    // TODO: outsource into function
+    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
+        transaction,
+        budget.user as u64,
+        begin,
+        end,
+        None,
+    )
+    .await?
+    else {
+        return Err(anyhow!("Unexpected ServerCostForProject variant.").into());
+    };
+    let over = UserBudgetOverSimple {
+        budget_id: budget_id as u32,
+        user_id: budget.user,
+        user_name: budget.username,
+        over: cost.total >= budget.amount as f64,
+    };
+    overs.push(over);
+    Ok(overs)
 }
 
 pub async fn calculate_user_budget_over_for_budget_combined(
