@@ -215,11 +215,44 @@ pub async fn calculate_user_budget_over_for_user_combined(
 }
 
 pub async fn calculate_user_budget_over_for_user_detail(
-    _transaction: &mut Transaction<'_, MySql>,
-    _user_id: u64,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    user_id: u64,
+    end: DateTime<Utc>,
 ) -> Result<Vec<UserBudgetOverDetail>, UnexpectedOnlyError> {
-    todo!()
+    let mut overs = vec![];
+    let year = end.year() as u32;
+    let Some(budget) = select_maybe_user_budget_by_user_and_year_from_db(
+        transaction,
+        user_id,
+        year,
+    )
+    .await?
+    else {
+        return Ok(overs);
+    };
+    // TODO: outsource into function
+    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
+        transaction,
+        budget.user as u64,
+        begin,
+        end,
+        None,
+    )
+    .await?
+    else {
+        return Err(anyhow!("Unexpected ServerCostForProject variant.").into());
+    };
+    let over = UserBudgetOverDetail {
+        budget_id: budget.id,
+        user_id: budget.user,
+        user_name: budget.username,
+        over: cost.total >= budget.amount as f64,
+        cost: cost.total,
+        budget: budget.amount,
+    };
+    overs.push(over);
+    Ok(overs)
 }
 
 pub async fn calculate_user_budget_over_for_user_combined_detail(
