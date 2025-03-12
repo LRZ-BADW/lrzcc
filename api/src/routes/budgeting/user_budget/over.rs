@@ -1,13 +1,18 @@
 use crate::authorization::require_admin_user;
+use crate::database::budgeting::project_budget::select_maybe_project_budget_by_project_and_year_from_db;
 use crate::database::budgeting::user_budget::{
     select_maybe_user_budget_by_user_and_year_from_db,
     select_maybe_user_budget_from_db,
     select_user_budgets_by_project_and_year_from_db,
     select_user_budgets_by_year_from_db,
 };
+use crate::database::user::user::select_user_from_db;
 use crate::error::{OptionApiError, UnexpectedOnlyError};
 use crate::routes::accounting::server_cost::get::{
     calculate_server_cost_for_user, ServerCostForUser,
+};
+use crate::routes::server_cost::get::{
+    calculate_server_cost_for_project, ServerCostForProject,
 };
 use actix_web::web::{Data, Query, ReqData};
 use actix_web::HttpResponse;
@@ -71,11 +76,72 @@ pub async fn calculate_user_budget_over_for_budget_normal(
 }
 
 pub async fn calculate_user_budget_over_for_budget_combined(
-    _transaction: &mut Transaction<'_, MySql>,
-    _budget_id: u64,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    budget_id: u64,
+    end: DateTime<Utc>,
 ) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
-    todo!()
+    let mut overs = vec![];
+    let Some(budget) =
+        select_maybe_user_budget_from_db(transaction, budget_id).await?
+    else {
+        return Ok(overs);
+    };
+    let year = budget.year;
+    let user = select_user_from_db(transaction, budget.user as u64)
+        .await
+        .context("Failed to select user")?;
+    let project_budget =
+        select_maybe_project_budget_by_project_and_year_from_db(
+            transaction,
+            user.project as u64,
+            year,
+        )
+        .await?;
+    if year != end.year() as u32 {
+        return Ok(overs);
+    }
+    // TODO: outsource into function
+    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
+        transaction,
+        budget.user as u64,
+        begin,
+        end,
+        None,
+    )
+    .await?
+    else {
+        return Err(anyhow!("Unexpected ServerCostForProject variant.").into());
+    };
+    let ServerCostForProject::Normal(project_cost) =
+        calculate_server_cost_for_project(
+            transaction,
+            user.project as u64,
+            begin,
+            end,
+            None,
+        )
+        .await?
+    else {
+        return Err(anyhow!("Unexpected ServerCostForProject variant.").into());
+    };
+    let over = UserBudgetOverCombined {
+        budget_id: budget_id as u32,
+        user_id: budget.user,
+        user_name: budget.username,
+        project_budget_id: project_budget.clone().map(|b| b.id),
+        project_id: user.project,
+        project_name: user.project_name,
+        over: cost.total >= budget.amount as f64
+            || match project_budget {
+                Some(project_budget) => {
+                    project_cost.total >= project_budget.amount as f64
+                }
+                None => false,
+            },
+    };
+    overs.push(over);
+    Ok(overs)
 }
 
 pub async fn calculate_user_budget_over_for_budget_detail(
