@@ -1,3 +1,4 @@
+use crate::common::display_option;
 use crate::common::is_false;
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
@@ -91,7 +92,8 @@ pub struct UserBudgetOverCombined {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    pub project_budget_id: u32,
+    #[tabled(display = "display_option")]
+    pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
