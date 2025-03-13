@@ -12,6 +12,8 @@ mod modify;
 use modify::user_budget_modify;
 mod delete;
 use delete::user_budget_delete;
+mod over;
+use over::user_budget_over;
 mod sync;
 use sync::user_budget_sync;
 
@@ -23,6 +25,7 @@ pub fn user_budgets_scope() -> Scope {
         // TODO: what about PUT?
         .route("/{user_budget_id}/", patch().to(user_budget_modify))
         .route("/{user_budget_id}/", delete().to(user_budget_delete))
+        .route("/over", get().to(user_budget_over))
         .route("/sync/", get().to(user_budget_sync))
 }
 

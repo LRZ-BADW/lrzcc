@@ -1,4 +1,6 @@
+use crate::common::display_option;
 use crate::common::is_false;
+use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use std::fmt::Display;
@@ -25,6 +27,17 @@ pub struct UserBudgetListParams {
     pub project: Option<u32>,
     pub all: Option<bool>,
     pub year: Option<u32>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct UserBudgetOverParams {
+    pub end: Option<DateTime<FixedOffset>>,
+    pub budget: Option<u32>,
+    pub user: Option<u32>,
+    pub project: Option<u32>,
+    pub all: Option<bool>,
+    pub combined: Option<bool>,
+    pub detail: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -67,7 +80,7 @@ impl UserBudgetModifyData {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetOver {
+pub struct UserBudgetOverSimple {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
@@ -75,18 +88,19 @@ pub struct UserBudgetOver {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetCombined {
+pub struct UserBudgetOverCombined {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    pub project_budget_id: u32,
+    #[tabled(display = "display_option")]
+    pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetDetail {
+pub struct UserBudgetOverDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
@@ -96,16 +110,18 @@ pub struct UserBudgetDetail {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
-pub struct UserBudgetCombinedDetail {
+pub struct UserBudgetOverCombinedDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    pub project_budget_id: u32,
+    #[tabled(display = "display_option")]
+    pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
     pub project_cost: f64,
-    pub project_budget: u32,
+    #[tabled(display = "display_option")]
+    pub project_budget: Option<u32>,
     pub user_cost: f64,
     pub user_budget: u32,
 }
