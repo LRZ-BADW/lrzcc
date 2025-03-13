@@ -614,11 +614,80 @@ pub async fn calculate_user_budget_over_for_project_normal(
 }
 
 pub async fn calculate_user_budget_over_for_project_combined(
-    _transaction: &mut Transaction<'_, MySql>,
-    _project_id: u64,
-    _end: DateTime<Utc>,
+    transaction: &mut Transaction<'_, MySql>,
+    project_id: u64,
+    end: DateTime<Utc>,
 ) -> Result<Vec<UserBudgetOverCombined>, UnexpectedOnlyError> {
-    todo!()
+    let mut overs = vec![];
+    let year = end.year() as u32;
+    if year != end.year() as u32 {
+        return Ok(overs);
+    }
+    let budgets = select_user_budgets_by_project_and_year_from_db(
+        transaction,
+        project_id,
+        year,
+    )
+    .await?;
+    for budget in budgets {
+        // TODO: doing all the calculations in a loop is inefficient
+        let user = select_user_from_db(transaction, budget.user as u64)
+            .await
+            .context("Failed to select user")?;
+        let project_budget =
+            select_maybe_project_budget_by_project_and_year_from_db(
+                transaction,
+                user.project as u64,
+                year,
+            )
+            .await?;
+        // TODO: outsource into function
+        let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+        let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
+            transaction,
+            budget.user as u64,
+            begin,
+            end,
+            None,
+        )
+        .await?
+        else {
+            return Err(
+                anyhow!("Unexpected ServerCostForProject variant.").into()
+            );
+        };
+        let ServerCostForProject::Normal(project_cost) =
+            calculate_server_cost_for_project(
+                transaction,
+                user.project as u64,
+                begin,
+                end,
+                None,
+            )
+            .await?
+        else {
+            return Err(
+                anyhow!("Unexpected ServerCostForProject variant.").into()
+            );
+        };
+        let over = UserBudgetOverCombined {
+            budget_id: budget.id,
+            user_id: budget.user,
+            user_name: budget.username,
+            project_budget_id: project_budget.clone().map(|b| b.id),
+            project_id: user.project,
+            project_name: user.project_name,
+            over: cost.total >= budget.amount as f64
+                || match project_budget.clone() {
+                    Some(project_budget) => {
+                        project_cost.total >= project_budget.amount as f64
+                    }
+                    None => false,
+                },
+        };
+        overs.push(over);
+    }
+    Ok(overs)
 }
 
 pub async fn calculate_user_budget_over_for_project_detail(
