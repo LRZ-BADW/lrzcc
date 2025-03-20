@@ -66,6 +66,70 @@ pub struct ProjectMinimal {
     pub name: String,
 }
 
+// {
+//     "flavors": [
+//         {
+//             "OS-FLV-DISABLED:disabled": false,
+//             "disk": 1,
+//             "OS-FLV-EXT-DATA:ephemeral": 0,
+//             "os-flavor-access:is_public": true,
+//             "id": "1",
+//             "links": [
+//                 {
+//                     "href": "http://openstack.example.com/v2/6f70656e737461636b20342065766572/flavors/1",
+//                     "rel": "self"
+//                 },
+//                 {
+//                     "href": "http://openstack.example.com/6f70656e737461636b20342065766572/flavors/1",
+//                     "rel": "bookmark"
+//                 }
+//             ],
+//             "name": "m1.tiny",
+//             "ram": 512,
+//             "swap": 0,
+//             "vcpus": 1,
+//             "rxtx_factor": 1.0,
+//             "description": null,
+//             "extra_specs": {}
+//       ]
+// }
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct FlavorDetailed {
+    // "OS-FLV-DISABLED:disabled": false,
+    // "disk": 1,
+    // "OS-FLV-EXT-DATA:ephemeral": 0,
+    // "os-flavor-access:is_public": true,
+    // "id": "1",
+    id: String,
+    // "links": [
+    //     {
+    //         "href": "http://openstack.example.com/v2/6f70656e737461636b20342065766572/flavors/1",
+    //         "rel": "self"
+    //     },
+    //     {
+    //         "href": "http://openstack.example.com/6f70656e737461636b20342065766572/flavors/1",
+    //         "rel": "bookmark"
+    //     }
+    // ],
+    // "name": "m1.tiny",
+    name: String,
+    // "ram": 512,
+    ram: u32,
+    // "swap": 0,
+    swap: u32,
+    // "vcpus": 1,
+    vcpus: u32,
+    // "rxtx_factor": 1.0,
+    // "description": null,
+    description: Option<String>,
+    // "extra_specs": {}
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct FlavorDetailedList {
+    flavors: Vec<FlavorDetailed>,
+}
+
 impl OpenStack {
     pub async fn new(
         settings: OpenStackSettings,
