@@ -5,7 +5,7 @@ VERSION=0.7.0
 docker build \
     --tag "gierens/lrzcc:v${VERSION}" \
     --tag "gierens/lrzcc:latest" \
-    --file Dockerfile \
+    --file api/Dockerfile \
     .
 
 if [ $? -eq 0 ]; then
