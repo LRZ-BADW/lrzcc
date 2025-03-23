@@ -22,3 +22,4 @@ LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 - [lib](lib): client-side API-binding library ![crates.io](https://img.shields.io/crates/v/lrzcc?link=https://crates.io/crates/lrzcc)
 - [test](test): shared test helpers and end-to-end tests
 - [wire](wire): library for shared data structures used for API communication ![crates.io](https://img.shields.io/crates/v/lrzcc-wire?link=https://crates.io/crates/lrzcc-wire)
+- [ui](ui): fullstack WASM web user interface ![crates.io](https://img.shields.io/crates/v/lrzcc-ui?link=https://crates.io/crates/lrzcc-ui)
