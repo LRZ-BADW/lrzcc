@@ -1,0 +1,26 @@
+[package]
+name = "lrzcc-ui"
+version = "0.0.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dioxus = { version = "0.6.3", features = ["fullstack"] }
+
+[features]
+default = []
+web = ["dioxus/web"]
+server = ["dioxus/server"]
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
