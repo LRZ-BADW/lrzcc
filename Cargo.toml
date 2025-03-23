@@ -6,9 +6,22 @@ members = [
     "cli",
     "wire",
     "test",
+    "ui",
 ]
 
 [workspace.dependencies.cargo-husky]
 version = "1.5"
 default-features = false
 features = [ "user-hooks" ]
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
