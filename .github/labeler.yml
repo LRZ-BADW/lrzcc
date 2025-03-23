@@ -22,6 +22,12 @@ cli:
     - "cli/**/*"
     - "cli/*"
 
+ui:
+- changed-files:
+  - any-glob-to-any-file:
+    - "ui/**/*"
+    - "ui/*"
+
 dep:
 - changed-files:
   - any-glob-to-any-file:
