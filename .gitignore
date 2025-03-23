@@ -1,3 +1,6 @@
 /target
+/dist
 *.tar
 *.tar.gz
+*.pyc
+**/__pycache__

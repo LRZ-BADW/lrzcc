@@ -1,0 +1,34 @@
+[package]
+name = "lrzcc-ui"
+description = "Rust web UI for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
+authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
+categories = ["web-programming"]
+edition = "2021"
+homepage = "https://github.com/LRZ-BADW/lrzcc"
+repository = "https://github.com/LRZ-BADW/lrzcc"
+exclude = []
+readme = "README.md"
+license = "MIT"
+version = "0.0.1"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dioxus = { version = "0.6.3", features = ["fullstack"] }
+
+[features]
+default = []
+web = ["dioxus/web"]
+server = ["dioxus/server"]
+
+[profile]
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
