@@ -66,6 +66,71 @@ pub struct ProjectMinimal {
     pub name: String,
 }
 
+// {
+//     "flavors": [
+//         {
+//             "OS-FLV-DISABLED:disabled": false,
+//             "disk": 1,
+//             "OS-FLV-EXT-DATA:ephemeral": 0,
+//             "os-flavor-access:is_public": true,
+//             "id": "1",
+//             "links": [
+//                 {
+//                     "href": "http://openstack.example.com/v2/6f70656e737461636b20342065766572/flavors/1",
+//                     "rel": "self"
+//                 },
+//                 {
+//                     "href": "http://openstack.example.com/6f70656e737461636b20342065766572/flavors/1",
+//                     "rel": "bookmark"
+//                 }
+//             ],
+//             "name": "m1.tiny",
+//             "ram": 512,
+//             "swap": 0,
+//             "vcpus": 1,
+//             "rxtx_factor": 1.0,
+//             "description": null,
+//             "extra_specs": {}
+//       ]
+// }
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct FlavorDetailed {
+    // "OS-FLV-DISABLED:disabled": false,
+    // "disk": 1,
+    disk: u32,
+    // "OS-FLV-EXT-DATA:ephemeral": 0,
+    // "os-flavor-access:is_public": true,
+    // "id": "1",
+    id: String,
+    // "links": [
+    //     {
+    //         "href": "http://openstack.example.com/v2/6f70656e737461636b20342065766572/flavors/1",
+    //         "rel": "self"
+    //     },
+    //     {
+    //         "href": "http://openstack.example.com/6f70656e737461636b20342065766572/flavors/1",
+    //         "rel": "bookmark"
+    //     }
+    // ],
+    // "name": "m1.tiny",
+    name: String,
+    // "ram": 512,
+    ram: u64,
+    // "swap": 0,
+    //swap: u32,
+    // "vcpus": 1,
+    vcpus: u32,
+    // "rxtx_factor": 1.0,
+    // "description": null,
+    description: Option<String>,
+    // "extra_specs": {}
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct FlavorDetailedList {
+    flavors: Vec<FlavorDetailed>,
+}
+
 impl OpenStack {
     pub async fn new(
         settings: OpenStackSettings,
@@ -127,6 +192,36 @@ impl OpenStack {
         )
         .context("Could not parse response")?;
         Ok(project.token.project)
+    }
+
+    pub async fn get_flavors(
+        &self,
+    ) -> Result<Vec<FlavorDetailed>, anyhow::Error> {
+        let client = self.client().await?;
+        let url = format!(
+            "{}/v2.1/flavors/detail?is_public=False",
+            self.settings.nova_endpoint
+        );
+        let response = client
+            .get(url.as_str())
+            .send()
+            .await
+            .context("Could not retrieve flavor list")?;
+        if !response.status().is_success() {
+            return Err(anyhow::anyhow!(
+                "Failed to validate user token, returned code {}",
+                response.status().as_u16()
+            ));
+        }
+        let flavors: FlavorDetailedList = serde_json::from_str(
+            response
+                .text()
+                .await
+                .context("Could not read response text")?
+                .as_str(),
+        )
+        .context("Could not parse response")?;
+        Ok(flavors.flavors)
     }
 }
 

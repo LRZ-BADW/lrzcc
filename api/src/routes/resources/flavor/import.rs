@@ -1,6 +1,7 @@
 use crate::authorization::require_admin_user;
 use crate::database::resources::flavor::select_all_flavors_from_db;
 use crate::error::NormalApiError;
+use crate::openstack::OpenStack;
 use actix_web::web::{Data, ReqData};
 use actix_web::HttpResponse;
 use anyhow::Context;
@@ -8,12 +9,13 @@ use lrzcc_wire::resources::FlavorImport;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
-#[tracing::instrument(name = "flavor_import")]
+#[tracing::instrument(name = "flavor_import", skip(openstack))]
 pub async fn flavor_import(
     user: ReqData<User>,
     // TODO: not necessary?
     project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
+    openstack: Data<OpenStack>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, NormalApiError> {
     require_admin_user(&user)?;
@@ -22,6 +24,8 @@ pub async fn flavor_import(
         .await
         .context("Failed to begin transaction")?;
     let flavors = select_all_flavors_from_db(&mut transaction).await?;
+    let os_flavors = openstack.get_flavors().await?;
+    println!("{:?}", os_flavors);
     transaction
         .commit()
         .await
