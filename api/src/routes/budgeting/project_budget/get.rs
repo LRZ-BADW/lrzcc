@@ -8,7 +8,7 @@ use sqlx::MySqlPool;
 
 use super::ProjectBudgetIdParam;
 use crate::{
-    authorization::require_admin_user,
+    authorization::require_project_user_or_return_not_found,
     database::budgeting::project_budget::select_project_budget_from_db,
     error::OptionApiError,
 };
@@ -22,7 +22,6 @@ pub async fn project_budget_get(
     params: Path<ProjectBudgetIdParam>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
@@ -32,6 +31,7 @@ pub async fn project_budget_get(
         params.project_budget_id as u64,
     )
     .await?;
+    require_project_user_or_return_not_found(&user, project_budget.project)?;
     transaction
         .commit()
         .await
