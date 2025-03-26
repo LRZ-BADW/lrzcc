@@ -1,5 +1,5 @@
 use super::ProjectBudgetIdParam;
-use crate::authorization::require_admin_user;
+use crate::authorization::require_project_user;
 use crate::database::budgeting::project_budget::select_project_budget_from_db;
 use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
@@ -17,7 +17,6 @@ pub async fn project_budget_get(
     params: Path<ProjectBudgetIdParam>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
@@ -27,6 +26,7 @@ pub async fn project_budget_get(
         params.project_budget_id as u64,
     )
     .await?;
+    require_project_user(&user, project_budget.project)?;
     transaction
         .commit()
         .await
