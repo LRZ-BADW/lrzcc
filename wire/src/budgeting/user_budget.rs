@@ -8,7 +8,9 @@ use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct UserBudget {
+    #[sqlx(try_from = "i32")]
     pub id: u32,
+    #[sqlx(try_from = "i32")]
     pub user: u32,
     pub username: String,
     pub year: u32,
