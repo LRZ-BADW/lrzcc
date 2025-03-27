@@ -8,8 +8,8 @@ cargo check --all
 echo '+cargo sqlx prepare --workspace --check'
 cargo sqlx prepare --workspace --check
 
-echo '+cargo fmt --all -- --check'
-cargo fmt --all -- --check
+echo '+cargo +nightly fmt --all -- --check'
+cargo +nightly fmt --all -- --check
 
 echo '+cargo spellcheck --cfg=.spellcheck.toml'
 cargo spellcheck --cfg=.spellcheck.toml -m 1
