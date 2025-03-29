@@ -1,7 +1,6 @@
 use super::UserBudgetIdParam;
+use crate::authorization::require_admin_user;
 use crate::database::budgeting::user_budget::select_user_budget_from_db;
-use crate::database::user::user::select_user_from_db;
-use crate::error::AuthOnlyError;
 use crate::error::OptionApiError;
 use actix_web::web::{Data, Path, ReqData};
 use actix_web::HttpResponse;
@@ -18,6 +17,7 @@ pub async fn user_budget_get(
     params: Path<UserBudgetIdParam>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
+    require_admin_user(&user)?;
     let mut transaction = db_pool
         .begin()
         .await
@@ -27,18 +27,6 @@ pub async fn user_budget_get(
         params.user_budget_id as u64,
     )
     .await?;
-    let user_budget_user =
-        select_user_from_db(&mut transaction, user_budget.user as u64).await?;
-    #[allow(clippy::nonminimal_bool)]
-    if !user.is_staff
-        && !(user.role == 1 && user.id == user_budget.user)
-        && !(user.role == 2 && user.project == user_budget_user.project)
-    {
-        return Err(AuthOnlyError::AuthorizationError(
-            "Admin privileges, master user of project or respective user required"
-                .to_string(),
-        ).into());
-    }
     transaction
         .commit()
         .await
