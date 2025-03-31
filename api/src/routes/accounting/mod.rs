@@ -1,5 +1,4 @@
-use actix_web::web::scope;
-use actix_web::Scope;
+use actix_web::{web::scope, Scope};
 
 mod server_state;
 use server_state::server_states_scope;

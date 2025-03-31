@@ -1,5 +1,4 @@
-use actix_web::web::ReqData;
-use actix_web::HttpResponse;
+use actix_web::{web::ReqData, HttpResponse};
 use lrzcc_wire::user::{Project, ProjectMinimal, User, UserDetailed};
 
 #[tracing::instrument(name = "user_me")]

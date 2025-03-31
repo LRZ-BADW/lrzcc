@@ -1,13 +1,17 @@
-use crate::authorization::require_admin_user;
-use crate::database::user::user::select_user_from_db;
-use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
-use actix_web::web::{Data, Json, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User, UserModifyData};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::UserIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::user::user::select_user_from_db,
+    error::{NotFoundOrUnexpectedApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "user_modify")]
 pub async fn user_modify(

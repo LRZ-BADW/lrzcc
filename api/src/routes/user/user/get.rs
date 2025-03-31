@@ -1,12 +1,16 @@
-use super::UserIdParam;
-use crate::authorization::require_master_user_or_return_not_found;
-use crate::database::user::user::select_user_detail_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::UserIdParam;
+use crate::{
+    authorization::require_master_user_or_return_not_found,
+    database::user::user::select_user_detail_from_db, error::OptionApiError,
+};
 
 #[tracing::instrument(name = "user_get")]
 pub async fn user_get(

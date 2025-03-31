@@ -1,14 +1,19 @@
-use crate::authorization::{require_admin_user, require_master_user};
-use crate::database::user::user::{
-    select_all_users_from_db, select_users_by_id_from_db,
-    select_users_by_project_from_db,
+use actix_web::{
+    web::{Data, Query, ReqData},
+    HttpResponse,
 };
-use crate::error::NormalApiError;
-use actix_web::web::{Data, Query, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User, UserListParams};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::{require_admin_user, require_master_user},
+    database::user::user::{
+        select_all_users_from_db, select_users_by_id_from_db,
+        select_users_by_project_from_db,
+    },
+    error::NormalApiError,
+};
 
 #[tracing::instrument(name = "user_list")]
 pub async fn user_list(

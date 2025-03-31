@@ -1,16 +1,23 @@
-use crate::authorization::require_admin_user;
-use crate::database::quota::flavor_quota::insert_flavor_quota_into_db;
-use crate::database::{
-    resources::flavor_group::select_flavor_group_name_from_db,
-    user::user::select_user_name_from_db,
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
 };
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    quota::{FlavorQuota, FlavorQuotaCreateData},
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        quota::flavor_quota::insert_flavor_quota_into_db,
+        resources::flavor_group::select_flavor_group_name_from_db,
+        user::user::select_user_name_from_db,
+    },
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_quota_create")]
 pub async fn flavor_quota_create(

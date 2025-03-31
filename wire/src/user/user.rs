@@ -1,9 +1,10 @@
-use crate::user::ProjectMinimal;
+use std::{cmp::PartialEq, fmt::Display};
+
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use std::cmp::PartialEq;
-use std::fmt::Display;
 use tabled::Tabled;
+
+use crate::user::ProjectMinimal;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
 pub struct User {

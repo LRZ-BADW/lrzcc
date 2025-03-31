@@ -1,6 +1,7 @@
+use std::error::Error;
+
 use chrono::{DateTime, FixedOffset};
 use clap::Args;
-use std::error::Error;
 
 #[cfg(not(feature = "user"))]
 use crate::common::{find_id as user_find_id, find_id as project_find_id};

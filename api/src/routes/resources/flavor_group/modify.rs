@@ -1,14 +1,20 @@
-use crate::authorization::require_admin_user;
-use crate::database::resources::flavor_group::select_flavor_group_from_db;
-use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
-use actix_web::web::{Data, Json, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
-use lrzcc_wire::resources::{FlavorGroup, FlavorGroupModifyData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    resources::{FlavorGroup, FlavorGroupModifyData},
+    user::{Project, User},
+};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::FlavorGroupIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::resources::flavor_group::select_flavor_group_from_db,
+    error::{NotFoundOrUnexpectedApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "flavor_group_modify")]
 pub async fn flavor_group_modify(

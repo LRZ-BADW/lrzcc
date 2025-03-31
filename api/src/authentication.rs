@@ -1,14 +1,17 @@
-use crate::error::{
-    bad_request_error, internal_server_error, unauthorized_error,
+use actix_web::{
+    body::MessageBody,
+    dev::{ServiceRequest, ServiceResponse},
+    middleware::Next,
+    web::Data,
+    HttpMessage,
 };
-use crate::openstack::{OpenStack, ProjectMinimal as OpenstackProjectMinimal};
-use actix_web::body::MessageBody;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::middleware::Next;
-use actix_web::web::Data;
-use actix_web::HttpMessage;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use crate::{
+    error::{bad_request_error, internal_server_error, unauthorized_error},
+    openstack::{OpenStack, ProjectMinimal as OpenstackProjectMinimal},
+};
 
 // TODO revise error handling here as well and test errors
 

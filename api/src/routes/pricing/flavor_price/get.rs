@@ -1,11 +1,16 @@
-use super::FlavorPriceIdParam;
-use crate::database::pricing::flavor_price::select_flavor_price_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::FlavorPriceIdParam;
+use crate::{
+    database::pricing::flavor_price::select_flavor_price_from_db,
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_price_get")]
 pub async fn flavor_price_get(

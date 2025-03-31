@@ -1,11 +1,14 @@
-use crate::error::ApiError;
+use std::fmt::Debug;
+
 use anyhow::Context;
 use lrzcc_wire::error::ErrorResponse;
-use reqwest::blocking::{Client, Response};
-use reqwest::{Method, StatusCode};
-use serde::de::DeserializeOwned;
-use serde::ser::Serialize;
-use std::fmt::Debug;
+use reqwest::{
+    blocking::{Client, Response},
+    Method, StatusCode,
+};
+use serde::{de::DeserializeOwned, ser::Serialize};
+
+use crate::error::ApiError;
 
 #[derive(serde::Serialize, Debug)]
 pub(crate) struct SerializableFoo {}

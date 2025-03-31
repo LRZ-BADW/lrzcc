@@ -1,9 +1,12 @@
-use crate::common::{request, SerializableNone};
-use crate::error::ApiError;
-use lrzcc_wire::resources::CloudUsage;
-use reqwest::blocking::Client;
-use reqwest::{Method, StatusCode};
 use std::rc::Rc;
+
+use lrzcc_wire::resources::CloudUsage;
+use reqwest::{blocking::Client, Method, StatusCode};
+
+use crate::{
+    common::{request, SerializableNone},
+    error::ApiError,
+};
 
 pub struct UsageApi {
     pub url: String,

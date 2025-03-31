@@ -1,13 +1,16 @@
-use crate::common::{request, request_bare, SerializableNone};
-use crate::error::ApiError;
+use std::rc::Rc;
+
 use anyhow::Context;
 use lrzcc_wire::user::{
     Project, ProjectCreateData, ProjectListParams, ProjectModifyData,
     ProjectRetrieved,
 };
-use reqwest::blocking::Client;
-use reqwest::{Method, StatusCode};
-use std::rc::Rc;
+use reqwest::{blocking::Client, Method, StatusCode};
+
+use crate::{
+    common::{request, request_bare, SerializableNone},
+    error::ApiError,
+};
 
 pub struct ProjectApi {
     pub url: String,

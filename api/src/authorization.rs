@@ -1,5 +1,6 @@
-use crate::error::{AuthOnlyError, NotFoundOnlyError};
 use lrzcc_wire::user::User;
+
+use crate::error::{AuthOnlyError, NotFoundOnlyError};
 
 pub fn require_admin_user(user: &User) -> Result<(), AuthOnlyError> {
     if !user.is_staff {

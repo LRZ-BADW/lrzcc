@@ -1,10 +1,15 @@
-use crate::authorization::require_admin_user;
-use crate::error::{MinimalApiError, NormalApiError};
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectCreateData, User};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
+
+use crate::{
+    authorization::require_admin_user,
+    error::{MinimalApiError, NormalApiError},
+};
 
 pub struct NewProject {
     pub name: String,

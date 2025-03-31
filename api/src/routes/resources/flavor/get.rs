@@ -1,12 +1,17 @@
-use super::FlavorIdParam;
-use crate::authorization::require_admin_user;
-use crate::database::resources::flavor::select_flavor_detail_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::FlavorIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::resources::flavor::select_flavor_detail_from_db,
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_get")]
 pub async fn flavor_get(

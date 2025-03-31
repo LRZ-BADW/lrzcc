@@ -1,5 +1,7 @@
-use actix_web::web::{get, scope};
-use actix_web::Scope;
+use actix_web::{
+    web::{get, scope},
+    Scope,
+};
 
 pub(crate) mod get;
 use get::server_cost;

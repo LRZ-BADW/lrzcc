@@ -1,16 +1,25 @@
-use crate::authorization::require_admin_user;
-use crate::database::{
-    accounting::server_state::{insert_server_state_into_db, NewServerState},
-    resources::flavor::select_flavor_name_from_db,
-    user::user::select_user_name_from_db,
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
 };
-use crate::error::{NormalApiError, OptionApiError};
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::accounting::{ServerState, ServerStateCreateData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    accounting::{ServerState, ServerStateCreateData},
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        accounting::server_state::{
+            insert_server_state_into_db, NewServerState,
+        },
+        resources::flavor::select_flavor_name_from_db,
+        user::user::select_user_name_from_db,
+    },
+    error::{NormalApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "server_state_create")]
 pub async fn server_state_create(

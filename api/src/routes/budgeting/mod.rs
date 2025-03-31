@@ -1,5 +1,4 @@
-use actix_web::web::scope;
-use actix_web::Scope;
+use actix_web::{web::scope, Scope};
 
 mod project_budget;
 use project_budget::project_budgets_scope;

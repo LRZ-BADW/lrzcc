@@ -1,9 +1,10 @@
-use crate::error::{
-    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
-};
 use anyhow::Context;
 use lrzcc_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
+
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 
 #[tracing::instrument(
     name = "select_maybe_flavor_quota_from_db",

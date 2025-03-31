@@ -1,7 +1,10 @@
-use anyhow::Context;
-use reqwest::blocking::ClientBuilder;
-use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
 use std::{rc::Rc, time::Duration};
+
+use anyhow::Context;
+use reqwest::{
+    blocking::ClientBuilder,
+    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
+};
 
 mod common;
 pub mod error;

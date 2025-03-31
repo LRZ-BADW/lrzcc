@@ -1,5 +1,7 @@
-use actix_web::web::{delete, get, patch, post, scope};
-use actix_web::Scope;
+use actix_web::{
+    web::{delete, get, patch, post, scope},
+    Scope,
+};
 use serde::Deserialize;
 
 mod create;

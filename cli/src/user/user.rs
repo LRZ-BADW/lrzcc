@@ -1,11 +1,15 @@
-use crate::common::{
-    ask_for_confirmation, print_object_list, print_single_object, Execute,
-    Format,
-};
-use crate::user::project::find_id as project_find_id;
+use std::error::Error;
+
 use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
-use std::error::Error;
+
+use crate::{
+    common::{
+        ask_for_confirmation, print_object_list, print_single_object, Execute,
+        Format,
+    },
+    user::project::find_id as project_find_id,
+};
 
 #[derive(Args, Debug)]
 #[group(multiple = false)]

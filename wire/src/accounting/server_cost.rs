@@ -1,7 +1,7 @@
+use std::{collections::HashMap, fmt::Debug};
+
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::fmt::Debug;
 use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]

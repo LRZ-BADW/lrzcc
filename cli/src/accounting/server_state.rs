@@ -1,22 +1,22 @@
+use std::error::Error;
+
+use chrono::{DateTime, FixedOffset};
+use clap::{Args, Subcommand};
+
+#[cfg(not(feature = "resources"))]
+use crate::common::find_id as flavor_find_id;
 use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
     Format,
 };
-use chrono::{DateTime, FixedOffset};
-use clap::{Args, Subcommand};
-use std::error::Error;
-
 #[cfg(not(feature = "user"))]
 use crate::common::{find_id as user_find_id, find_id as project_find_id};
+#[cfg(feature = "resources")]
+use crate::resources::flavor::find_id as flavor_find_id;
 #[cfg(feature = "user")]
 use crate::user::{
     project::find_id as project_find_id, user::find_id as user_find_id,
 };
-
-#[cfg(not(feature = "resources"))]
-use crate::common::find_id as flavor_find_id;
-#[cfg(feature = "resources")]
-use crate::resources::flavor::find_id as flavor_find_id;
 
 #[derive(Args, Debug)]
 #[group(multiple = false)]

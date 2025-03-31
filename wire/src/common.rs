@@ -1,5 +1,4 @@
-use std::borrow::Borrow;
-use std::fmt::Display;
+use std::{borrow::Borrow, fmt::Display};
 
 pub fn display_option<T: Display>(option: &Option<T>) -> String {
     match option {

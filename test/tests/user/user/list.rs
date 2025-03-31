@@ -1,6 +1,7 @@
+use std::str::FromStr;
+
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
-use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 // Permission matrix:

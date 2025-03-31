@@ -1,15 +1,17 @@
-use crate::common::{request, SerializableNone};
-use crate::error::ApiError;
+use std::{fmt::Debug, rc::Rc};
+
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::accounting::{
     ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
     ServerCostSimple, ServerCostUser,
 };
-use reqwest::blocking::Client;
-use reqwest::{Method, StatusCode};
-use std::fmt::Debug;
-use std::rc::Rc;
+use reqwest::{blocking::Client, Method, StatusCode};
+
+use crate::{
+    common::{request, SerializableNone},
+    error::ApiError,
+};
 
 #[derive(Debug)]
 pub struct ServerCostRequest {
