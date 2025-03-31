@@ -1,7 +1,8 @@
+use std::str::FromStr;
+
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
 use lrzcc_wire::user::ProjectRetrieved;
-use std::str::FromStr;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]

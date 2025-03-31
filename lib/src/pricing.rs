@@ -1,15 +1,17 @@
-use crate::common::{request, request_bare, SerializableNone};
-use crate::error::ApiError;
+use std::rc::Rc;
+
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
 use lrzcc_wire::pricing::{
     FlavorPrice, FlavorPriceCreateData, FlavorPriceInitialize,
     FlavorPriceModifyData,
 };
-use reqwest::blocking::Client;
-use reqwest::Url;
-use reqwest::{Method, StatusCode};
-use std::rc::Rc;
+use reqwest::{blocking::Client, Method, StatusCode, Url};
+
+use crate::{
+    common::{request, request_bare, SerializableNone},
+    error::ApiError,
+};
 
 pub struct FlavorPriceApi {
     pub url: String,

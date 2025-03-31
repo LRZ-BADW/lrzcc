@@ -1,10 +1,14 @@
-use crate::configuration::OpenStackSettings;
+use std::time::Instant;
+
 use anyhow::Context;
 use jzon::object;
-use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
-use reqwest::ClientBuilder;
-use std::time::Instant;
+use reqwest::{
+    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
+    ClientBuilder,
+};
 use tokio::sync::RwLock;
+
+use crate::configuration::OpenStackSettings;
 
 struct Token {
     settings: OpenStackSettings,

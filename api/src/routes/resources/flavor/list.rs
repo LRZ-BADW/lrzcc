@@ -1,15 +1,22 @@
-use crate::authorization::require_admin_user;
-use crate::database::resources::flavor::{
-    select_all_flavors_from_db, select_flavors_by_flavor_group_from_db,
-    select_lrz_flavors_from_db,
+use actix_web::{
+    web::{Data, Query, ReqData},
+    HttpResponse,
 };
-use crate::error::NormalApiError;
-use actix_web::web::{Data, Query, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::resources::FlavorListParams;
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    resources::FlavorListParams,
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::resources::flavor::{
+        select_all_flavors_from_db, select_flavors_by_flavor_group_from_db,
+        select_lrz_flavors_from_db,
+    },
+    error::NormalApiError,
+};
 
 #[tracing::instrument(name = "flavor_list")]
 pub async fn flavor_list(

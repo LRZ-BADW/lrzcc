@@ -1,14 +1,20 @@
-use crate::authorization::require_admin_user;
-use crate::database::pricing::flavor_price::select_flavor_price_from_db;
-use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
-use actix_web::web::{Data, Json, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
-use lrzcc_wire::pricing::{FlavorPrice, FlavorPriceModifyData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    pricing::{FlavorPrice, FlavorPriceModifyData},
+    user::{Project, User},
+};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::FlavorPriceIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::pricing::flavor_price::select_flavor_price_from_db,
+    error::{NotFoundOrUnexpectedApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "flavor_price_modify")]
 pub async fn flavor_price_modify(

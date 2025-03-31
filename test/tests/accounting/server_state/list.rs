@@ -1,8 +1,10 @@
-use super::assert_contains_server_state;
+use std::str::FromStr;
+
 use lrzcc::{Api, Token};
 use lrzcc_test::{random_uuid, spawn_app};
-use std::str::FromStr;
 use tokio::task::spawn_blocking;
+
+use super::assert_contains_server_state;
 
 #[tokio::test]
 async fn e2e_lib_normal_user_can_list_own_server_states() {

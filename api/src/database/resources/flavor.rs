@@ -1,11 +1,12 @@
-use crate::error::{
-    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
-};
 use anyhow::Context;
 use lrzcc_wire::resources::{
     Flavor, FlavorCreateData, FlavorDetailed, FlavorGroupMinimal, FlavorMinimal,
 };
 use sqlx::{Executor, FromRow, MySql, Transaction};
+
+use crate::error::{
+    MinimalApiError, NotFoundOrUnexpectedApiError, UnexpectedOnlyError,
+};
 
 #[tracing::instrument(
     name = "select_maybe_flavor_name_from_db",

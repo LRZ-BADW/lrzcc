@@ -1,5 +1,6 @@
-use crate::common::{print_single_object, Format};
 use std::error::Error;
+
+use crate::common::{print_single_object, Format};
 
 pub(crate) fn budget_bulk_create(
     api: lrzcc::Api,

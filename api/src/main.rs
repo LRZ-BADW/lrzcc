@@ -1,6 +1,8 @@
-use lrzcc_api::configuration::get_configuration;
-use lrzcc_api::startup::Application;
-use lrzcc_api::telemetry::{get_subscriber, init_subscriber};
+use lrzcc_api::{
+    configuration::get_configuration,
+    startup::Application,
+    telemetry::{get_subscriber, init_subscriber},
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

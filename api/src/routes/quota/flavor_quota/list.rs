@@ -1,16 +1,23 @@
-use crate::authorization::require_admin_user;
-use crate::database::quota::flavor_quota::{
-    select_all_flavor_quotas_from_db,
-    select_flavor_quotas_by_flavor_group_from_db,
-    select_flavor_quotas_by_user_from_db,
+use actix_web::{
+    web::{Data, Query, ReqData},
+    HttpResponse,
 };
-use crate::error::NormalApiError;
-use actix_web::web::{Data, Query, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::quota::FlavorQuotaListParams;
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    quota::FlavorQuotaListParams,
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::quota::flavor_quota::{
+        select_all_flavor_quotas_from_db,
+        select_flavor_quotas_by_flavor_group_from_db,
+        select_flavor_quotas_by_user_from_db,
+    },
+    error::NormalApiError,
+};
 
 #[tracing::instrument(name = "flavor_quota_list")]
 pub async fn flavor_quota_list(

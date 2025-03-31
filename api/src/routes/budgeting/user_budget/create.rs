@@ -1,15 +1,22 @@
-use crate::authorization::require_admin_user;
-use crate::database::budgeting::user_budget::{
-    insert_user_budget_into_db, NewUserBudget,
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
 };
-use crate::database::user::user::select_user_name_from_db;
-use crate::error::{NormalApiError, OptionApiError};
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::budgeting::{UserBudget, UserBudgetCreateData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    budgeting::{UserBudget, UserBudgetCreateData},
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        budgeting::user_budget::{insert_user_budget_into_db, NewUserBudget},
+        user::user::select_user_name_from_db,
+    },
+    error::{NormalApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "user_budget_create")]
 pub async fn user_budget_create(

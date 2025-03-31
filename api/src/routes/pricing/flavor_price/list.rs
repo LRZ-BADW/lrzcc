@@ -1,10 +1,15 @@
-use crate::database::pricing::flavor_price::select_all_flavor_prices_from_db;
-use crate::error::NormalApiError;
-use actix_web::web::{Data, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use crate::{
+    database::pricing::flavor_price::select_all_flavor_prices_from_db,
+    error::NormalApiError,
+};
 
 #[tracing::instrument(name = "flavor_price_list")]
 pub async fn flavor_price_list(

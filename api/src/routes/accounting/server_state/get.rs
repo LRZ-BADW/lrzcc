@@ -1,13 +1,20 @@
-use super::ServerStateIdParam;
-use crate::authorization::require_master_user_or_return_not_found;
-use crate::database::accounting::server_state::select_server_state_from_db;
-use crate::database::user::user::select_user_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::ServerStateIdParam;
+use crate::{
+    authorization::require_master_user_or_return_not_found,
+    database::{
+        accounting::server_state::select_server_state_from_db,
+        user::user::select_user_from_db,
+    },
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "server_state_get")]
 pub async fn server_state_get(

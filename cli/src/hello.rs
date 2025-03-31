@@ -1,6 +1,8 @@
-use crate::common::{print_single_object, Execute, Format};
-use clap::Subcommand;
 use std::error::Error;
+
+use clap::Subcommand;
+
+use crate::common::{print_single_object, Execute, Format};
 
 #[derive(Subcommand, Debug)]
 pub(crate) enum HelloCommand {

@@ -1,9 +1,10 @@
-use crate::resources::FlavorMinimal;
-use crate::user::ProjectMinimal;
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 use sqlx::{mysql::MySqlRow, FromRow, Row};
-use std::fmt::Display;
 use tabled::Tabled;
+
+use crate::{resources::FlavorMinimal, user::ProjectMinimal};
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorGroup {

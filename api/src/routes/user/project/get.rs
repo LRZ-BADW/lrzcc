@@ -1,14 +1,23 @@
-use super::ProjectIdParam;
-use crate::authorization::require_admin_user_or_return_not_found;
-use crate::database::resources::flavor_group::select_minimal_flavor_groups_by_project_id_from_db;
-use crate::database::user::project::select_project_from_db;
-use crate::database::user::user::select_minimal_users_by_project_id_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, ProjectDetailed, ProjectRetrieved, User};
 use sqlx::MySqlPool;
+
+use super::ProjectIdParam;
+use crate::{
+    authorization::require_admin_user_or_return_not_found,
+    database::{
+        resources::flavor_group::select_minimal_flavor_groups_by_project_id_from_db,
+        user::{
+            project::select_project_from_db,
+            user::select_minimal_users_by_project_id_from_db,
+        },
+    },
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "project_get")]
 pub async fn project_get(

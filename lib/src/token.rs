@@ -1,9 +1,11 @@
+use std::{convert::AsRef, str::FromStr};
+
 use anyhow::Context;
 use jzon::object;
-use reqwest::blocking::{Client, ClientBuilder};
-use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
-use std::convert::AsRef;
-use std::str::FromStr;
+use reqwest::{
+    blocking::{Client, ClientBuilder},
+    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
+};
 
 #[derive(Clone)]
 struct TokenInner {

@@ -1,15 +1,26 @@
-use super::FlavorGroupIdParam;
-use crate::authorization::require_admin_user;
-use crate::database::resources::flavor::select_minimal_flavors_by_group_from_db;
-use crate::database::resources::flavor_group::select_flavor_group_from_db;
-use crate::database::user::project::select_project_minimal_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
-use lrzcc_wire::resources::FlavorGroupDetailed;
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    resources::FlavorGroupDetailed,
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use super::FlavorGroupIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        resources::{
+            flavor::select_minimal_flavors_by_group_from_db,
+            flavor_group::select_flavor_group_from_db,
+        },
+        user::project::select_project_minimal_from_db,
+    },
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_group_get")]
 pub async fn flavor_group_get(

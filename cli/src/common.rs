@@ -1,14 +1,17 @@
+use std::{
+    borrow::Cow,
+    fmt::Display,
+    io::{stdin, stdout, Write},
+};
+
 use anyhow::{anyhow, Context};
 use chrono::Datelike;
 use clap::{builder::PossibleValue, ValueEnum};
 use serde::Serialize;
-use std::borrow::Cow;
-use std::fmt::Display;
-use std::io::{stdin, stdout, Write};
-use tabled::builder::Builder;
-use tabled::grid::records::vec_records::Text;
-use tabled::settings::Style;
-use tabled::{Table, Tabled};
+use tabled::{
+    builder::Builder, grid::records::vec_records::Text, settings::Style, Table,
+    Tabled,
+};
 
 #[derive(Debug, Clone)]
 pub(crate) enum TableFormat {

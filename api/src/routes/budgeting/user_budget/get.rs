@@ -1,12 +1,17 @@
-use super::UserBudgetIdParam;
-use crate::authorization::require_admin_user;
-use crate::database::budgeting::user_budget::select_user_budget_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::UserBudgetIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::budgeting::user_budget::select_user_budget_from_db,
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "user_budget_get")]
 pub async fn user_budget_get(

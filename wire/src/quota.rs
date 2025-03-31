@@ -1,6 +1,7 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use std::fmt::Display;
 use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]

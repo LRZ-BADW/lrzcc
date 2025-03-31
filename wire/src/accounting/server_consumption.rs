@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 pub type ServerConsumptionFlavors = HashMap<String, f64>;
 

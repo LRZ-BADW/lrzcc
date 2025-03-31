@@ -1,9 +1,9 @@
-use crate::common::request;
-use crate::error::ApiError;
-use lrzcc_wire::budgeting::{BudgetBulkCreate, BudgetBulkCreateData};
-use reqwest::blocking::Client;
-use reqwest::{Method, StatusCode};
 use std::rc::Rc;
+
+use lrzcc_wire::budgeting::{BudgetBulkCreate, BudgetBulkCreateData};
+use reqwest::{blocking::Client, Method, StatusCode};
+
+use crate::{common::request, error::ApiError};
 
 pub struct BudgetBulkCreateApi {
     pub url: String,

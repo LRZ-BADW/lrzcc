@@ -1,24 +1,27 @@
-use crate::authentication::{extract_user_and_project, require_valid_token};
-use crate::configuration::{DatabaseSettings, Settings};
-use crate::error::not_found;
-use crate::error::MinimalApiError;
-use crate::openstack::OpenStack;
-use crate::routes::user::project::create::{
-    insert_project_into_db, NewProject,
-};
-use crate::routes::user::user::create::{insert_user_into_db, NewUser};
-use crate::routes::{
-    accounting_scope, budgeting_scope, health_check, hello_scope,
-    pricing_scope, quota_scope, resources_scope, user_scope,
-};
+use std::net::TcpListener;
+
 use actix_web::{
     dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
 };
 use anyhow::Context;
-use sqlx::mysql::MySqlPoolOptions;
-use sqlx::MySqlPool;
-use std::net::TcpListener;
+use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use tracing_actix_web::TracingLogger;
+
+use crate::{
+    authentication::{extract_user_and_project, require_valid_token},
+    configuration::{DatabaseSettings, Settings},
+    error::{not_found, MinimalApiError},
+    openstack::OpenStack,
+    routes::{
+        accounting_scope, budgeting_scope, health_check, hello_scope,
+        pricing_scope, quota_scope, resources_scope,
+        user::{
+            project::create::{insert_project_into_db, NewProject},
+            user::create::{insert_user_into_db, NewUser},
+        },
+        user_scope,
+    },
+};
 
 pub struct Application {
     port: u16,

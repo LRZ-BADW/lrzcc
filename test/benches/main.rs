@@ -1,11 +1,9 @@
 #[macro_use]
 extern crate bencher;
 
+use std::{env, str::FromStr};
+
 use bencher::Bencher;
-
-use std::env;
-use std::str::FromStr;
-
 use lrzcc::{Api, Token};
 
 fn bench_hello_user(b: &mut Bencher) {

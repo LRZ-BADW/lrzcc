@@ -1,12 +1,17 @@
-use super::FlavorQuotaIdParam;
-use crate::authorization::require_admin_user;
-use crate::database::quota::flavor_quota::select_flavor_quota_from_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
 use lrzcc_wire::user::{Project, User};
 use sqlx::MySqlPool;
+
+use super::FlavorQuotaIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::quota::flavor_quota::select_flavor_quota_from_db,
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_quota_get")]
 pub async fn flavor_quota_get(

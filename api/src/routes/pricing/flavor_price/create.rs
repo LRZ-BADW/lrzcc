@@ -1,15 +1,22 @@
-use crate::authorization::require_admin_user;
-use crate::database::pricing::flavor_price::{
-    insert_flavor_price_into_db, NewFlavorPrice,
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
 };
-use crate::database::resources::flavor::select_flavor_name_from_db;
-use crate::error::{NormalApiError, OptionApiError};
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
-use lrzcc_wire::pricing::{FlavorPrice, FlavorPriceCreateData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    pricing::{FlavorPrice, FlavorPriceCreateData},
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        pricing::flavor_price::{insert_flavor_price_into_db, NewFlavorPrice},
+        resources::flavor::select_flavor_name_from_db,
+    },
+    error::{NormalApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "flavor_price_create")]
 pub async fn flavor_price_create(

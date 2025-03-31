@@ -1,12 +1,19 @@
-use crate::authorization::require_admin_user;
-use crate::database::resources::flavor_group::insert_flavor_group_into_db;
-use crate::error::OptionApiError;
-use actix_web::web::{Data, Json, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
-use lrzcc_wire::resources::{FlavorGroup, FlavorGroupCreateData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    resources::{FlavorGroup, FlavorGroupCreateData},
+    user::{Project, User},
+};
 use sqlx::MySqlPool;
+
+use crate::{
+    authorization::require_admin_user,
+    database::resources::flavor_group::insert_flavor_group_into_db,
+    error::OptionApiError,
+};
 
 #[tracing::instrument(name = "flavor_group_create")]
 pub async fn flavor_group_create(

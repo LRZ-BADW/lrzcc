@@ -1,6 +1,7 @@
+use std::fmt::Display;
+
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use tabled::Tabled;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]

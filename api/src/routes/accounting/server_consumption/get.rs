@@ -1,24 +1,36 @@
-use crate::authorization::require_admin_user;
-use crate::database::accounting::server_state::{
-    select_ordered_server_states_by_server_begin_and_end_from_db,
-    select_ordered_server_states_by_user_begin_and_end_from_db,
+use std::collections::HashMap;
+
+use actix_web::{
+    web::{Data, Query, ReqData},
+    HttpResponse,
 };
-use crate::database::user::project::select_all_projects_from_db;
-use crate::database::user::user::select_users_by_project_from_db;
-use crate::error::{OptionApiError, UnexpectedOnlyError};
-use actix_web::web::{Data, Query, ReqData};
-use actix_web::HttpResponse;
 use anyhow::Context;
 use chrono::{DateTime, Datelike, TimeZone, Utc};
-use lrzcc_wire::accounting::{
-    ServerConsumptionAll, ServerConsumptionFlavors, ServerConsumptionParams,
-    ServerConsumptionProject, ServerConsumptionServer, ServerConsumptionUser,
-    ServerState,
+use lrzcc_wire::{
+    accounting::{
+        ServerConsumptionAll, ServerConsumptionFlavors,
+        ServerConsumptionParams, ServerConsumptionProject,
+        ServerConsumptionServer, ServerConsumptionUser, ServerState,
+    },
+    user::{Project, User},
 };
-use lrzcc_wire::user::{Project, User};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
-use std::collections::HashMap;
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        accounting::server_state::{
+            select_ordered_server_states_by_server_begin_and_end_from_db,
+            select_ordered_server_states_by_user_begin_and_end_from_db,
+        },
+        user::{
+            project::select_all_projects_from_db,
+            user::select_users_by_project_from_db,
+        },
+    },
+    error::{OptionApiError, UnexpectedOnlyError},
+};
 
 const CONSUMING_STATES: [&str; 15] = [
     "ACTIVE",

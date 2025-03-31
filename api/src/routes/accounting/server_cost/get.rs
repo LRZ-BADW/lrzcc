@@ -1,34 +1,47 @@
-use crate::authorization::require_admin_user;
-use crate::database::accounting::server_state::select_user_class_by_server_from_db;
-use crate::database::pricing::flavor_price::select_flavor_prices_for_period_from_db;
-use crate::database::resources::flavor::select_all_flavors_from_db;
-use crate::database::user::project::{
-    select_all_projects_from_db, select_user_class_by_project_from_db,
+use std::collections::HashMap;
+
+use actix_web::{
+    web::{Data, Query, ReqData},
+    HttpResponse,
 };
-use crate::database::user::user::select_user_class_by_user_from_db;
-use crate::error::{OptionApiError, UnexpectedOnlyError};
-use crate::routes::accounting::server_consumption::get::{
-    calculate_server_consumption_for_all,
-    calculate_server_consumption_for_project,
-    calculate_server_consumption_for_server,
-    calculate_server_consumption_for_user, ServerConsumptionForAll,
-    ServerConsumptionForProject, ServerConsumptionForUser,
-};
-use actix_web::web::{Data, Query, ReqData};
-use actix_web::HttpResponse;
 use anyhow::{anyhow, Context};
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use indexmap::IndexMap;
-use lrzcc_wire::accounting::{
-    ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
-    ServerCostSimple, ServerCostUser,
+use lrzcc_wire::{
+    accounting::{
+        ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
+        ServerCostSimple, ServerCostUser,
+    },
+    pricing::FlavorPrice,
+    user::{Project, User},
 };
-use lrzcc_wire::pricing::FlavorPrice;
-use lrzcc_wire::user::{Project, User};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
-use std::collections::HashMap;
 use strum::{EnumIter, IntoEnumIterator};
+
+use crate::{
+    authorization::require_admin_user,
+    database::{
+        accounting::server_state::select_user_class_by_server_from_db,
+        pricing::flavor_price::select_flavor_prices_for_period_from_db,
+        resources::flavor::select_all_flavors_from_db,
+        user::{
+            project::{
+                select_all_projects_from_db,
+                select_user_class_by_project_from_db,
+            },
+            user::select_user_class_by_user_from_db,
+        },
+    },
+    error::{OptionApiError, UnexpectedOnlyError},
+    routes::accounting::server_consumption::get::{
+        calculate_server_consumption_for_all,
+        calculate_server_consumption_for_project,
+        calculate_server_consumption_for_server,
+        calculate_server_consumption_for_user, ServerConsumptionForAll,
+        ServerConsumptionForProject, ServerConsumptionForUser,
+    },
+};
 
 #[derive(Hash, PartialEq, Eq, Clone, EnumIter, Debug)]
 enum UserClass {

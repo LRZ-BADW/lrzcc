@@ -1,14 +1,16 @@
-use crate::common::{request, request_bare, SerializableNone};
-use crate::error::ApiError;
+use std::rc::Rc;
+
 use anyhow::Context;
 use lrzcc_wire::quota::{
     FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData,
     FlavorQuotaListParams, FlavorQuotaModifyData,
 };
-use reqwest::blocking::Client;
-use reqwest::Url;
-use reqwest::{Method, StatusCode};
-use std::rc::Rc;
+use reqwest::{blocking::Client, Method, StatusCode, Url};
+
+use crate::{
+    common::{request, request_bare, SerializableNone},
+    error::ApiError,
+};
 
 pub struct FlavorQuotaApi {
     pub url: String,

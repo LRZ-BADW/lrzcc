@@ -1,9 +1,12 @@
-use actix_web::body::BoxBody;
-use actix_web::error::InternalError;
-use actix_web::http::header::HeaderValue;
-use actix_web::http::{header::CONTENT_TYPE, StatusCode};
-use actix_web::HttpResponse;
-use actix_web::ResponseError;
+use actix_web::{
+    body::BoxBody,
+    error::InternalError,
+    http::{
+        header::{HeaderValue, CONTENT_TYPE},
+        StatusCode,
+    },
+    HttpResponse, ResponseError,
+};
 use lrzcc_wire::error::{error_chain_fmt, ErrorResponse};
 
 pub fn unauthorized_error(message: &str) -> actix_web::Error {

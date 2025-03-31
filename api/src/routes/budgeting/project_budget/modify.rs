@@ -1,14 +1,20 @@
-use crate::authorization::require_admin_user;
-use crate::database::budgeting::project_budget::select_project_budget_from_db;
-use crate::error::{NotFoundOrUnexpectedApiError, OptionApiError};
-use actix_web::web::{Data, Json, Path, ReqData};
-use actix_web::HttpResponse;
+use actix_web::{
+    web::{Data, Json, Path, ReqData},
+    HttpResponse,
+};
 use anyhow::Context;
-use lrzcc_wire::budgeting::{ProjectBudget, ProjectBudgetModifyData};
-use lrzcc_wire::user::{Project, User};
+use lrzcc_wire::{
+    budgeting::{ProjectBudget, ProjectBudgetModifyData},
+    user::{Project, User},
+};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::ProjectBudgetIdParam;
+use crate::{
+    authorization::require_admin_user,
+    database::budgeting::project_budget::select_project_budget_from_db,
+    error::{NotFoundOrUnexpectedApiError, OptionApiError},
+};
 
 #[tracing::instrument(name = "project_budget_modify")]
 pub async fn project_budget_modify(

@@ -1,10 +1,10 @@
+use std::{process::ExitCode, str::FromStr};
+
 use chrono::{DateTime, FixedOffset};
 use clap::{ArgAction::SetFalse, Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
 use lrzcc::{Api, Token};
-use std::process::ExitCode;
-use std::str::FromStr;
 
 mod common;
 
@@ -23,15 +23,12 @@ mod resources;
 #[cfg(feature = "user")]
 mod user;
 
-use common::{Execute, Format, TableFormat};
-
 use accounting::ServerStateCommand;
-use budgeting::ProjectBudgetCommand;
-use budgeting::UserBudgetCommand;
+use budgeting::{ProjectBudgetCommand, UserBudgetCommand};
+use common::{Execute, Format, TableFormat};
 use pricing::FlavorPriceCommand;
 use quota::FlavorQuotaCommand;
-use resources::FlavorCommand;
-use resources::FlavorGroupCommand;
+use resources::{FlavorCommand, FlavorGroupCommand};
 use user::UserCommand;
 
 #[derive(Args, Debug)]

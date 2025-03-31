@@ -1,8 +1,10 @@
-use super::assert_equal_server_states;
+use std::str::FromStr;
+
 use lrzcc::{Api, Token};
 use lrzcc_test::spawn_app;
-use std::str::FromStr;
 use tokio::task::spawn_blocking;
+
+use super::assert_equal_server_states;
 
 // Permission matrix:
 //                     own state    state from own project     other state

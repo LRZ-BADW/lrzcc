@@ -1,9 +1,11 @@
-use crate::common::is_false;
+use std::fmt::Display;
+
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use std::fmt::Display;
 use tabled::Tabled;
+
+use crate::common::is_false;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
 pub struct ProjectBudget {

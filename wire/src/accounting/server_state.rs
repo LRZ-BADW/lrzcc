@@ -1,8 +1,10 @@
-use crate::common::display_option;
+use std::fmt::Display;
+
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use tabled::Tabled;
+
+use crate::common::display_option;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ServerState {
