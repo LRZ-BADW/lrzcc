@@ -83,3 +83,6 @@ parallelize
 budget_over_tree
 budget_bulk_create
 u32
+bool
+{}
+extra_specs
