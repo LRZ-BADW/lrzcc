@@ -203,8 +203,9 @@ pub async fn select_all_flavors_from_db(
             f.group_id as group_id,
             g.name as group_name,
             f.weight as weight
-        FROM resources_flavorgroup as g, resources_flavor as f
-        WHERE g.id = f.group_id
+        FROM resources_flavor as f
+        LEFT JOIN resources_flavorgroup AS g
+        ON f.group_id = g.id
         "#,
     );
     let rows = transaction
@@ -309,7 +310,7 @@ pub async fn insert_flavor_into_db(
     // TODO: what about non-existing project_id?
     if result.rows_affected() == 0 {
         return Err(MinimalApiError::ValidationError(
-            "Failed to insert new flavor group, a conflicting entry exists"
+            "Failed to insert new flavor, a conflicting entry exists"
                 .to_string(),
         ));
     }

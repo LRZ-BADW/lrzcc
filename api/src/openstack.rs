@@ -59,6 +59,7 @@ impl TokenHandler {
     }
 }
 
+// TODO: maybe we could also use rust-openstack at some point.
 pub struct OpenStack {
     settings: OpenStackSettings,
     token: TokenHandler,
@@ -68,6 +69,41 @@ pub struct OpenStack {
 pub struct ProjectMinimal {
     pub id: String,
     pub name: String,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct Link {
+    pub href: String,
+    pub rel: String,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct FlavorDetailed {
+    #[serde(rename = "OS-FLV-DISABLED:disabled")]
+    pub disabled: bool,
+    pub disk: u32,
+    // TODO: this does not work, why?
+    // #[serde(rename = "OS-FLV-EXT-DATA:ephemeral")]
+    // pub ephemeral: bool,
+    #[serde(rename = "os-flavor-access:is_public")]
+    pub is_public: bool,
+    pub id: String,
+    pub links: Vec<Link>,
+    pub name: String,
+    pub ram: u32,
+    // TODO: this does not work, why?
+    // pub swap: u32,
+    pub vcpus: u32,
+    pub rxtx_factor: f32,
+    pub description: Option<String>,
+    // TODO: this is a more complicated field.
+    // "extra_specs": {}
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct FlavorDetailedList {
+    flavors: Vec<FlavorDetailed>,
 }
 
 impl OpenStack {
@@ -131,6 +167,36 @@ impl OpenStack {
         )
         .context("Could not parse response")?;
         Ok(project.token.project)
+    }
+
+    pub async fn get_flavors(
+        &self,
+    ) -> Result<Vec<FlavorDetailed>, anyhow::Error> {
+        let client = self.client().await?;
+        let url = format!(
+            "{}/v2.1/flavors/detail?is_public=False",
+            self.settings.nova_endpoint
+        );
+        let response = client
+            .get(url.as_str())
+            .send()
+            .await
+            .context("Could not retrieve flavor list")?;
+        if !response.status().is_success() {
+            return Err(anyhow::anyhow!(
+                "Failed to validate user token, returned code {}",
+                response.status().as_u16()
+            ));
+        }
+        let flavors: FlavorDetailedList = serde_json::from_str(
+            response
+                .text()
+                .await
+                .context("Could not read response text")?
+                .as_str(),
+        )
+        .context("Could not parse response")?;
+        Ok(flavors.flavors)
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n            f.id as id,\n            f.name as name,\n            f.openstack_id as openstack_id,\n            f.group_id as group_id,\n            g.name as group_name,\n            f.weight as weight\n        FROM resources_flavorgroup as g, resources_flavor as f\n        WHERE g.id = f.group_id\n        ",
+  "query": "\n        SELECT\n            f.id as id,\n            f.name as name,\n            f.openstack_id as openstack_id,\n            f.group_id as group_id,\n            g.name as group_name,\n            f.weight as weight\n        FROM resources_flavor as f\n        LEFT JOIN resources_flavorgroup AS g\n        ON f.group_id = g.id\n        ",
   "describe": {
     "columns": [
       {
@@ -44,7 +44,7 @@
         "name": "group_name",
         "type_info": {
           "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "flags": "UNIQUE_KEY | NO_DEFAULT_VALUE",
           "max_size": 256
         }
       },
@@ -66,9 +66,9 @@
       false,
       false,
       true,
-      false,
+      true,
       false
     ]
   },
-  "hash": "d8a229b2160364a996868f15aced92ae3942ab2b3c4a01a1404a8976d3ec9154"
+  "hash": "01a3429e170172a401e79a9fdc5b9544f912ed346040ec9bf9da4d5011cd8d0d"
 }
