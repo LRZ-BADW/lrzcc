@@ -17,7 +17,6 @@ pub use resources::*;
 pub use user::*;
 
 // TODO: missing endpoints
-// - resources::flavor::import
 // - resources::flavor::usage
 // - resources::flavor_group::initialize
 // - resources::flavor_group::usage
