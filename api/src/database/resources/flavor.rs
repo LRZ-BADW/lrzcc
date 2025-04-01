@@ -203,8 +203,9 @@ pub async fn select_all_flavors_from_db(
             f.group_id as group_id,
             g.name as group_name,
             f.weight as weight
-        FROM resources_flavorgroup as g, resources_flavor as f
-        WHERE g.id = f.group_id
+        FROM resources_flavor as f
+        LEFT JOIN resources_flavorgroup AS g
+        ON f.group_id = g.id
         "#,
     );
     let rows = transaction
