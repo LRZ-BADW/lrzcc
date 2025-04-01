@@ -310,7 +310,7 @@ pub async fn insert_flavor_into_db(
     // TODO: what about non-existing project_id?
     if result.rows_affected() == 0 {
         return Err(MinimalApiError::ValidationError(
-            "Failed to insert new flavor group, a conflicting entry exists"
+            "Failed to insert new flavor, a conflicting entry exists"
                 .to_string(),
         ));
     }
