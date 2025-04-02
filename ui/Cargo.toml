@@ -20,15 +20,3 @@ dioxus = { version = "0.6.3", features = ["fullstack"] }
 default = []
 web = ["dioxus/web"]
 server = ["dioxus/server"]
-
-[profile]
-
-[profile.wasm-dev]
-inherits = "dev"
-opt-level = 1
-
-[profile.server-dev]
-inherits = "dev"
-
-[profile.android-dev]
-inherits = "dev"
