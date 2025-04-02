@@ -64,3 +64,18 @@ pub fn require_project_user_or_return_not_found(
     }
     Ok(())
 }
+
+pub fn require_user_or_project_master_or_not_found(
+    user: &User,
+    user_id: u32,
+    project_id: u32,
+) -> Result<(), NotFoundOnlyError> {
+    #[allow(clippy::nonminimal_bool)]
+    if !user.is_staff
+        && !(user.role == 1 && user.id == user_id)
+        && !(user.role == 2 && user.project == project_id)
+    {
+        return Err(NotFoundOnlyError::NotFoundError);
+    }
+    Ok(())
+}
