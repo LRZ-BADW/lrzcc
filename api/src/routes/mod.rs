@@ -37,8 +37,6 @@ pub use user::*;
 // - resources::flavor_group::get
 // - resources::flavor::get
 // - quota::flavor_quota::get
-// - budgeting::project_budget::get
-// - budgeting::user_budget::get
 // - accounting::server_state::list
 // - accounting::server_consumption
 // - accounting::server_cost
