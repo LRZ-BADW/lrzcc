@@ -174,6 +174,16 @@ impl From<AuthOnlyError> for OptionApiError {
     }
 }
 
+impl From<UnexpectedOnlyError> for MinimalApiError {
+    fn from(value: UnexpectedOnlyError) -> Self {
+        match value {
+            UnexpectedOnlyError::UnexpectedError(message) => {
+                Self::UnexpectedError(message)
+            }
+        }
+    }
+}
+
 #[derive(thiserror::Error)]
 pub enum NormalApiError {
     #[error("{0}")]
