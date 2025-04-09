@@ -1,5 +1,5 @@
 use actix_web::{
-    web::{get, scope},
+    web::{post, scope},
     Scope,
 };
 
@@ -14,5 +14,5 @@ pub fn budgeting_scope() -> Scope {
     scope("/budgeting")
         .service(project_budgets_scope())
         .service(user_budgets_scope())
-        .route("/budgetbulkcreate", get().to(budget_bulk_create))
+        .route("/budgetbulkcreate/", post().to(budget_bulk_create))
 }
