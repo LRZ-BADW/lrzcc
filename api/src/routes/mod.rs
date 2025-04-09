@@ -26,7 +26,6 @@ pub use user::*;
 // - user::import
 // - accounting::server_state::import
 // - budgeting::budget_over_tree
-// - budgeting::budget_bulk_create
 
 // TODO: improve the following endpoints
 // - budgeting::project_budget::modify
