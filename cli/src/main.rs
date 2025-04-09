@@ -391,8 +391,7 @@ fn main() -> ExitCode {
             }
         }
         Command::UserBudget {
-            command:
-                UserBudgetCommand::Delete { .. } | UserBudgetCommand::Sync { .. },
+            command: UserBudgetCommand::Delete { .. } | UserBudgetCommand::Sync,
         }
         | Command::ProjectBudget {
             command: ProjectBudgetCommand::Delete { .. },

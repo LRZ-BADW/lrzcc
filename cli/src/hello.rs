@@ -21,8 +21,8 @@ impl Execute for HelloCommand {
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            Admin {} => admin(api, format),
-            User {} => user(api, format),
+            Admin => admin(api, format),
+            User => user(api, format),
         }
     }
 }
