@@ -15,10 +15,12 @@ use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 
 use crate::{
-    authorization::require_admin_user,
+    authorization::{
+        require_admin_user, require_project_user_or_return_not_found,
+    },
     database::budgeting::project_budget::{
         select_maybe_project_budget_by_project_and_year_from_db,
-        select_maybe_project_budget_from_db,
+        select_maybe_project_budget_from_db, select_project_budget_from_db,
         select_project_budgets_by_year_from_db,
     },
     error::{OptionApiError, UnexpectedOnlyError},
@@ -345,14 +347,13 @@ pub async fn project_budget_over(
     params: Query<ProjectBudgetOverParams>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    // TODO: add proper permission check
-    require_admin_user(&user)?;
     let end = params.end.unwrap_or(Utc::now().fixed_offset());
     let mut transaction = db_pool
         .begin()
         .await
         .context("Failed to begin transaction")?;
     let over = if params.all.unwrap_or(false) {
+        require_admin_user(&user)?;
         calculate_project_budget_over_for_all(
             &mut transaction,
             end.into(),
@@ -360,6 +361,7 @@ pub async fn project_budget_over(
         )
         .await?
     } else if let Some(project_id) = params.project {
+        require_project_user_or_return_not_found(&user, project_id)?;
         calculate_project_budget_over_for_project(
             &mut transaction,
             project_id as u64,
@@ -368,6 +370,13 @@ pub async fn project_budget_over(
         )
         .await?
     } else if let Some(budget_id) = params.budget {
+        let project_budget =
+            select_project_budget_from_db(&mut transaction, budget_id as u64)
+                .await?;
+        require_project_user_or_return_not_found(
+            &user,
+            project_budget.project,
+        )?;
         calculate_project_budget_over_for_budget(
             &mut transaction,
             budget_id as u64,
