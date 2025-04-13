@@ -25,7 +25,7 @@ pub fn project_budgets_scope() -> Scope {
         // TODO: what about PUT?
         .route("/{project_budget_id}/", patch().to(project_budget_modify))
         .route("/{project_budget_id}/", delete().to(project_budget_delete))
-        .route("/over", get().to(project_budget_over))
+        .route("/over/", get().to(project_budget_over))
 }
 
 // TODO: wouldn't a general IdParam be better?
