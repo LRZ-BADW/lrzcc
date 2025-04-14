@@ -15,13 +15,16 @@ use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 
 use crate::{
-    authorization::require_admin_user,
+    authorization::{
+        require_admin_user, require_master_user_or_return_not_found,
+        require_user_or_project_master_or_not_found,
+    },
     database::{
         budgeting::{
             project_budget::select_maybe_project_budget_by_project_and_year_from_db,
             user_budget::{
                 select_maybe_user_budget_by_user_and_year_from_db,
-                select_maybe_user_budget_from_db,
+                select_maybe_user_budget_from_db, select_user_budget_from_db,
                 select_user_budgets_by_project_and_year_from_db,
                 select_user_budgets_by_year_from_db,
             },
@@ -1126,13 +1129,13 @@ pub async fn user_budget_over(
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
     // TODO: add proper permission check
-    require_admin_user(&user)?;
     let end = params.end.unwrap_or(Utc::now().fixed_offset());
     let mut transaction = db_pool
         .begin()
         .await
         .context("Failed to begin transaction")?;
     let over = if params.all.unwrap_or(false) {
+        require_admin_user(&user)?;
         calculate_user_budget_over_for_all(
             &mut transaction,
             end.into(),
@@ -1141,6 +1144,7 @@ pub async fn user_budget_over(
         )
         .await?
     } else if let Some(project_id) = params.project {
+        require_master_user_or_return_not_found(&user, project_id)?;
         calculate_user_budget_over_for_project(
             &mut transaction,
             project_id as u64,
@@ -1150,6 +1154,13 @@ pub async fn user_budget_over(
         )
         .await?
     } else if let Some(user_id) = params.user {
+        let user_queried =
+            select_user_from_db(&mut transaction, user_id as u64).await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            user_id,
+            user_queried.project,
+        )?;
         calculate_user_budget_over_for_user(
             &mut transaction,
             user_id as u64,
@@ -1159,6 +1170,17 @@ pub async fn user_budget_over(
         )
         .await?
     } else if let Some(budget_id) = params.budget {
+        let user_budget =
+            select_user_budget_from_db(&mut transaction, budget_id as u64)
+                .await?;
+        let user_budget_user =
+            select_user_from_db(&mut transaction, user_budget.user as u64)
+                .await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            user_budget_user.id,
+            user_budget_user.project,
+        )?;
         calculate_user_budget_over_for_budget(
             &mut transaction,
             budget_id as u64,
