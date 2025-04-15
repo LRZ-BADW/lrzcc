@@ -14,29 +14,46 @@ async fn e2e_lib_normal_user_can_list_own_server_states() {
         .setup_test_project(0, 0, 2)
         .await
         .expect("Failed to setup test project");
-    let user = test_project.normals[0].user.clone();
+    let normal_user_1 = test_project.normals[0].user.clone();
     let token = test_project.normals[0].token.clone();
-    let user2 = test_project.normals[1].user.clone();
+    let normal_user_2 = test_project.normals[1].user.clone();
     server
-        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mock_keystone_auth(
+            &token,
+            &normal_user_1.openstack_id,
+            &normal_user_1.name,
+        )
         .mount(&server.keystone_server)
         .await;
     let flavor = server
         .setup_test_flavor()
         .await
         .expect("Failed to setup test flavor");
-    let server_state1 = server
-        .setup_test_server_state(&flavor, &user)
+    let server_id = random_uuid();
+    let server_state_1 = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user_1,
+            &server_id,
+        )
         .await
         .expect("Failed to setup test server state 1");
-    let server_state2 = server
-        .setup_test_server_state(&flavor, &user)
+    let server_state_2 = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user_1,
+            &server_id,
+        )
         .await
         .expect("Failed to setup test server state 2");
-    let _server_state3 = server
-        .setup_test_server_state(&flavor, &user2)
+    let server_state_3 = server
+        .setup_test_server_state(&flavor, &normal_user_1)
         .await
         .expect("Failed to setup test server state 3");
+    let _server_state_4 = server
+        .setup_test_server_state(&flavor, &normal_user_2)
+        .await
+        .expect("Failed to setup test server state 4");
 
     spawn_blocking(move || {
         // arrange
@@ -49,12 +66,32 @@ async fn e2e_lib_normal_user_can_list_own_server_states() {
         .unwrap();
 
         // act
-        let server_states = client.server_state.list().send().unwrap();
+        let server_states_1 = client.server_state.list().send().unwrap();
+        let server_states_2 = client
+            .server_state
+            .list()
+            .user(normal_user_1.id)
+            .send()
+            .unwrap();
+        let server_states_3 = client
+            .server_state
+            .list()
+            .server(&server_id)
+            .send()
+            .unwrap();
 
         // assert
-        assert_eq!(server_states.len(), 2);
-        assert_contains_server_state(&server_states, &server_state1);
-        assert_contains_server_state(&server_states, &server_state2);
+        assert_eq!(server_states_1.len(), 3);
+        assert_contains_server_state(&server_states_1, &server_state_1);
+        assert_contains_server_state(&server_states_1, &server_state_2);
+        assert_contains_server_state(&server_states_1, &server_state_3);
+        assert_eq!(server_states_2.len(), 3);
+        assert_contains_server_state(&server_states_2, &server_state_1);
+        assert_contains_server_state(&server_states_2, &server_state_2);
+        assert_contains_server_state(&server_states_2, &server_state_3);
+        assert_eq!(server_states_3.len(), 2);
+        assert_contains_server_state(&server_states_3, &server_state_1);
+        assert_contains_server_state(&server_states_3, &server_state_2);
     })
     .await
     .unwrap();
@@ -65,16 +102,34 @@ async fn e2e_lib_normal_user_cannot_use_other_server_state_list_filters() {
     // arrange
     let server = spawn_app().await;
     let test_project = server
-        .setup_test_project(0, 0, 1)
+        .setup_test_project(0, 0, 2)
         .await
         .expect("Failed to setup test project");
-    let user = test_project.normals[0].user.clone();
+    let normal_user_1 = test_project.normals[0].user.clone();
     let project = test_project.project.clone();
     let token = test_project.normals[0].token.clone();
+    let normal_user_2 = test_project.normals[1].user.clone();
     server
-        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
+        .mock_keystone_auth(
+            &token,
+            &normal_user_1.openstack_id,
+            &normal_user_1.name,
+        )
         .mount(&server.keystone_server)
         .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_id = random_uuid();
+    let _server_state = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user_2,
+            &server_id,
+        )
+        .await
+        .expect("Failed to setup test server state 2");
 
     spawn_blocking(move || {
         // arrange
@@ -87,25 +142,34 @@ async fn e2e_lib_normal_user_cannot_use_other_server_state_list_filters() {
         .unwrap();
 
         // act
-        let list1 = client.server_state.list().all().send();
-        let list2 = client.server_state.list().user(user.id).send();
-        let list3 = client.server_state.list().project(project.id).send();
+        let server_states_1 = client.server_state.list().all().send();
+        let server_states_2 =
+            client.server_state.list().project(project.id).send();
+        let server_states_3 =
+            client.server_state.list().user(normal_user_2.id).send();
+        let server_states_4 =
+            client.server_state.list().server(server_id.as_str()).send();
 
         // assert
-        assert!(list1.is_err());
-        assert!(list2.is_err());
-        assert!(list3.is_err());
+        assert!(server_states_1.is_err());
+        assert!(server_states_2.is_err());
         assert_eq!(
-            list1.unwrap_err().to_string(),
+            server_states_1.unwrap_err().to_string(),
             format!("Admin privileges required")
         );
         assert_eq!(
-            list2.unwrap_err().to_string(),
+            server_states_2.unwrap_err().to_string(),
             "Resource not found".to_string()
         );
+        assert!(server_states_3.is_err());
         assert_eq!(
-            list3.unwrap_err().to_string(),
-            format!("Admin or master user privileges for respective project required")
+            server_states_3.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
+        assert!(server_states_4.is_err());
+        assert_eq!(
+            server_states_4.unwrap_err().to_string(),
+            "Resource not found".to_string()
         );
     })
     .await
@@ -159,89 +223,21 @@ async fn e2e_lib_master_user_can_list_own_projects_and_users_server_states() {
         .setup_test_project(0, 1, 1)
         .await
         .expect("Failed to setup test project");
-    let user = test_project.masters[0].user.clone();
+    let master_user = test_project.masters[0].user.clone();
     let token = test_project.masters[0].token.clone();
-    let user2 = test_project.normals[0].user.clone();
+    let normal_user_1 = test_project.normals[0].user.clone();
     let project = test_project.project.clone();
     let test_project2 = server
         .setup_test_project(0, 0, 1)
         .await
         .expect("Failed to setup test project");
-    let user3 = test_project2.normals[0].user.clone();
+    let normal_user_2 = test_project2.normals[0].user.clone();
     server
-        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
-        .mount(&server.keystone_server)
-        .await;
-    let flavor = server
-        .setup_test_flavor()
-        .await
-        .expect("Failed to setup test flavor");
-    let server_state1 = server
-        .setup_test_server_state(&flavor, &user)
-        .await
-        .expect("Failed to setup test server state 1");
-    let server_state2 = server
-        .setup_test_server_state(&flavor, &user2)
-        .await
-        .expect("Failed to setup test server state 1");
-    let _server_state3 = server
-        .setup_test_server_state(&flavor, &user3)
-        .await
-        .expect("Failed to setup test server state 1");
-
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
+        .mock_keystone_auth(
+            &token,
+            &master_user.openstack_id,
+            &master_user.name,
         )
-        .unwrap();
-
-        // act
-        let server_states1 = client.server_state.list().send().unwrap();
-        let server_states2 =
-            client.server_state.list().user(user2.id).send().unwrap();
-        let server_states3 = client
-            .server_state
-            .list()
-            .project(project.id)
-            .send()
-            .unwrap();
-
-        // assert
-        assert_eq!(server_states1.len(), 1);
-        assert_contains_server_state(&server_states1, &server_state1);
-        assert_eq!(server_states2.len(), 1);
-        assert_contains_server_state(&server_states2, &server_state2);
-        assert_eq!(server_states3.len(), 2);
-        assert_contains_server_state(&server_states3, &server_state1);
-        assert_contains_server_state(&server_states3, &server_state2);
-    })
-    .await
-    .unwrap();
-}
-
-#[tokio::test]
-async fn e2e_lib_server_state_list_server_filter_stays_within_project_for_master_user(
-) {
-    // arrange
-    let server = spawn_app().await;
-    let test_project = server
-        .setup_test_project(0, 1, 1)
-        .await
-        .expect("Failed to setup test project");
-    let user = test_project.masters[0].user.clone();
-    let token = test_project.masters[0].token.clone();
-    let user2 = test_project.normals[0].user.clone();
-    let test_project2 = server
-        .setup_test_project(0, 0, 1)
-        .await
-        .expect("Failed to setup test project");
-    let user3 = test_project2.normals[0].user.clone();
-    server
-        .mock_keystone_auth(&token, &user.openstack_id, &user.name)
         .mount(&server.keystone_server)
         .await;
     let flavor = server
@@ -249,30 +245,35 @@ async fn e2e_lib_server_state_list_server_filter_stays_within_project_for_master
         .await
         .expect("Failed to setup test flavor");
     let server_id = random_uuid();
-    let server_state1 = server
-        .setup_test_server_state_with_server_id(&flavor, &user, &server_id)
+    let server_state_1 = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user_1,
+            &server_id,
+        )
         .await
         .expect("Failed to setup test server state 1");
-    let server_state2 = server
-        .setup_test_server_state_with_server_id(&flavor, &user2, &server_id)
+    let server_state_2 = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user_1,
+            &server_id,
+        )
         .await
         .expect("Failed to setup test server state 2");
-    let _server_state3 = server
-        .setup_test_server_state_with_server_id(&flavor, &user3, &server_id)
+
+    let server_state_3 = server
+        .setup_test_server_state(&flavor, &master_user)
         .await
         .expect("Failed to setup test server state 3");
-    let _server_state4 = server
-        .setup_test_server_state(&flavor, &user)
+    let server_state_4 = server
+        .setup_test_server_state(&flavor, &normal_user_1)
         .await
         .expect("Failed to setup test server state 4");
-    let _server_state5 = server
-        .setup_test_server_state(&flavor, &user2)
+    let _server_state_5 = server
+        .setup_test_server_state(&flavor, &normal_user_2)
         .await
         .expect("Failed to setup test server state 5");
-    let _server_state6 = server
-        .setup_test_server_state(&flavor, &user3)
-        .await
-        .expect("Failed to setup test server state 6");
 
     spawn_blocking(move || {
         // arrange
@@ -285,7 +286,20 @@ async fn e2e_lib_server_state_list_server_filter_stays_within_project_for_master
         .unwrap();
 
         // act
-        let server_states = client
+        let server_states_1 = client.server_state.list().send().unwrap();
+        let server_states_2 = client
+            .server_state
+            .list()
+            .user(normal_user_1.id)
+            .send()
+            .unwrap();
+        let server_states_3 = client
+            .server_state
+            .list()
+            .project(project.id)
+            .send()
+            .unwrap();
+        let server_states_4 = client
             .server_state
             .list()
             .server(&server_id)
@@ -293,9 +307,99 @@ async fn e2e_lib_server_state_list_server_filter_stays_within_project_for_master
             .unwrap();
 
         // assert
-        assert_eq!(server_states.len(), 2);
-        assert_contains_server_state(&server_states, &server_state1);
-        assert_contains_server_state(&server_states, &server_state2);
+        assert_eq!(server_states_1.len(), 1);
+        assert_contains_server_state(&server_states_1, &server_state_3);
+        assert_eq!(server_states_2.len(), 3);
+        assert_contains_server_state(&server_states_2, &server_state_1);
+        assert_contains_server_state(&server_states_2, &server_state_2);
+        assert_eq!(server_states_3.len(), 4);
+        assert_contains_server_state(&server_states_3, &server_state_1);
+        assert_contains_server_state(&server_states_3, &server_state_2);
+        assert_contains_server_state(&server_states_3, &server_state_3);
+        assert_contains_server_state(&server_states_3, &server_state_4);
+        assert_eq!(server_states_4.len(), 2);
+        assert_contains_server_state(&server_states_4, &server_state_1);
+        assert_contains_server_state(&server_states_4, &server_state_2);
+    })
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn e2e_lib_master_user_cannot_list_other_projects_and_users_server_states(
+) {
+    // arrange
+    let server = spawn_app().await;
+    let test_project_1 = server
+        .setup_test_project(0, 1, 0)
+        .await
+        .expect("Failed to setup test project");
+    let master_user = test_project_1.masters[0].user.clone();
+    let token = test_project_1.masters[0].token.clone();
+    let test_project_2 = server
+        .setup_test_project(0, 0, 1)
+        .await
+        .expect("Failed to setup test project");
+    let normal_user = test_project_2.normals[0].user.clone();
+    server
+        .mock_keystone_auth(
+            &token,
+            &master_user.openstack_id,
+            &master_user.name,
+        )
+        .mount(&server.keystone_server)
+        .await;
+    let flavor = server
+        .setup_test_flavor()
+        .await
+        .expect("Failed to setup test flavor");
+    let server_id = random_uuid();
+    let _server_state = server
+        .setup_test_server_state_with_server_id(
+            &flavor,
+            &normal_user,
+            &server_id,
+        )
+        .await
+        .expect("Failed to setup test server state 1");
+
+    spawn_blocking(move || {
+        // arrange
+        let client = Api::new(
+            format!("{}/api", &server.address),
+            Token::from_str(&token).unwrap(),
+            None,
+            None,
+        )
+        .unwrap();
+
+        // act
+        let server_states_1 =
+            client.server_state.list().user(normal_user.id).send();
+        let server_states_2 = client
+            .server_state
+            .list()
+            .project(test_project_2.project.id)
+            .send();
+        let server_states_3 =
+            client.server_state.list().server(&server_id).send();
+
+        // assert
+        assert!(server_states_1.is_err());
+        assert_eq!(
+            server_states_1.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
+        assert!(server_states_2.is_err());
+        assert_eq!(
+            server_states_2.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
+        assert!(server_states_3.is_err());
+        assert_eq!(
+            server_states_3.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
     })
     .await
     .unwrap();
