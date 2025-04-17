@@ -178,6 +178,23 @@ impl ProjectBudgetOverRequest {
         }
     }
 
+    pub fn send(&self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
+        let params = serde_urlencoded::to_string(&self.params)
+            .context("Failed to encode URL parameters")?;
+        let url = if params.is_empty() {
+            self.url.clone()
+        } else {
+            format!("{}?{}", self.url, params)
+        };
+        request(
+            &self.client,
+            Method::GET,
+            url.as_str(),
+            SerializableNone!(),
+            StatusCode::OK,
+        )
+    }
+
     pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
         self.params.end = Some(end);
         self
