@@ -11,8 +11,8 @@ use sqlx::MySqlPool;
 
 use crate::{
     authorization::{
-        require_admin_user, require_master_user,
-        require_master_user_or_return_not_found,
+        require_admin_user, require_master_user_or_return_not_found,
+        require_user_or_project_master_or_not_found,
     },
     database::{
         accounting::server_state::{
@@ -43,7 +43,7 @@ pub async fn server_state_list(
         require_admin_user(&user)?;
         select_all_server_states_from_db(&mut transaction).await?
     } else if let Some(project_id) = params.project {
-        require_master_user(&user, project_id)?;
+        require_master_user_or_return_not_found(&user, project_id)?;
         if let Some(server_id) = params.server.clone() {
             select_server_states_by_server_and_project_from_db(
                 &mut transaction,
@@ -62,7 +62,11 @@ pub async fn server_state_list(
         let user1 = select_user_from_db(&mut transaction, user_id as u64)
             .await
             .context("Failed to select user")?;
-        require_master_user_or_return_not_found(&user, user1.project)?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            user1.id,
+            user1.project,
+        )?;
         if let Some(server_id) = params.server.clone() {
             select_server_states_by_server_and_user_from_db(
                 &mut transaction,
@@ -78,17 +82,19 @@ pub async fn server_state_list(
             .await?
         }
     } else if let Some(server_id) = params.server.clone() {
-        if require_admin_user(&user).is_ok() {
+        let server_states =
             select_server_states_by_server_from_db(&mut transaction, server_id)
-                .await?
-        } else {
-            require_master_user(&user, project.id)?;
-            select_server_states_by_server_and_project_from_db(
-                &mut transaction,
-                server_id,
-                project.id as u64,
-            )
-            .await?
+                .await?;
+        let server_state_user =
+            select_user_from_db(&mut transaction, server_states[0].user as u64)
+                .await?;
+        match require_user_or_project_master_or_not_found(
+            &user,
+            server_state_user.id,
+            server_state_user.project,
+        ) {
+            Ok(_) => server_states,
+            Err(e) => return Err(e.into()),
         }
     } else {
         select_server_states_by_user_from_db(&mut transaction, user.id as u64)
