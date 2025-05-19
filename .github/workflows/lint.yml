@@ -23,7 +23,7 @@ permissions: {}
 
 env:
   CARGO_TERM_COLOR: always
-  SQLX_VERSION: "0.8.3"
+  SQLX_VERSION: "0.8.5"
   SQLX_FEATURES: "rustls,mysql"
   DATABASE_URL: "mysql://root:password@127.0.0.1:3306/lrzcc"
 
