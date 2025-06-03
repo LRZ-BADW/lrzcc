@@ -5,8 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use lrzcc_wire::{accounting::ServerStateImport, user::User};
 use sqlx::MySqlPool;
-use std::collections::HashMap;
-use std::hash::Hash;
+use std::{collections::HashMap, hash::Hash};
 
 use crate::{
     authorization::require_admin_user,
