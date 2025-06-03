@@ -14,6 +14,8 @@ mod modify;
 use modify::server_state_modify;
 mod delete;
 use delete::server_state_delete;
+mod import;
+use import::server_state_import;
 
 pub fn server_states_scope() -> Scope {
     scope("/serverstates")
@@ -23,6 +25,7 @@ pub fn server_states_scope() -> Scope {
         // TODO: what about PUT?
         .route("/{server_state_id}/", patch().to(server_state_modify))
         .route("/{server_state_id}/", delete().to(server_state_delete))
+        .route("/import/", get().to(server_state_import))
 }
 
 // TODO: wouldn't a general IdParam be better?
