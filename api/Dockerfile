@@ -12,7 +12,7 @@ WORKDIR /app
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
 ENV SQLX_OFFLINE true
-RUN cargo build --release --bin lrzcc-api
+RUN cargo build --release --bin avina-api
 
 FROM debian:bookworm-slim as runtime
 WORKDIR /app
@@ -21,7 +21,7 @@ RUN apt update -y \
     && apt autoremove -y \
     && apt clean -y \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/lrzcc-api lrzcc-api
+COPY --from=builder /app/target/release/avina-api avina-api
 COPY configuration configuration
 ENV APP_ENVIRONMENT production
-ENTRYPOINT ["./lrzcc-api"]
+ENTRYPOINT ["./avina-api"]

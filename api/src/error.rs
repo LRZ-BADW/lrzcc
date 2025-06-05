@@ -7,7 +7,7 @@ use actix_web::{
     },
     HttpResponse, ResponseError,
 };
-use lrzcc_wire::error::{error_chain_fmt, ErrorResponse};
+use avina_wire::error::{error_chain_fmt, ErrorResponse};
 
 pub fn unauthorized_error(message: &str) -> actix_web::Error {
     InternalError::from_response(

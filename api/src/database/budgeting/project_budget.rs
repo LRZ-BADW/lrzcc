@@ -1,6 +1,6 @@
 use anyhow::Context;
 use chrono::{Datelike, Utc};
-use lrzcc_wire::budgeting::{ProjectBudget, ProjectBudgetCreateData};
+use avina_wire::budgeting::{ProjectBudget, ProjectBudgetCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 use crate::error::{

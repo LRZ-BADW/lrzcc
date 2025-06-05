@@ -1,5 +1,5 @@
 use actix_web::{web::ReqData, HttpResponse};
-use lrzcc_wire::user::{Project, ProjectMinimal, User, UserDetailed};
+use avina_wire::user::{Project, ProjectMinimal, User, UserDetailed};
 
 #[tracing::instrument(name = "user_me")]
 pub async fn user_me(

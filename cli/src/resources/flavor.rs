@@ -143,7 +143,7 @@ pub(crate) use FlavorCommand::*;
 impl Execute for FlavorCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -187,7 +187,7 @@ impl Execute for FlavorCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &FlavorListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -202,7 +202,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -211,7 +211,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name: String,
     openstack_id: String,
@@ -230,7 +230,7 @@ fn create(
 }
 
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
     name: Option<String>,
@@ -256,14 +256,14 @@ fn modify(
 }
 
 // TODO replace all command functions errors by anyhow::Error
-fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
     Ok(api.flavor.delete(id)?)
 }
 
 fn import(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     quiet: bool,
 ) -> Result<(), Box<dyn Error>> {
@@ -275,7 +275,7 @@ fn import(
 }
 
 fn usage(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &FlavorUsageFilter,
     aggregate: bool,
@@ -317,7 +317,7 @@ fn usage(
 
 // TODO the find id functions can be condensed into a macro
 pub(crate) fn find_id(
-    api: &lrzcc::Api,
+    api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {

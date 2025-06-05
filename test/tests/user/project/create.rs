@@ -1,10 +1,10 @@
 use std::str::FromStr;
 
-use lrzcc::{Api, Token};
-use lrzcc_test::{
+use avina::{Api, Token};
+use avina_test::{
     random_alphanumeric_string, random_number, random_uuid, spawn_app,
 };
-use lrzcc_wire::user::ProjectRetrieved;
+use avina_wire::user::ProjectRetrieved;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]
@@ -177,7 +177,7 @@ async fn e2e_lib_project_create_twice_returns_bad_request() {
             .user_class(user_class)
             .send();
         match create {
-            Err(lrzcc::error::ApiError::ResponseError(message)) => {
+            Err(avina::error::ApiError::ResponseError(message)) => {
                 assert_eq!(
                     message,
                     "Failed to insert new project, a conflicting entry exists"

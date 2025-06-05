@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker stop lrzcc-db
-docker rm lrzcc-db
+docker stop avina-db
+docker rm avina-db

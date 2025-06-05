@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use anyhow::Context;
-use lrzcc_wire::quota::{
+use avina_wire::quota::{
     FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData,
     FlavorQuotaListParams, FlavorQuotaModifyData,
 };

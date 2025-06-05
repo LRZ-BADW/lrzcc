@@ -3,7 +3,7 @@ use std::error::Error;
 use crate::common::{print_single_object, Format};
 
 pub(crate) fn budget_bulk_create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     year: i32,
 ) -> Result<(), Box<dyn Error>> {

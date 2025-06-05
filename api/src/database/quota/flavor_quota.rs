@@ -1,5 +1,5 @@
 use anyhow::Context;
-use lrzcc_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
+use avina_wire::quota::{FlavorQuota, FlavorQuotaCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 use crate::error::{

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use lrzcc::{Api, Token};
-use lrzcc_test::{
+use avina::{Api, Token};
+use avina_test::{
     random_alphanumeric_string, random_bool, random_number, random_uuid,
     spawn_app,
 };

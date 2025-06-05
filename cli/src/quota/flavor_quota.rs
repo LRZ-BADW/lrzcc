@@ -107,7 +107,7 @@ pub(crate) use FlavorQuotaCommand::*;
 impl Execute for FlavorQuotaCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -142,7 +142,7 @@ impl Execute for FlavorQuotaCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &FlavorQuotaListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -160,7 +160,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
@@ -168,7 +168,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     flavor_group: &str,
     user: &str,
@@ -184,7 +184,7 @@ fn create(
 }
 
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: u32,
     user: Option<String>,
@@ -206,13 +206,13 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor_quota.delete(*id)?)
 }
 
 fn check(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     user: &str,
     flavor: &str,

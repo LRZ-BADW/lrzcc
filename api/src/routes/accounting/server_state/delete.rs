@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use lrzcc_wire::user::{Project, User};
+use avina_wire::user::{Project, User};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::ServerStateIdParam;

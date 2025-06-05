@@ -1,11 +1,11 @@
 [package]
-name = "lrzcc"
+name = "avina"
 description = "Rust client library for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["api-bindings"]
 edition = "2021"
-homepage = "https://github.com/LRZ-BADW/lrzcc"
-repository = "https://github.com/LRZ-BADW/lrzcc"
+homepage = "https://github.com/LRZ-BADW/avina"
+repository = "https://github.com/LRZ-BADW/avina"
 exclude = []
 readme = "README.md"
 license = "MIT"
@@ -14,20 +14,20 @@ version = "1.7.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "lrzcc"
+name = "avina"
 crate-type = ["cdylib", "rlib"]
 path = "src/lib.rs"
 
 [features]
 default = ["all"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = ["lrzcc-wire/accounting"]
-budgeting = ["lrzcc-wire/budgeting"]
-hello = ["lrzcc-wire/hello"]
-pricing = ["lrzcc-wire/pricing"]
-quota = ["lrzcc-wire/quota"]
-resources = ["lrzcc-wire/resources"]
-user = ["lrzcc-wire/user"]
+accounting = ["avina-wire/accounting"]
+budgeting = ["avina-wire/budgeting"]
+hello = ["avina-wire/hello"]
+pricing = ["avina-wire/pricing"]
+quota = ["avina-wire/quota"]
+resources = ["avina-wire/resources"]
+user = ["avina-wire/user"]
 
 [dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }
@@ -38,7 +38,7 @@ thiserror = "2"
 anyhow = "1"
 chrono = { version = "0.4", features = ["serde"] }
 jzon = "0.12"
-lrzcc-wire = { version = "1.6", path = "../wire" }
+avina-wire = { version = "1.6", path = "../wire" }
 
 [dev-dependencies]
 cargo-husky = { workspace = true }

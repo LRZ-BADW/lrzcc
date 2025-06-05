@@ -17,7 +17,7 @@ pub(crate) use HelloCommand::*;
 impl Execute for HelloCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -27,10 +27,10 @@ impl Execute for HelloCommand {
     }
 }
 
-fn admin(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn admin(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.hello.admin()?, format)
 }
 
-fn user(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn user(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.hello.user()?, format)
 }

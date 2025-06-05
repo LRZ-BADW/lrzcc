@@ -1,5 +1,5 @@
-use lrzcc_test::{random_uuid, spawn_app};
-use lrzcc_wire::hello::Hello;
+use avina_test::{random_uuid, spawn_app};
+use avina_wire::hello::Hello;
 
 #[tokio::test]
 async fn hello_returns_unauthorized_for_missing_token() {

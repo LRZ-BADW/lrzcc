@@ -4,7 +4,7 @@ use actix_web::{
 };
 use anyhow::{anyhow, Context};
 use chrono::{DateTime, Datelike, TimeZone, Utc};
-use lrzcc_wire::{
+use avina_wire::{
     budgeting::{
         UserBudgetOverCombined, UserBudgetOverCombinedDetail,
         UserBudgetOverDetail, UserBudgetOverParams, UserBudgetOverSimple,

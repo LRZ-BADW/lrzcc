@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
-use lrzcc_wire::accounting::{
+use avina_wire::accounting::{
     ServerState, ServerStateCreateData, ServerStateImport,
     ServerStateListParams, ServerStateModifyData,
 };

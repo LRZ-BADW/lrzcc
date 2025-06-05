@@ -1,4 +1,4 @@
-# lrzcc-cli
+# avina-cli
 CLI application written in Rust for LRZ-specific features of
 the Openstack-based LRZ Compute Cloud, [https://cc.lrz.de](https://cc.lrz.de), first and
 foremost the budgeting system.
@@ -6,7 +6,7 @@ foremost the budgeting system.
 ## Installation
 Install the tool via cargo:
 ```bash
-cargo install lrzcc-cli
+cargo install avina-cli
 ```
 
 ## Usage
@@ -30,45 +30,45 @@ Note: this stores you credentials in environment variables starting with
 
 #### Get Own User
 ```bash
-lrzcc user me
+avina user me
 ```
 Note: role 1 indicates that you are a normal user, role 2 means you are a
 master user.
 
 #### Display Cloud Usage
 ```bash
-lrzcc -f json usage
+avina -f json usage
 ```
 Note: the `-f json` tells the tool to simply output the JSON response from
 the API.
 
 #### List Flavor Prices
 ```bash
-lrzcc flavor-price list
+avina flavor-price list
 ```
 
 #### Calculate Own Consumption and Cost
 ```bash
-lrzcc server-consumption
-lrzcc server-cost
+avina server-consumption
+avina server-cost
 ```
 
 #### View User and Project Budget
 ```bash
-lrzcc user-budget list
-lrzcc project-budget list
+avina user-budget list
+avina project-budget list
 ```
 
 #### Check of Budget is Over
 ```bash
-lrzcc user-budget over -dc
+avina user-budget over -dc
 ```
 
 #### Show Budget Over Tree
 This hierarchical view also shows a breakdown of the cost down to the
 individual servers and is what the webui uses:
 ```bash
-lrzcc -f json budget-over-tree
+avina -f json budget-over-tree
 ```
 Note: the `-f json` tells the tool to simply output the JSON response from
 the API.
@@ -77,33 +77,33 @@ the API.
 
 #### List Own Project and Users
 ```bash
-lrzcc project list
-lrzcc user list -p <project_id/name>
+avina project list
+avina user list -p <project_id/name>
 ```
 
 #### List Budgets of Own Project
 ```bash
-lrzcc user-budget list -p <project_id/name>
+avina user-budget list -p <project_id/name>
 ```
 
 #### List Budget Over Status of Project's Users
 ```bash
-lrzcc user-budget over -p <project_id/name> -dc
+avina user-budget over -p <project_id/name> -dc
 ```
 
 #### Show Budget Over Tree of Project's Users
 This hierarchical view also shows a breakdown of the cost down to the
 individual users and servers and is what the webui uses:
 ```bash
-lrzcc -f json budget-over-tree -p <project_id/name>
+avina -f json budget-over-tree -p <project_id/name>
 ```
 Note: the `-f json` tells the tool to simply output the JSON response from
 the API.
 
 #### Modify Budgets
 ```bash
-lrzcc user-budget modify <user_budget_id> -a <amount>
-lrzcc project-budget modify <project_budget_id> -a <amount>
+avina user-budget modify <user_budget_id> -a <amount>
+avina project-budget modify <project_budget_id> -a <amount>
 ```
 Note: you cannot set a budget below the already acrued costs or modify the
 budget of a past year.

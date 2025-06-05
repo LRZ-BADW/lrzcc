@@ -1,5 +1,5 @@
 use anyhow::Context;
-use lrzcc_wire::resources::{
+use avina_wire::resources::{
     Flavor, FlavorCreateData, FlavorDetailed, FlavorGroupMinimal, FlavorMinimal,
 };
 use sqlx::{Executor, FromRow, MySql, Transaction};

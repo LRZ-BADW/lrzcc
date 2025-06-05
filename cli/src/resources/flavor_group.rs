@@ -103,7 +103,7 @@ pub(crate) use FlavorGroupCommand::*;
 impl Execute for FlavorGroupCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -131,7 +131,7 @@ impl Execute for FlavorGroupCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &FlavorGroupListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -143,7 +143,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -152,7 +152,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name: String,
 ) -> Result<(), Box<dyn Error>> {
@@ -160,7 +160,7 @@ fn create(
 }
 
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
     name: Option<String>,
@@ -178,19 +178,19 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
     Ok(api.flavor_group.delete(id)?)
 }
 
-fn initialize(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn initialize(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let result = api.flavor_group.initialize()?;
     print_single_object(result, format)
 }
 
 fn usage(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &FlavorGroupUsageFilter,
     aggregate: bool,
@@ -231,7 +231,7 @@ fn usage(
 }
 
 pub(crate) fn find_id(
-    api: &lrzcc::Api,
+    api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {

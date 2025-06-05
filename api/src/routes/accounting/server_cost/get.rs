@@ -7,7 +7,7 @@ use actix_web::{
 use anyhow::{anyhow, Context};
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use indexmap::IndexMap;
-use lrzcc_wire::{
+use avina_wire::{
     accounting::{
         ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
         ServerCostSimple, ServerCostUser,

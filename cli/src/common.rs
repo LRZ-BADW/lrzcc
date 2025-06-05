@@ -209,7 +209,7 @@ impl ValueEnum for Format {
 pub(crate) trait Execute {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn std::error::Error>>;
 }
@@ -236,7 +236,7 @@ pub(crate) fn ask_for_confirmation() -> Result<(), anyhow::Error> {
 
 #[allow(dead_code)]
 pub(crate) fn find_id(
-    _api: &lrzcc::Api,
+    _api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {

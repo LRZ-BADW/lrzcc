@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use anyhow::Context;
-use lrzcc_wire::user::{
+use avina_wire::user::{
     User, UserCreateData, UserDetailed, UserImport, UserListParams,
     UserModifyData,
 };

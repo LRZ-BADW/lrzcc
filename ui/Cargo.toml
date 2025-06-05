@@ -1,11 +1,11 @@
 [package]
-name = "lrzcc-ui"
+name = "avina-ui"
 description = "Rust web UI for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["web-programming"]
 edition = "2021"
-homepage = "https://github.com/LRZ-BADW/lrzcc"
-repository = "https://github.com/LRZ-BADW/lrzcc"
+homepage = "https://github.com/LRZ-BADW/avina"
+repository = "https://github.com/LRZ-BADW/avina"
 exclude = []
 readme = "README.md"
 license = "MIT"

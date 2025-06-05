@@ -1,6 +1,6 @@
 use anyhow::Context;
 use chrono::{DateTime, Utc};
-use lrzcc_wire::accounting::{ServerState, ServerStateCreateData};
+use avina_wire::accounting::{ServerState, ServerStateCreateData};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 use crate::error::{

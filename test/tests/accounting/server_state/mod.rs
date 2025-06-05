@@ -4,7 +4,7 @@ mod get;
 mod list;
 mod modify;
 
-use lrzcc_wire::accounting::ServerState;
+use avina_wire::accounting::ServerState;
 
 pub fn equal_server_states(
     server_state_1: &ServerState,

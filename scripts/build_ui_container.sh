@@ -3,8 +3,8 @@
 VERSION=0.0.1
 
 docker build \
-    --tag "gierens/lrzcc-ui:v${VERSION}" \
-    --tag "gierens/lrzcc-ui:latest" \
+    --tag "gierens/avina-ui:v${VERSION}" \
+    --tag "gierens/avina-ui:latest" \
     --file ui/Dockerfile \
     .
 
@@ -17,6 +17,6 @@ fi
 read -p "Publish container? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker push "gierens/lrzcc-ui:v${VERSION}"
-    docker push "gierens/lrzcc-ui:latest"
+    docker push "gierens/avina-ui:v${VERSION}"
+    docker push "gierens/avina-ui:latest"
 fi

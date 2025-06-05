@@ -5,7 +5,7 @@ database:
   port: 3306
   username: "root"
   password: "password"
-  database_name: "lrzcc"
+  database_name: "avina"
 openstack:
   # admin credentials
   username: "USERNAME"

@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use lrzcc::{Api, Token};
-use lrzcc_test::{
+use avina::{Api, Token};
+use avina_test::{
     random_alphanumeric_string, random_bool, random_number, random_uuid,
     spawn_app,
 };
@@ -202,7 +202,7 @@ async fn e2e_lib_user_create_twice_returns_bad_request() {
             .create(name.clone(), openstack_id.clone(), project.id)
             .send();
         match create {
-            Err(lrzcc::error::ApiError::ResponseError(message)) => {
+            Err(avina::error::ApiError::ResponseError(message)) => {
                 assert_eq!(
                     message,
                     "Failed to insert new user, a conflicting entry exists"

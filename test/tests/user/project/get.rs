@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use lrzcc::{Api, Token};
-use lrzcc_test::spawn_app;
-use lrzcc_wire::user::ProjectRetrieved;
+use avina::{Api, Token};
+use avina_test::spawn_app;
+use avina_wire::user::ProjectRetrieved;
 use tokio::task::spawn_blocking;
 
 #[tokio::test]

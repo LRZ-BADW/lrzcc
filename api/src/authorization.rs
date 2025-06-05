@@ -1,4 +1,4 @@
-use lrzcc_wire::user::User;
+use avina_wire::user::User;
 
 use crate::error::{AuthOnlyError, NotFoundOnlyError};
 

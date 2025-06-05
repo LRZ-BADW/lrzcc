@@ -1,5 +1,5 @@
 [package]
-name = "lrzcc-test"
+name = "avina-test"
 version = "0.5.0"
 edition = "2021"
 license = "MIT"
@@ -7,7 +7,7 @@ publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "lrzcc_test"
+name = "avina_test"
 path = "src/lib.rs"
 
 [[test]]
@@ -19,9 +19,9 @@ name = "main"
 harness = false
 
 [dependencies]
-lrzcc = { version = "1.7", path = "../lib" }
-lrzcc-api = { version = "0.7", path = "../api" }
-lrzcc-wire = { version = "1.6", path = "../wire" }
+avina = { version = "1.7", path = "../lib" }
+avina-api = { version = "0.7", path = "../api" }
+avina-wire = { version = "1.6", path = "../wire" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde_json = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }

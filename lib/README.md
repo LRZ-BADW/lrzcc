@@ -1,4 +1,4 @@
-# lrzcc-lib
+# avina-lib
 API bindings written in Rust for LRZ-specific features of
 the Openstack-based LRZ Compute Cloud, [https://cc.lrz.de](https://cc.lrz.de), first and
 foremost the budgeting system.
@@ -6,11 +6,11 @@ foremost the budgeting system.
 ## Usage
 To use the library add the following to your `Cargo.toml` under `[dependencies]`:
 ```toml
-lrzcc = 1
+avina = 1
 ```
 After that you create a `Token` and `Api` object to interact with the API:
 ```rust
-use lrzcc::{Token, Api};
+use avina::{Token, Api};
 
 // let token = Token::from_str("abcdefg...").unwrap();
 let token = Token::new(

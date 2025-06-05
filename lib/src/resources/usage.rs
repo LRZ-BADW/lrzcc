@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use lrzcc_wire::resources::CloudUsage;
+use avina_wire::resources::CloudUsage;
 use reqwest::{blocking::Client, Method, StatusCode};
 
 use crate::{

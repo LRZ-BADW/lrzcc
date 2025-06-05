@@ -5,7 +5,7 @@ use actix_web::{
     web::Data,
     HttpMessage,
 };
-use lrzcc_wire::user::{Project, User};
+use avina_wire::user::{Project, User};
 use sqlx::MySqlPool;
 
 use crate::{

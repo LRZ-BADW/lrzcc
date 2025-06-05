@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use anyhow::Context;
-use lrzcc_wire::error::ErrorResponse;
+use avina_wire::error::ErrorResponse;
 use reqwest::{
     blocking::{Client, Response},
     Method, StatusCode,

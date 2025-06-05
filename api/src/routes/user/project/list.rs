@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use lrzcc_wire::user::{Project, ProjectListParams, User};
+use avina_wire::user::{Project, ProjectListParams, User};
 use sqlx::MySqlPool;
 
 use crate::{

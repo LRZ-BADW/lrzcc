@@ -1,9 +1,9 @@
 #!/bin/bash
 
-docker stop lrzcc-api || true
-docker rm lrzcc-api || true
+docker stop avina-api || true
+docker rm avina-api || true
 docker run \
-    --name lrzcc-api \
+    --name avina-api \
     -e APP_OPENSTACK__KEYSTONE_ENDPOINT="${OS_AUTH_URL}" \
     -e APP_OPENSTACK__USERNAME="${OS_USERNAME}" \
     -e APP_OPENSTACK__PASSWORD="${OS_PASSWORD}" \
@@ -12,4 +12,4 @@ docker run \
     -e APP_OPENSTACK__DOMAIN="${OS_USER_DOMAIN_NAME}" \
     -e APP_OPENSTACK__DOMAIN_ID="${OS_PROJECT_DOMAIN_ID}" \
     -d \
-    lrzcc-api
+    avina-api

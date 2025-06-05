@@ -46,7 +46,7 @@ pub(crate) struct ServerCostFilter {
 }
 
 pub(crate) fn server_cost(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     begin: Option<DateTime<FixedOffset>>,
     end: Option<DateTime<FixedOffset>>,

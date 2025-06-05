@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use anyhow::Context;
-use lrzcc_wire::resources::{
+use avina_wire::resources::{
     Flavor, FlavorCreateData, FlavorDetailed, FlavorImport, FlavorListParams,
     FlavorModifyData, FlavorUsage, FlavorUsageAggregate,
 };

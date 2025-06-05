@@ -18,17 +18,17 @@ fi
 DB_HOST="${MARIADB_HOST:=127.0.0.1}"
 DB_USER=${MARIADB_USER:=root}
 DB_PASSWORD="${MARIADB_PASSWORD:=password}"
-DB_NAME="${MARIADB_DB:=lrzcc}"
+DB_NAME="${MARIADB_DB:=avina}"
 DB_PORT="${MARIADB_PORT:=3306}"
 
 if [[ -z "${SKIP_DOCKER}" ]]; then
-    docker stop lrzcc-db || true
-    docker rm lrzcc-db || true
+    docker stop avina-db || true
+    docker rm avina-db || true
     docker run \
         -e MARIADB_ROOT_PASSWORD="${DB_PASSWORD}" \
         -e MARIADB_DB="${DB_NAME}" \
         -p "${DB_PORT}":3306 \
-        --name lrzcc-db \
+        --name avina-db \
         -d mariadb:latest
 fi
 
