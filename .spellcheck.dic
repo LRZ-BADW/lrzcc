@@ -86,3 +86,7 @@ u32
 bool
 {}
 extra_specs
+datetime
+hashmap
+NormalApiError
+AuthOrUnexpectedError
