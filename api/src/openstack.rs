@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{collections::HashMap, time::Instant};
 
 use anyhow::Context;
 use jzon::object;
@@ -106,6 +106,103 @@ pub struct FlavorDetailedList {
     flavors: Vec<FlavorDetailed>,
 }
 
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct ServerDetailedFlavor {
+    pub id: String,
+    pub links: Vec<Link>,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct ServerDetailedSecurityGroup {
+    pub name: String,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct ServerDetailedVolumesAttached {
+    pub id: String,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct ServerDetailedAddress {
+    pub version: usize,
+    pub addr: String,
+    #[serde(rename = "OS-EXT-IPS:type")]
+    pub addr_type: String,
+    #[serde(rename = "OS-EXT-IPS-MAC:mac_addr")]
+    pub mac_addr: String,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+#[serde(untagged)]
+pub enum ServerDetailedImage {
+    Some { id: String, links: Vec<Link> },
+    None(String),
+}
+
+// TODO: there are many missing fields here.
+#[derive(Clone, Debug, serde::Deserialize)]
+#[allow(unused)]
+pub struct ServerDetailed {
+    pub id: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub status: String,
+    pub tenant_id: String,
+    pub user_id: String,
+    pub metadata: HashMap<String, String>,
+    #[serde(rename = "hostId")]
+    pub host_id: String,
+    pub image: ServerDetailedImage,
+    pub flavor: ServerDetailedFlavor,
+    // TODO: this is actually a datetime
+    pub created: String,
+    // TODO: this is actually a datetime
+    pub updated: String,
+    pub addresses: HashMap<String, Vec<ServerDetailedAddress>>,
+    #[serde(rename = "accessIPv4")]
+    pub access_ipv4: String,
+    #[serde(rename = "accessIPv6")]
+    pub access_ipv6: String,
+    pub links: Vec<Link>,
+    #[serde(rename = "OS-DCF:diskConfig")]
+    pub disk_config: String,
+    #[serde(rename = "OS-EXT-AZ:availability_zone")]
+    pub availability_zone: String,
+    pub config_drive: String,
+    pub key_name: Option<String>,
+    // TODO: this is actually a datetime
+    #[serde(rename = "OS-SRV-USG:launched_at")]
+    pub launched_at: Option<String>,
+    // TODO: this is actually a datetime
+    #[serde(rename = "OS-SRV-USG:terminated_at")]
+    pub terminated_at: Option<String>,
+    #[serde(rename = "OS-EXT-SRV-ATTR:host")]
+    pub host: Option<String>,
+    #[serde(rename = "OS-EXT-SRV-ATTR:instance_name")]
+    pub instance_name: String,
+    #[serde(rename = "OS-EXT-SRV-ATTR:hypervisor_hostname")]
+    pub hypervisor_hostname: Option<String>,
+    #[serde(rename = "OS-EXT-STS:task_state")]
+    pub task_state: Option<String>,
+    #[serde(rename = "OS-EXT-STS:vm_state")]
+    pub vm_state: String,
+    #[serde(rename = "OS-EXT-STS:power_state")]
+    pub power_state: usize,
+    #[serde(rename = "os-extended-volumes:volumes_attached")]
+    pub volumes_attached: Vec<ServerDetailedVolumesAttached>,
+    pub security_groups: Option<Vec<ServerDetailedSecurityGroup>>,
+}
+
+#[derive(Clone, Debug, serde::Deserialize)]
+pub struct ServerDetailedList {
+    servers: Vec<ServerDetailed>,
+}
+
 impl OpenStack {
     pub async fn new(
         settings: OpenStackSettings,
@@ -197,6 +294,36 @@ impl OpenStack {
         )
         .context("Could not parse response")?;
         Ok(flavors.flavors)
+    }
+
+    pub async fn get_servers(
+        &self,
+    ) -> Result<Vec<ServerDetailed>, anyhow::Error> {
+        let client = self.client().await?;
+        let url = format!(
+            "{}/v2.1/servers/detail?all_tenants=True",
+            self.settings.nova_endpoint
+        );
+        let response = client
+            .get(url.as_str())
+            .send()
+            .await
+            .context("Could not retrieve server list")?;
+        if !response.status().is_success() {
+            return Err(anyhow::anyhow!(
+                "Failed to validate user token, returned code {}",
+                response.status().as_u16()
+            ));
+        }
+        let servers: ServerDetailedList = serde_json::from_str(
+            response
+                .text()
+                .await
+                .context("Could not read response text")?
+                .as_str(),
+        )
+        .context("Could not parse response")?;
+        Ok(servers.servers)
     }
 }
 
