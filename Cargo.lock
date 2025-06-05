@@ -370,7 +370,7 @@ checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
 name = "avina"
-version = "1.7.0"
+version = "1.8.0"
 dependencies = [
  "anyhow",
  "avina-wire",
@@ -386,7 +386,7 @@ dependencies = [
 
 [[package]]
 name = "avina-api"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "actix-web",
  "anyhow",
@@ -418,7 +418,7 @@ dependencies = [
 
 [[package]]
 name = "avina-cli"
-version = "1.5.2"
+version = "1.6.0"
 dependencies = [
  "anyhow",
  "avina",
@@ -434,7 +434,7 @@ dependencies = [
 
 [[package]]
 name = "avina-test"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "avina",
@@ -462,7 +462,7 @@ dependencies = [
 
 [[package]]
 name = "avina-wire"
-version = "1.6.0"
+version = "1.7.0"
 dependencies = [
  "cargo-husky",
  "chrono",
