@@ -10,7 +10,7 @@ use avina_wire::{
     },
     user::User,
 };
-use chrono::{DateTime, Datelike, TimeZone, Utc};
+use chrono::{DateTime, Datelike, Utc};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 
@@ -40,12 +40,11 @@ use crate::{
             calculate_server_cost_for_project, ServerCostForProject,
         },
     },
+    utils::start_of_the_year,
 };
 
 #[derive(Serialize)]
 #[serde(untagged)]
-// TODO: remove this
-#[allow(dead_code)]
 pub enum UserBudgetOver {
     Normal(Vec<UserBudgetOverSimple>),
     Combined(Vec<UserBudgetOverCombined>),
@@ -68,8 +67,7 @@ pub async fn calculate_user_budget_over_for_budget_normal(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -116,8 +114,7 @@ pub async fn calculate_user_budget_over_for_budget_combined(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -175,8 +172,7 @@ pub async fn calculate_user_budget_over_for_budget_detail(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -225,8 +221,7 @@ pub async fn calculate_user_budget_over_for_budget_combined_detail(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -332,8 +327,7 @@ pub async fn calculate_user_budget_over_for_user_normal(
     else {
         return Ok(overs);
     };
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -384,8 +378,7 @@ pub async fn calculate_user_budget_over_for_user_combined(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -444,8 +437,7 @@ pub async fn calculate_user_budget_over_for_user_detail(
     else {
         return Ok(overs);
     };
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -498,8 +490,7 @@ pub async fn calculate_user_budget_over_for_user_combined_detail(
     if year != end.year() as u32 {
         return Ok(overs);
     }
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
         transaction,
         budget.user as u64,
@@ -602,8 +593,7 @@ pub async fn calculate_user_budget_over_for_project_normal(
         year,
     )
     .await?;
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     for budget in budgets {
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
@@ -657,8 +647,7 @@ pub async fn calculate_user_budget_over_for_project_combined(
                 year,
             )
             .await?;
-        // TODO: outsource into function
-        let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+        let begin = start_of_the_year(year);
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
             budget.user as u64,
@@ -719,8 +708,7 @@ pub async fn calculate_user_budget_over_for_project_detail(
         year,
     )
     .await?;
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     for budget in budgets {
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
@@ -776,8 +764,7 @@ pub async fn calculate_user_budget_over_for_project_combined_detail(
                 year,
             )
             .await?;
-        // TODO: outsource into function
-        let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+        let begin = start_of_the_year(year);
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
             budget.user as u64,
@@ -880,8 +867,7 @@ pub async fn calculate_user_budget_over_for_all_normal(
     let year = end.year() as u32;
     let budgets =
         select_user_budgets_by_year_from_db(transaction, year).await?;
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     for budget in budgets {
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
@@ -930,8 +916,7 @@ pub async fn calculate_user_budget_over_for_all_combined(
                 year,
             )
             .await?;
-        // TODO: outsource into function
-        let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+        let begin = start_of_the_year(year);
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
             budget.user as u64,
@@ -987,8 +972,7 @@ pub async fn calculate_user_budget_over_for_all_detail(
     let year = end.year() as u32;
     let budgets =
         select_user_budgets_by_year_from_db(transaction, year).await?;
-    // TODO: outsource into function
-    let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+    let begin = start_of_the_year(year);
     for budget in budgets {
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
@@ -1039,8 +1023,7 @@ pub async fn calculate_user_budget_over_for_all_combined_detail(
                 year,
             )
             .await?;
-        // TODO: outsource into function
-        let begin = Utc.with_ymd_and_hms(year as i32, 1, 1, 1, 0, 0).unwrap();
+        let begin = start_of_the_year(year);
         let ServerCostForUser::Normal(cost) = calculate_server_cost_for_user(
             transaction,
             budget.user as u64,
