@@ -1,8 +1,8 @@
 use std::error::Error;
 
 use anyhow::{anyhow, Context};
-use clap::{Args, Subcommand};
 use avina_wire::user::ProjectRetrieved;
+use clap::{Args, Subcommand};
 
 use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,

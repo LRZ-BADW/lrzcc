@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use chrono::{DateTime, FixedOffset, Utc};
 use avina::{Api, Token};
 use avina_test::{random_alphanumeric_string, random_uuid, spawn_app};
+use chrono::{DateTime, FixedOffset, Utc};
 use tokio::task::spawn_blocking;
 
 use super::assert_equal_server_states;

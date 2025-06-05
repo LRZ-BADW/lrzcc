@@ -1,6 +1,6 @@
 use anyhow::Context;
-use chrono::{DateTime, Utc};
 use avina_wire::pricing::{FlavorPrice, FlavorPriceCreateData};
+use chrono::{DateTime, Utc};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 use crate::error::{

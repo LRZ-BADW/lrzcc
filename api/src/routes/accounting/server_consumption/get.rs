@@ -5,7 +5,6 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use chrono::{DateTime, Datelike, TimeZone, Utc};
 use avina_wire::{
     accounting::{
         ServerConsumptionAll, ServerConsumptionFlavors,
@@ -14,6 +13,7 @@ use avina_wire::{
     },
     user::{Project, User},
 };
+use chrono::{DateTime, Datelike, TimeZone, Utc};
 use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 
