@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.7.0
+VERSION=0.8.0
 
 docker build \
     --tag "gierens/avina:v${VERSION}" \
