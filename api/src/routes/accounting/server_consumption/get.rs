@@ -11,7 +11,7 @@ use avina_wire::{
         ServerConsumptionParams, ServerConsumptionProject,
         ServerConsumptionServer, ServerConsumptionUser, ServerState,
     },
-    user::{Project, User},
+    user::User,
 };
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use serde::Serialize;
@@ -267,8 +267,6 @@ pub enum ServerConsumption {
 #[tracing::instrument(name = "server_consumption")]
 pub async fn server_consumption(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Query<ServerConsumptionParams>,
     // TODO: is the ValidationError variant ever used?

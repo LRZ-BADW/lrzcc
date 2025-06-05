@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     budgeting::{BudgetBulkCreate, BudgetBulkCreateData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::{MySql, MySqlPool, Transaction};
 
@@ -92,8 +92,6 @@ async fn bulk_create_project_budgets(
 #[tracing::instrument(name = "budget_bulk_create")]
 pub async fn budget_bulk_create(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<BudgetBulkCreateData>,
     // TODO: is the ValidationError variant ever used?

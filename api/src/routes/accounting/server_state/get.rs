@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User};
+use avina_wire::user::User;
 use sqlx::MySqlPool;
 
 use super::ServerStateIdParam;
@@ -19,8 +19,6 @@ use crate::{
 #[tracing::instrument(name = "server_state_get")]
 pub async fn server_state_get(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<ServerStateIdParam>,
     // TODO: is the ValidationError variant ever used?

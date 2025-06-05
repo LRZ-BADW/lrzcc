@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User};
+use avina_wire::user::User;
 use sqlx::MySqlPool;
 
 use super::UserBudgetIdParam;
@@ -19,8 +19,6 @@ use crate::{
 #[tracing::instrument(name = "user_budget_get")]
 pub async fn user_budget_get(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<UserBudgetIdParam>,
     // TODO: is the ValidationError variant ever used?

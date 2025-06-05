@@ -11,7 +11,7 @@ use avina_wire::{
         ServerCostSimple, ServerCostUser,
     },
     pricing::FlavorPrice,
-    user::{Project, User},
+    user::User,
 };
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use indexmap::IndexMap;
@@ -906,8 +906,6 @@ pub enum ServerCost {
 #[tracing::instrument(name = "server_cost")]
 pub async fn server_cost(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Query<ServerCostParams>,
     // TODO: is the ValidationError variant ever used?
