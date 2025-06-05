@@ -3,8 +3,8 @@ extern crate bencher;
 
 use std::{env, str::FromStr};
 
-use bencher::Bencher;
 use avina::{Api, Token};
+use bencher::Bencher;
 
 fn bench_hello_user(b: &mut Bencher) {
     let token =

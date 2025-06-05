@@ -1,10 +1,10 @@
 use std::{process::ExitCode, str::FromStr};
 
+use avina::{Api, Token};
 use chrono::{DateTime, FixedOffset};
 use clap::{ArgAction::SetFalse, Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
-use avina::{Api, Token};
 
 mod common;
 

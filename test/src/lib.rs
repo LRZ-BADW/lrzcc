@@ -1,7 +1,6 @@
 use std::ops::Range;
 
 use anyhow::Context;
-use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use avina_api::{
     configuration::{get_configuration, DatabaseSettings},
     database::{
@@ -31,6 +30,7 @@ use avina_wire::{
     resources::{Flavor, FlavorCreateData, FlavorGroup, FlavorGroupCreateData},
     user::{Project, User},
 };
+use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use once_cell::sync::Lazy;
 use rand::{distr::Alphanumeric, rng, Rng};
 use serde_json::json;
