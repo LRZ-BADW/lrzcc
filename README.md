@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/LRZ-BADW/avina/main/logo.png)
 
-API bindings, CLI application and partial API-backend written in Rust for
+API bindings, CLI application and API-backend written in Rust for
 LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 [https://cc.lrz.de](https://cc.lrz.de), first and foremost the budgeting system.
 
@@ -17,8 +17,8 @@ LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 </div>
 
 ## Crates
-- [api](api): partial rewrite of the API server application ![crates.io](https://img.shields.io/crates/v/avina-api?link=https://crates.io/crates/avina-api)
-- [cli](cli): full rewrite of the CLI application ![crates.io](https://img.shields.io/crates/v/avina-cli?link=https://crates.io/crates/avina-cli)
+- [api](api): backend API server application ![crates.io](https://img.shields.io/crates/v/avina-api?link=https://crates.io/crates/avina-api)
+- [cli](cli): cleint-side CLI application ![crates.io](https://img.shields.io/crates/v/avina-cli?link=https://crates.io/crates/avina-cli)
 - [lib](lib): client-side API-binding library ![crates.io](https://img.shields.io/crates/v/avina?link=https://crates.io/crates/avina)
 - [test](test): shared test helpers and end-to-end tests
 - [wire](wire): library for shared data structures used for API communication ![crates.io](https://img.shields.io/crates/v/avina-wire?link=https://crates.io/crates/avina-wire)
