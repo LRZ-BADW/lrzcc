@@ -1,4 +1,5 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.81.0 as chef
+FROM rust:1 AS chef
+RUN cargo install cargo-chef
 WORKDIR /app
 RUN apt update && apt install mold clang -y
 
