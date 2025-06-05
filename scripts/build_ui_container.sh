@@ -12,6 +12,7 @@ if [ $? -eq 0 ]; then
     echo "Successfully built the container"
 else
     echo "Failed to build the container"
+    exit 1
 fi
 
 read -p "Publish container? " -n 1 -r
