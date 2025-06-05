@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     resources::{FlavorCreateData, FlavorImport},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::MySqlPool;
 
@@ -21,8 +21,6 @@ use crate::{
 #[tracing::instrument(name = "flavor_import", skip(openstack))]
 pub async fn flavor_import(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     openstack: Data<OpenStack>,
     // TODO: is the ValidationError variant ever used?

@@ -8,7 +8,7 @@ use avina_wire::{
         UserBudgetOverCombined, UserBudgetOverCombinedDetail,
         UserBudgetOverDetail, UserBudgetOverParams, UserBudgetOverSimple,
     },
-    user::{Project, User},
+    user::User,
 };
 use chrono::{DateTime, Datelike, TimeZone, Utc};
 use serde::Serialize;
@@ -1122,8 +1122,6 @@ pub async fn calculate_user_budget_over_for_all(
 #[tracing::instrument(name = "user_budget_over")]
 pub async fn user_budget_over(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Query<UserBudgetOverParams>,
     // TODO: is the ValidationError variant ever used?

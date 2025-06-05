@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User};
+use avina_wire::user::User;
 use sqlx::MySqlPool;
 
 use super::FlavorIdParam;
@@ -16,8 +16,6 @@ use crate::{
 #[tracing::instrument(name = "flavor_get")]
 pub async fn flavor_get(
     user: ReqData<User>,
-    // TODO: not necessary?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<FlavorIdParam>,
     // TODO: is the ValidationError variant ever used?
