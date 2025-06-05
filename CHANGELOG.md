@@ -4,7 +4,158 @@ This is the combined changelog of all contained `avina` crates.
 ## [Unreleased]
 ...
 
-## Repository
+## Repository - 2025-06-05
+
+### Dependencies
+- bump ring to v0.17.13
+- bump openssl from 0.10.71 to 0.10.72
+
+### CI
+- add zizmor config to ignore unpinned-uses for now
+- sort imports with rustfmt nightly
+- increase stale days to 90 and close to 30
+- bump sqlx from 0.8.3 to 0.8.6
+- bump taiki-e/install-action from 2.48.1 to 2.52.4
+
+### Documentation
+- docs(readme): remove "partial", "rewrite" from descriptions
+
+### Misc
+- rename project to avina
+- update sqlx offline query data
+- update spellcheck dictionary, remove old cspell dictionary
+- add deny ignore for unmaintained paste
+- correct sqlx-cli install cmd in init_db.sh
+- remove OpenSSL and add CDLA-Permissive-2.0 licenses in deny config
+- add bsl-1.0 as allowed license in deny config
+
+## [avina-ui-v0.0.1] - 2025-06-05
+
+### Features
+- add initial ui crate
+- add scripts to build and run the dioxus app
+- add Dockerfile for ui app
+- add Django wrapper app
+
+## [avina-test-v0.6.0] - 2025-06-05
+
+### Dependencies
+- bump anyhow from 1.0.95 to 1.0.98
+- bump chrono from 0.4.39 to 0.4.41
+- bump once_cell from 1.20.2 to 1.21.3
+- bump rand from 0.9.0 to 0.9.1
+- bump reqwest from 0.12.12 to 0.12.19
+- bump serde_json from 1.0.138 to 1.0.140
+- bump sqlx from 0.8.3 to 0.8.6
+- bump tokio from 1.43.0 to 1.45.1
+- bump uuid from 1.12.1 to 1.17.0
+- bump wiremock from 0.6.2 to 0.6.3
+
+### Tests
+- add tests for project budget over endpoint
+- add tests for user budget over endpoint
+- update tests for server state list endpoint
+- add tests for user budget access
+- add tests for project budget access
+
+## [avina-cli-v1.6.0] - 2025-06-05
+
+### Fixes
+- remove unused struct patterns
+
+### Dependencies
+- bump anyhow from 1.0.95 to 1.0.98
+- bump chrono from 0.4.39 to 0.4.41
+- bump clap from 4.5.28 to 4.5.39
+- bump serde from 1.0.217 to 1.0.219
+- bump serde_json from 1.0.138 to 1.0.140
+- bump tabled from 0.17.0 to 0.20.0
+
+## [avina-lib-v1.8.0] - 2025-06-05
+
+### Features
+- rename UserBudgetOver to UserBudgetOverSimple
+- move UserBudgetOverParams to wire
+- rename ProjectBudgetOver response structs
+- move ProjectBudgetOverParams into wire
+
+### Fixes
+- correct typo in UserBudgetOver response types
+
+### Dependencies
+- bump anyhow from 1.0.95 to 1.0.98
+- bump chrono from 0.4.39 to 0.4.41
+- bump reqwest from 0.12.12 to 0.12.19
+- bump serde from 1.0.217 to 1.0.219
+- bump serde_json from 1.0.138 to 1.0.140
+- bump thiserror from 2.0.11 to 2.0.12
+
+## [avina-api-v0.8.0] - 2025-06-05
+
+### Dependencies
+- bump actix-web from 4.9.0 to 4.11.0
+- bump anyhow from 1.0.95 to 1.0.98
+- bump chrono from 0.4.39 to 0.4.41
+- bump config from 0.15.7 to 0.15.11
+- bump indexmap from 2.7.0 to 2.9.0
+- bump once_cell from 1.20.2 to 1.21.3
+- bump rand from 0.9.0 to 0.9.1
+- bump reqwest from 0.12.12 to 0.12.19
+- bump serde from 1.0.217 to 1.0.219
+- bump serde-aux from 4.5.0 to 4.7.0
+- bump serde_json from 1.0.138 to 1.0.140
+- bump sqlx from 0.8.3 to 0.8.6
+- bump strum from 0.26.3 to 0.27.1
+- bump thiserror from 2.0.11 to 2.0.12
+- bump tokio from 1.43.0 to 1.45.1
+- bump tracing-actix-web from 0.7.15 to 0.7.18
+- bump uuid from 1.12.1 to 1.17.0
+- bump wiremock from 0.6.2 to 0.6.3
+
+### Fixes
+- add sqlx from to Row structs in server_state::import mod
+- correct error message in insert_flavor_into_db
+- correct join in select_all_flavors_from_db
+
+### Features
+- add server-state import endpoint
+- add Openstack.get_servers function
+- add flavor import endpoint
+- add OpenStack.get_flavors
+- add user-budget over endpoint
+- add project-budget over endpoint
+- add budget bulk create endpoint
+
+- Merge pull request #272 from fredberto/project-user-budget-permissions
+
+### Documentation
+- add development requirements section to README.md
+- update endpoint todo list in routes module
+
+## [avina-wire-v1.7.0] - 2025-06-05
+
+### Features
+- rename UserBudgetOver to UserBudgetOverSimple
+- move UserBudgetOverParams to wire
+- rename ProjectBudgetOver response structs
+- move ProjectBudgetOverParams into wire
+
+### Fixes
+- correct typo in UserBudgetOver response types
+- add sqlx try_froms to ProjectBudget
+- replace tabled display_with with display
+- add sqlx try_froms to UserBudget
+- make UserBudgetOverCombinedDetail.project_budget optional
+- make UserBudgetOverCombinedDetail.project_budget_id optional
+- make UserBudgetOverCombined.project_budget_id optional
+
+### Dependencies
+- bump chrono from 0.4.39 to 0.4.41
+- bump serde from 1.0.217 to 1.0.219
+- bump sqlx from 0.8.3 to 0.8.6
+- bump tabled from 0.17.0 to 0.20.0
+
+## Repository - 2025-02-05
 
 ### Documentation
 - fix typo in crates list in readme
