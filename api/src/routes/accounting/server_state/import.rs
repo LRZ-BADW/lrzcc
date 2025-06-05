@@ -194,6 +194,7 @@ pub async fn select_maybe_flavor_id_by_openstack_id_from_db(
     #[derive(FromRow)]
     #[allow(dead_code)]
     struct Row {
+        #[sqlx(try_from = "i64")]
         id: u64,
     }
     let query = sqlx::query!(
@@ -242,6 +243,7 @@ pub async fn select_maybe_user_id_by_openstack_id_from_db(
     #[derive(FromRow)]
     #[allow(dead_code)]
     struct Row {
+        #[sqlx(try_from = "i64")]
         id: u64,
     }
     let query = sqlx::query!(
