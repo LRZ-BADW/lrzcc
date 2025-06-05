@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
-use lrzcc_wire::budgeting::{
+use avina_wire::budgeting::{
     ProjectBudget, ProjectBudgetCreateData, ProjectBudgetListParams,
     ProjectBudgetModifyData, ProjectBudgetOverDetail, ProjectBudgetOverParams,
     ProjectBudgetOverSimple,

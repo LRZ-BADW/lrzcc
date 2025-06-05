@@ -369,6 +369,109 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ace50bade8e6234aa140d9a2f552bbee1db4d353f69b8217bc503490fc1a9f26"
 
 [[package]]
+name = "avina"
+version = "1.7.0"
+dependencies = [
+ "anyhow",
+ "avina-wire",
+ "cargo-husky",
+ "chrono",
+ "jzon",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "thiserror 2.0.12",
+]
+
+[[package]]
+name = "avina-api"
+version = "0.7.0"
+dependencies = [
+ "actix-web",
+ "anyhow",
+ "avina-test",
+ "avina-wire",
+ "cargo-husky",
+ "chrono",
+ "config",
+ "indexmap",
+ "jzon",
+ "once_cell",
+ "rand 0.9.1",
+ "reqwest",
+ "secrecy",
+ "serde",
+ "serde-aux",
+ "serde_json",
+ "sqlx",
+ "strum",
+ "thiserror 2.0.12",
+ "tokio",
+ "tracing",
+ "tracing-actix-web",
+ "tracing-bunyan-formatter",
+ "tracing-log 0.2.0",
+ "tracing-subscriber",
+ "wiremock",
+]
+
+[[package]]
+name = "avina-cli"
+version = "1.5.2"
+dependencies = [
+ "anyhow",
+ "avina",
+ "avina-wire",
+ "cargo-husky",
+ "chrono",
+ "clap",
+ "colored",
+ "serde",
+ "serde_json",
+ "tabled",
+]
+
+[[package]]
+name = "avina-test"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "avina",
+ "avina-api",
+ "avina-wire",
+ "bencher",
+ "cargo-husky",
+ "chrono",
+ "once_cell",
+ "rand 0.9.1",
+ "reqwest",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "uuid",
+ "wiremock",
+]
+
+[[package]]
+name = "avina-ui"
+version = "0.0.1"
+dependencies = [
+ "dioxus",
+]
+
+[[package]]
+name = "avina-wire"
+version = "1.6.0"
+dependencies = [
+ "cargo-husky",
+ "chrono",
+ "serde",
+ "sqlx",
+ "tabled",
+]
+
+[[package]]
 name = "axum"
 version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2471,109 +2574,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "234cf4f4a04dc1f57e24b96cc0cd600cf2af460d4161ac5ecdd0af8e1f3b2a38"
 dependencies = [
  "hashbrown 0.15.2",
-]
-
-[[package]]
-name = "lrzcc"
-version = "1.7.0"
-dependencies = [
- "anyhow",
- "cargo-husky",
- "chrono",
- "jzon",
- "lrzcc-wire",
- "reqwest",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "thiserror 2.0.12",
-]
-
-[[package]]
-name = "lrzcc-api"
-version = "0.7.0"
-dependencies = [
- "actix-web",
- "anyhow",
- "cargo-husky",
- "chrono",
- "config",
- "indexmap",
- "jzon",
- "lrzcc-test",
- "lrzcc-wire",
- "once_cell",
- "rand 0.9.1",
- "reqwest",
- "secrecy",
- "serde",
- "serde-aux",
- "serde_json",
- "sqlx",
- "strum",
- "thiserror 2.0.12",
- "tokio",
- "tracing",
- "tracing-actix-web",
- "tracing-bunyan-formatter",
- "tracing-log 0.2.0",
- "tracing-subscriber",
- "wiremock",
-]
-
-[[package]]
-name = "lrzcc-cli"
-version = "1.5.2"
-dependencies = [
- "anyhow",
- "cargo-husky",
- "chrono",
- "clap",
- "colored",
- "lrzcc",
- "lrzcc-wire",
- "serde",
- "serde_json",
- "tabled",
-]
-
-[[package]]
-name = "lrzcc-test"
-version = "0.5.0"
-dependencies = [
- "anyhow",
- "bencher",
- "cargo-husky",
- "chrono",
- "lrzcc",
- "lrzcc-api",
- "lrzcc-wire",
- "once_cell",
- "rand 0.9.1",
- "reqwest",
- "serde_json",
- "sqlx",
- "tokio",
- "uuid",
- "wiremock",
-]
-
-[[package]]
-name = "lrzcc-ui"
-version = "0.0.1"
-dependencies = [
- "dioxus",
-]
-
-[[package]]
-name = "lrzcc-wire"
-version = "1.6.0"
-dependencies = [
- "cargo-husky",
- "chrono",
- "serde",
- "sqlx",
- "tabled",
 ]
 
 [[package]]

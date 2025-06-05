@@ -2,7 +2,7 @@ use std::{fmt::Debug, rc::Rc};
 
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
-use lrzcc_wire::accounting::{
+use avina_wire::accounting::{
     ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
     ServerCostSimple, ServerCostUser,
 };

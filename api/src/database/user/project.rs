@@ -1,5 +1,5 @@
 use anyhow::Context;
-use lrzcc_wire::user::{Project, ProjectMinimal};
+use avina_wire::user::{Project, ProjectMinimal};
 use sqlx::{Executor, FromRow, MySql, Transaction};
 
 use crate::error::{NotFoundOrUnexpectedApiError, UnexpectedOnlyError};

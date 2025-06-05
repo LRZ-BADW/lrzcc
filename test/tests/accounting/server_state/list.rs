@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use lrzcc::{Api, Token};
-use lrzcc_test::{random_uuid, spawn_app};
+use avina::{Api, Token};
+use avina_test::{random_uuid, spawn_app};
 use tokio::task::spawn_blocking;
 
 use super::assert_contains_server_state;

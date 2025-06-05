@@ -1,11 +1,11 @@
 [package]
-name = "lrzcc-cli"
+name = "avina-cli"
 description = "Rust CLI client for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["api-bindings", "command-line-utilities"]
 edition = "2021"
-homepage = "https://github.com/LRZ-BADW/lrzcc"
-repository = "https://github.com/LRZ-BADW/lrzcc"
+homepage = "https://github.com/LRZ-BADW/avina"
+repository = "https://github.com/LRZ-BADW/avina"
 exclude = []
 readme = "README.md"
 license = "MIT"
@@ -14,23 +14,23 @@ version = "1.5.2"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [[bin]]
-name = "lrzcc"
+name = "avina"
 path = "src/main.rs"
 
 [features]
 default = ["all"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = ["lrzcc/accounting"]
-budgeting = ["lrzcc/budgeting"]
-hello = ["lrzcc/hello"]
-pricing = ["lrzcc/pricing"]
-quota = ["lrzcc/quota"]
-resources = ["lrzcc/resources"]
-user = ["lrzcc/user"]
+accounting = ["avina/accounting"]
+budgeting = ["avina/budgeting"]
+hello = ["avina/hello"]
+pricing = ["avina/pricing"]
+quota = ["avina/quota"]
+resources = ["avina/resources"]
+user = ["avina/user"]
 
 [dependencies]
-lrzcc = { version = "1.7", path = "../lib" }
-lrzcc-wire = { version = "1.6", path = "../wire" }
+avina = { version = "1.7", path = "../lib" }
+avina-wire = { version = "1.6", path = "../wire" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 anyhow = "1"

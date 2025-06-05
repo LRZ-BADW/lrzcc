@@ -6,7 +6,7 @@ use actix_web::{
 };
 use anyhow::{anyhow, Context};
 use chrono::Utc;
-use lrzcc_wire::{accounting::ServerStateImport, user::User};
+use avina_wire::{accounting::ServerStateImport, user::User};
 use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 
 use crate::{

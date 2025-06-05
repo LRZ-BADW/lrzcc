@@ -32,7 +32,7 @@ pub(crate) struct BudgetOverTreeFilter {
 }
 
 pub(crate) fn budget_over_tree(
-    api: lrzcc::Api,
+    api: avina::Api,
     filter: BudgetOverTreeFilter,
     end: Option<DateTime<FixedOffset>>,
 ) -> Result<(), Box<dyn Error>> {

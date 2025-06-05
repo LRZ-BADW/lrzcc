@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use lrzcc_wire::hello::Hello;
+use avina_wire::hello::Hello;
 use reqwest::{blocking::Client, Method, StatusCode};
 
 use crate::{

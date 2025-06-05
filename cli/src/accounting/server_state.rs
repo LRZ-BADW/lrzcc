@@ -151,7 +151,7 @@ pub(crate) use ServerStateCommand::*;
 impl Execute for ServerStateCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -204,7 +204,7 @@ impl Execute for ServerStateCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &ServerStateListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -224,7 +224,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
@@ -233,7 +233,7 @@ fn get(
 
 #[allow(clippy::too_many_arguments)]
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     begin: DateTime<FixedOffset>,
     end: Option<DateTime<FixedOffset>>,
@@ -262,7 +262,7 @@ fn create(
 
 #[allow(clippy::too_many_arguments)]
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: u32,
     begin: Option<DateTime<FixedOffset>>,
@@ -301,13 +301,13 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.server_state.delete(*id)?)
 }
 
 fn import(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     quiet: bool,
 ) -> Result<(), Box<dyn Error>> {

@@ -2,7 +2,7 @@ use actix_web::{
     web::{get, scope, ReqData},
     HttpResponse, Scope,
 };
-use lrzcc_wire::{
+use avina_wire::{
     hello::Hello,
     user::{Project, User},
 };

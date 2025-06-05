@@ -2,7 +2,7 @@ use std::error::Error;
 
 use anyhow::{anyhow, Context};
 use clap::{Args, Subcommand};
-use lrzcc_wire::user::ProjectRetrieved;
+use avina_wire::user::ProjectRetrieved;
 
 use crate::common::{
     ask_for_confirmation, print_object_list, print_single_object, Execute,
@@ -80,7 +80,7 @@ pub(crate) use ProjectCommand::*;
 impl Execute for ProjectCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -116,7 +116,7 @@ impl Execute for ProjectCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &ProjectListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -130,7 +130,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
@@ -148,7 +148,7 @@ fn get(
 
 // TODO something here doesn't work ... no idea why so far
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name: String,
     openstack_id: String,
@@ -163,7 +163,7 @@ fn create(
 
 #[allow(clippy::too_many_arguments)]
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     name_or_id: &str,
     name: Option<String>,
@@ -184,14 +184,14 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
     let id = find_id(&api, name_or_id)?;
     ask_for_confirmation()?;
     Ok(api.project.delete(id)?)
 }
 
 pub(crate) fn find_id(
-    api: &lrzcc::Api,
+    api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
     if let Ok(id) = name_or_id.parse::<u32>() {

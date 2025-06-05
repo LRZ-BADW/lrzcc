@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
-use lrzcc_wire::budgeting::BudgetOverTree;
+use avina_wire::budgeting::BudgetOverTree;
 use reqwest::{blocking::Client, Method, StatusCode, Url};
 
 use crate::{

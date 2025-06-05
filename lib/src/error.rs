@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use lrzcc_wire::error::error_chain_fmt;
+use avina_wire::error::error_chain_fmt;
 
 #[derive(thiserror::Error)]
 pub enum ApiError {

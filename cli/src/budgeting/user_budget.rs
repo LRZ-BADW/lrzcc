@@ -142,7 +142,7 @@ pub(crate) use UserBudgetCommand::*;
 impl Execute for UserBudgetCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -167,7 +167,7 @@ impl Execute for UserBudgetCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &UserBudgetListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -188,7 +188,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
@@ -196,7 +196,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     user: &str,
     year: Option<u32>,
@@ -215,7 +215,7 @@ fn create(
 
 #[allow(clippy::too_many_arguments)]
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: u32,
     amount: Option<u32>,
@@ -231,13 +231,13 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.user_budget.delete(*id)?)
 }
 
 fn over(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &UserBudgetOverFilter,
     end: Option<DateTime<FixedOffset>>,
@@ -268,6 +268,6 @@ fn over(
     }
 }
 
-fn sync(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn sync(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     print_single_object(api.user_budget.sync()?, format)
 }

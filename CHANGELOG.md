@@ -1,5 +1,5 @@
 # Changelog
-This is the combined changelog of all contained `lrzcc` crates.
+This is the combined changelog of all contained `avina` crates.
 
 ## [Unreleased]
 ...
@@ -17,7 +17,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Miscellaneous
 - add Zlib license allowance in deny configuration
 
-## [lrzcc-api-v0.7.0] - 2025-02-05
+## [avina-api-v0.7.0] - 2025-02-05
 
 ### Database
 - add select_user_class_by_project_from_db
@@ -38,7 +38,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - add indexmap dependency
 - add strum dependency
-- bump lrzcc-wire from 1.5 to 1.6
+- bump avina-wire from 1.5 to 1.6
 - bump config from 0.15.4 to 0.15.7
 - bump sqlx from 0.8.2 to 0.8.3
 - bump reqwest from 0.12.10 to 0.12.12
@@ -47,20 +47,20 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump thiserror from 2.0.9 to 2.0.11
 - bump tokio from 1.42.0 to 1.43.0
 
-## [lrzcc-cli-v1.5.2] - 2025-02-05
+## [avina-cli-v1.5.2] - 2025-02-05
 
 ### Fixes
 - correct typo in flavor-price list help message
 
 ### Dependencies
-- bump lrzcc-wire from 1.5 to 1.6
-- bump lrzcc-lib from 1.6 to 1.7
+- bump avina-wire from 1.5 to 1.6
+- bump avina-lib from 1.6 to 1.7
 - bump clap from 4.5.23 to 4.5.28
 - bump colored from 2.2.0 to 3.0.0
 - bump serde from 1.0.216 to 1.0.217
 - bump serde_json from 1.0.134 to 1.0.138
 
-## [lrzcc-lib-v1.7.0] - 2025-02-05
+## [avina-lib-v1.7.0] - 2025-02-05
 - use ServerCostParams in ServerCostRequest
 - revise ServerConsumptionRequest to use ServerConsumptionParams
 - revise for optional ServerConsumptionParams fields
@@ -70,14 +70,14 @@ This is the combined changelog of all contained `lrzcc` crates.
 
 ### Dependencies
 - force reqwest to use rustls
-- bump lrzcc-wire from 1.5 to 1.6
+- bump avina-wire from 1.5 to 1.6
 - bump config from 0.15.4 to 0.15.7
 - bump reqwest from 0.12.10 to 0.12.12
 - bump serde from 1.0.216 to 1.0.217
 - bump serde_json from 1.0.134 to 1.0.138
 - bump thiserror from 2.0.9 to 2.0.11
 
-## [lrzcc-wire-v1.6.0] - 2025-02-05
+## [avina-wire-v1.6.0] - 2025-02-05
 
 ### Features
 - add ServerCostParams, ServerConsumptionParams
@@ -91,7 +91,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump sqlx from 0.8.2 to 0.8.3
 - bump serde from 1.0.216 to 1.0.217
 
-## [lrzcc-test-v0.5.0] - 2025-02-05
+## [avina-test-v0.5.0] - 2025-02-05
 
 ### Features
 - add rudimentary bench
@@ -102,9 +102,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - force reqwest to use rustls
 - add bencher dependency
-- bump lrzcc-lib from 1.6 to 1.7
-- bump lrzcc-api from 0.6 to 0.7
-- bump lrzcc-wire from 1.5 to 1.6
+- bump avina-lib from 1.6 to 1.7
+- bump avina-api from 0.6 to 0.7
+- bump avina-wire from 1.5 to 1.6
 - bump rand from 0.8.5 to 0.9.0
 - bump sqlx from 0.8.2 to 0.8.3
 - bump reqwest from 0.12.10 to 0.12.12
@@ -112,31 +112,31 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump tokio from 1.42.0 to 1.43.0
 - bump uuid from 1.11.0 to 1.12.1
 
-## [lrzcc-api-v0.6.1] - 2024-12-29
+## [avina-api-v0.6.1] - 2024-12-29
 
 ### Fixes
 - dynamically retrieve current year in sync_user_budgets_in_db
 - correct typo in error message in sync_user_budgets_in_db
 
-## [lrzcc-cli-v1.5.1] - 2024-12-29
+## [avina-cli-v1.5.1] - 2024-12-29
 
 ### Fixes
 - route user-budget sync and flavor/flavor-group modify to rust api
 
-## [lrzcc-cli-v1.5.0] - 2024-12-29
+## [avina-cli-v1.5.0] - 2024-12-29
 
 ### Features
 - add user-budget sync command to bugdgeting module
 
 ### Dependencies
-- bump lrzcc-wire from 1.4.0 to 1.5.0
-- bump lrzcc from 1.5.0 to 1.6.0
+- bump avina-wire from 1.4.0 to 1.5.0
+- bump avina from 1.5.0 to 1.6.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump serde_json from 1.0.133 to 1.0.134
 - bump serde from 1.0.215 to 1.0.216
 - bump colored from 2.1.0 to 2.2.0
 
-## [lrzcc-lib-v1.6.0] - 2024-12-29
+## [avina-lib-v1.6.0] - 2024-12-29
 
 ### Features
 - add UserBudgetApi.sync function to budgeting module
@@ -145,14 +145,14 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add user and end in BudgetOverTreeRequest.params in budgeting module
 
 ### Dependencies
-- bump lrzcc-wire from 1.4.0 to 1.5.0
+- bump avina-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump thiserror from 2.0.6 to 2.0.9
 - bump reqwest from 0.12.9 to 0.12.10
 - bump serde_json from 1.0.133 to 1.0.134
 - bump serde from 1.0.215 to 1.0.216
 
-## [lrzcc-api-v0.6.0] - 2024-12-29
+## [avina-api-v0.6.0] - 2024-12-29
 
 ### Features
 - add user_budget_sync endpoint to budgeting module
@@ -164,7 +164,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - use left join in flavor select functions
 
 ### Dependencies
-- bump lrzcc-wire from 1.4.0 to 1.5.0
+- bump avina-wire from 1.4.0 to 1.5.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump thiserror from 2.0.6 to 2.0.9
 - bump reqwest from 0.12.9 to 0.12.10
@@ -172,7 +172,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde from 1.0.215 to 1.0.216
 - bump config from 0.14.1 to 0.15.4
 
-## [lrzcc-wire-v1.5.0] - 2024-12-29
+## [avina-wire-v1.5.0] - 2024-12-29
 
 ### Features
 - add UserBudgetSync struct to budgeting module
@@ -183,7 +183,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - Bump serde from 1.0.215 to 1.0.216
 
-## [lrzcc-test-v0.4.0] - 2024-12-29
+## [avina-test-v0.4.0] - 2024-12-29
 
 ### Tests
 - add flavor modify tests to resource module
@@ -193,9 +193,9 @@ This is the combined changelog of all contained `lrzcc` crates.
 - correct get call in e2e_lib_flavor_price_delete_works in pricing module
 
 ### Dependencies
-- bump lrzcc-wire from 1.4.0 to 1.5.0
-- bump lrzcc from 1.5.0 to 1.6.0
-- bump lrzcc-api from 0.5.0 to 0.6.0
+- bump avina-wire from 1.4.0 to 1.5.0
+- bump avina from 1.5.0 to 1.6.0
+- bump avina-api from 0.5.0 to 0.6.0
 - bump anyhow from 1.0.94 to 1.0.95
 - bump reqwest from 0.12.9 to 0.12.10
 - bump serde_json from 1.0.133 to 1.0.134
@@ -225,16 +225,16 @@ This is the combined changelog of all contained `lrzcc` crates.
 - update sqlx offline query data
 - increase mariadb connection limit in init_db.sh script
 
-## [lrzcc-test-v0.3.0] - 2024-12-11
+## [avina-test-v0.3.0] - 2024-12-11
 
 ### Dependencies
 - add chrono dependency
 - add anyhow dependency
 - bump chrono from 0.4.38 to 0.4.39
 - run cargo update
-- bump lrzcc-wire from 1.3 to 1.4
-- bump lrzcc-lib from 1.4 to 1.5
-- bump lrzcc-api from 0.4 to 0.5
+- bump avina-wire from 1.3 to 1.4
+- bump avina-lib from 1.4 to 1.5
+- bump avina-api from 0.4 to 0.5
 
 ### Tests
 - add TestApp.setup_test_flavor
@@ -272,7 +272,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - add user_budget_delete tests
 - add TestApp.setup_test_user_budget
 
-## [lrzcc-cli-v1.4.0] - 2024-12-11
+## [avina-cli-v1.4.0] - 2024-12-11
 
 ### Features
 - route server-state crud and other delete commands to Rust API
@@ -282,21 +282,21 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump tabled from 0.16.0 to 0.17.0
 - bump clap from 4.5.22 to 4.5.23
 - bump chrono from 0.4.38 to 0.4.39
-- bump lrzcc-lib from 1.4 to 1.5
-- bump lrzcc-wire from 1.3 to 1.4
+- bump avina-lib from 1.4 to 1.5
+- bump avina-wire from 1.3 to 1.4
 
-## [lrzcc-lib-v1.5.0] - 2024-12-11
+## [avina-lib-v1.5.0] - 2024-12-11
 
 ### Dependencies
 - bump chrono from 0.4.38 to 0.4.39
 - bump thiserror from 2.0.4 to 2.0.6
 - run cargo update
-- bump lrzcc-wire from 1.3 to 1.4
+- bump avina-wire from 1.3 to 1.4
 
 ### Fixes
 - add missing trailing slash in server_state_modify url
 
-## [lrzcc-api-v0.5.0] - 2024-12-11
+## [avina-api-v0.5.0] - 2024-12-11
 
 ### Dependencies
 - run cargo update
@@ -304,7 +304,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump tracing from 0.1.40 to 0.1.41
 - bump chrono from 0.4.38 to 0.4.39
 - bump thiserror from 2.0.4 to 2.0.6
-- bump lrzcc-wire from 1.3 to 1.4
+- bump avina-wire from 1.3 to 1.4
 
 ### Database
 - move insert_flavor_into_db to database module
@@ -334,13 +334,13 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Authorization
 - add require_*_or_return_not_found functions
 
-## [lrzcc-wire-v1.4.0] - 2024-12-11
+## [avina-wire-v1.4.0] - 2024-12-11
 
 ### Dependencies
 - bump chrono from 0.4.38 to 0.4.39
 - run cargo update
 
-## [lrzcc-test-v0.2.1] - 2024-11-22
+## [avina-test-v0.2.1] - 2024-11-22
 
 ### Dependencies
 - bump wire from 1.2 to 1.3
@@ -351,14 +351,14 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump tokio from 1.40.0 to 1.41.1
 - bump reqwest from 0.12.8 to 0.12.9
 
-## [lrzcc-cli-v1.3.1] - 2024-11-22
+## [avina-cli-v1.3.1] - 2024-11-22
 
 ### Dependencies
 - bump anyhow from 1.0.89 to 1.0.93
 - bump serde from 1.0.210 to 1.0.214
 - bump serde_json from 1.0.128 to 1.0.133
 
-## [lrzcc-lib-v1.4.0] - 2024-11-22
+## [avina-lib-v1.4.0] - 2024-11-22
 
 ### Refactors
 - move ServerStateListParams from lib to wire
@@ -376,7 +376,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde_json from 1.0.128 to 1.0.133
 - bump thiserror from 1.0.64 to 2.0.0
 
-## [lrzcc-api-v0.4.0] - 2024-11-22
+## [avina-api-v0.4.0] - 2024-11-22
 
 ### Features
 
@@ -461,7 +461,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump tokio from 1.40.0 to 1.41.1
 - bump tracing-actix-web from 0.7.13 to 0.7.15
 
-## [lrzcc-wire-v1.3.0] - 2024-11-22
+## [avina-wire-v1.3.0] - 2024-11-22
 
 ### Features
 - derive Deserialize for FlavorPriceCreateData
@@ -483,7 +483,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump serde from 1.0.210 to 1.0.214
 - bump uuid from 1.10.0 to 1.11.0
 
-## [lrzcc-cli-v1.3.0] - 2024-10-08
+## [avina-cli-v1.3.0] - 2024-10-08
 
 ### Features
 - point user commands except import to rust api as well
@@ -493,7 +493,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump lib from 1.2 to 1.3
 - bump clap version from 4.5.18 to 4.5.20
 
-## [lrzcc-test-v0.2.0] - 2024-10-08
+## [avina-test-v0.2.0] - 2024-10-08
 
 ### Features
 - add tests for all user endpoints but import
@@ -509,7 +509,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - test: bump reqwest version from 0.12.7 to 0.12.8
 - test: bump once_cell from 1.20.1 to 1.20.2
 
-## [lrzcc-lib-v1.3.0] - 2024-10-08
+## [avina-lib-v1.3.0] - 2024-10-08
 
 ### Features
 - use User instead of UserCreated for UserApi::create call
@@ -520,7 +520,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump wire from 1.1 to 1.2
 - bump reqwest version from 0.12.7 to 0.12.8
 
-## [lrzcc-api-v0.3.0] - 2024-10-08
+## [avina-api-v0.3.0] - 2024-10-08
 
 ### Features
 - add authorization module and move require_admin_user there
@@ -535,7 +535,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump wire from 1.1 to 1.2
 - bump once_cell from 1.20.1 to 1.20.2
 
-## [lrzcc-wire-v1.2.0] - 2024-10-08
+## [avina-wire-v1.2.0] - 2024-10-08
 
 ### Features
 - remove UserCreated
@@ -545,18 +545,18 @@ This is the combined changelog of all contained `lrzcc` crates.
 - impl PartialEq for all response structs
 - implement inter-type PartialEqs for User and Project structs
 
-## [lrzcc-cli-v1.2.1] - 2024-09-30
+## [avina-cli-v1.2.1] - 2024-09-30
 
 ### Features
 - use Rust API for project commands by default
 
-## [lrzcc-cli-v1.2.0] - 2024-09-30
+## [avina-cli-v1.2.0] - 2024-09-30
 
 ### Dependencies
 - bump lib from 1.1 to 1.2
 - bump wire from 1.0 to 1.1
 
-## [lrzcc-test-v0.1.0] - 2024-09-30
+## [avina-test-v0.1.0] - 2024-09-30
 
 ### Features
 - add test crate for shared test helpers and cross-crate testing
@@ -565,13 +565,13 @@ This is the combined changelog of all contained `lrzcc` crates.
 - split project tests into submodules and add more tests
 - move api/tests/helpers to test crate
 
-## [lrzcc-lib-v1.2.0] - 2024-09-30
+## [avina-lib-v1.2.0] - 2024-09-30
 
 ### Features
 - refactor to use Project for project create response
 - use wire.project.ProjectListParams in project list with serde_urlencoded
 
-## [lrzcc-api-v0.2.0] - 2024-09-30
+## [avina-api-v0.2.0] - 2024-09-30
 
 ### Features
 - move api/tests/helpers to test crate
@@ -595,14 +595,14 @@ This is the combined changelog of all contained `lrzcc` crates.
 - bump thiserror from 1.0.63 to 1.0.64
 - bump once_cell from 1.20.0 to 1.20.1
 
-## [lrzcc-wire-v1.1.0] - 2024-09-30
+## [avina-wire-v1.1.0] - 2024-09-30
 
 ### Features
 - derive FromRow for Project, UserMinimal, FlavorGroupMinimal
 - remove ProjectCreated
 - add ProjectListParams
 
-## [lrzcc-cli-v1.1.2] - 2024-09-24
+## [avina-cli-v1.1.2] - 2024-09-24
 
 ### Fixes
 - revise to parse ProjectRetrieved in project get command
@@ -610,7 +610,7 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Dependencies
 - bump clap from 4.5.17 to 4.5.18
 
-## [lrzcc-lib-v1.1.1] - 2024-09-24
+## [avina-lib-v1.1.1] - 2024-09-24
 
 ### Fixes
 - revise to parse ProjectRetrieved during ProjectApi.get_project
@@ -621,12 +621,12 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Testing
 - add e2e tests for hello and project modules
 
-## [lrzcc-wire-v1.0.1] - 2024-09-24
+## [avina-wire-v1.0.1] - 2024-09-24
 
 ### Fixes
 - add project.ProjectRetrieved enum
 
-## [lrzcc-cli-v1.1.1] - 2024-09-15
+## [avina-cli-v1.1.1] - 2024-09-15
 
 ### Fixes
 - Add aliases `show` to all `get` commands to comply with former Python CLI client.
@@ -634,21 +634,21 @@ This is the combined changelog of all contained `lrzcc` crates.
 ### Documentation
 - Update name in `cargo install` command in README.
 
-## [lrzcc-api-v0.1.0] - 2024-09-15
-Initial release of the `lrzcc-api` crate containing a partial rewrite of the API
+## [avina-api-v0.1.0] - 2024-09-15
+Initial release of the `avina-api` crate containing a partial rewrite of the API
 server with authentication, the hello endpoint, proper testing, and basic
 docker deployment.
 
-## [lrzcc-cli-v1.1.0] - 2024-09-15
-Initial release of the `lrzcc-cli` crate containing just the CLI application.
+## [avina-cli-v1.1.0] - 2024-09-15
+Initial release of the `avina-cli` crate containing just the CLI application.
 
-## [lrzcc-v1.1.0] - 2024-09-15
-Initial release of the `lrzcc` crate containing just the Rust bindings.
+## [avina-v1.1.0] - 2024-09-15
+Initial release of the `avina` crate containing just the Rust bindings.
 
-## [lrzcc-wire-v1.0.0] - 2024-09-15
-Initial release of the `lrzcc-wire` crate containing just the shared data
+## [avina-wire-v1.0.0] - 2024-09-15
+Initial release of the `avina-wire` crate containing just the shared data
 structures used for API communication.
 
 ## [v1.0.0] - 2024-08-16
-Initial release of the `lrzcc` crate containing the new Rust bindings as well
+Initial release of the `avina` crate containing the new Rust bindings as well
 as a full Rust rewrite of the CLI application.

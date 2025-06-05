@@ -134,7 +134,7 @@ pub(crate) use ProjectBudgetCommand::*;
 impl Execute for ProjectBudgetCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -159,7 +159,7 @@ impl Execute for ProjectBudgetCommand {
 }
 
 fn list(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &ProjectBudgetListFilter,
 ) -> Result<(), Box<dyn Error>> {
@@ -180,7 +180,7 @@ fn list(
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
@@ -188,7 +188,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     project: &str,
     year: Option<u32>,
@@ -207,7 +207,7 @@ fn create(
 
 #[allow(clippy::too_many_arguments)]
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: u32,
     amount: Option<u32>,
@@ -223,13 +223,13 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.project_budget.delete(*id)?)
 }
 
 fn over(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     filter: &ProjectBudgetOverFilter,
     end: Option<DateTime<FixedOffset>>,

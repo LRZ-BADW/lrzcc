@@ -6,7 +6,7 @@ use actix_web::{
 };
 use anyhow::Context;
 use chrono::{DateTime, Datelike, TimeZone, Utc};
-use lrzcc_wire::{
+use avina_wire::{
     accounting::{
         ServerConsumptionAll, ServerConsumptionFlavors,
         ServerConsumptionParams, ServerConsumptionProject,

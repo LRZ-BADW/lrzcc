@@ -70,7 +70,7 @@ pub(crate) use FlavorPriceCommand::*;
 impl Execute for FlavorPriceCommand {
     fn execute(
         &self,
-        api: lrzcc::Api,
+        api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
@@ -103,13 +103,13 @@ impl Execute for FlavorPriceCommand {
     }
 }
 
-fn list(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn list(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let request = api.flavor_price.list();
     print_object_list(request.send()?, format)
 }
 
 fn get(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
@@ -117,7 +117,7 @@ fn get(
 }
 
 fn create(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     flavor: &str,
     user_class: u32,
@@ -136,7 +136,7 @@ fn create(
 }
 
 fn modify(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     id: u32,
     flavor: Option<String>,
@@ -161,12 +161,12 @@ fn modify(
     print_single_object(request.send()?, format)
 }
 
-fn delete(api: lrzcc::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
     Ok(api.flavor_price.delete(*id)?)
 }
 
-fn initialize(api: lrzcc::Api, format: Format) -> Result<(), Box<dyn Error>> {
+fn initialize(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let result = api.flavor_price.initialize()?;
     print_single_object(result, format)
 }

@@ -1,4 +1,4 @@
-use lrzcc_api::{
+use avina_api::{
     configuration::get_configuration,
     startup::Application,
     telemetry::{get_subscriber, init_subscriber},
@@ -7,7 +7,7 @@ use lrzcc_api::{
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let subscriber =
-        get_subscriber("lrzcc-api".into(), "info".into(), std::io::stdout);
+        get_subscriber("avina-api".into(), "info".into(), std::io::stdout);
     init_subscriber(subscriber);
 
     let configuration =

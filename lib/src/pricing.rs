@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Context;
 use chrono::{DateTime, FixedOffset};
-use lrzcc_wire::pricing::{
+use avina_wire::pricing::{
     FlavorPrice, FlavorPriceCreateData, FlavorPriceInitialize,
     FlavorPriceModifyData,
 };

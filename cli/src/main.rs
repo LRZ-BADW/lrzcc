@@ -4,7 +4,7 @@ use chrono::{DateTime, FixedOffset};
 use clap::{ArgAction::SetFalse, Args, Parser, Subcommand};
 use colored::Colorize;
 use common::current_year;
-use lrzcc::{Api, Token};
+use avina::{Api, Token};
 
 mod common;
 
@@ -157,7 +157,7 @@ struct Cli {
     #[clap(
         short = 'T',
         long,
-        help = format!("Timeout for requests in seconds [default: {}]", lrzcc::DEFAULT_TIMEOUT),
+        help = format!("Timeout for requests in seconds [default: {}]", avina::DEFAULT_TIMEOUT),
     )]
     timeout: Option<u64>,
 

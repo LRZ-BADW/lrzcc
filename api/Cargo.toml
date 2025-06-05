@@ -1,11 +1,11 @@
 [package]
-name = "lrzcc-api"
+name = "avina-api"
 description = "Rust API server for the LRZ-specific features of the Openstack-based LRZ Compute Cloud."
 authors = ["Sandro-Alessio Gierens <sandro@gierens.de>"]
 categories = ["web-programming"]
 edition = "2021"
-homepage = "https://github.com/LRZ-BADW/lrzcc"
-repository = "https://github.com/LRZ-BADW/lrzcc"
+homepage = "https://github.com/LRZ-BADW/avina"
+repository = "https://github.com/LRZ-BADW/avina"
 exclude = []
 readme = "README.md"
 license = "MIT"
@@ -15,23 +15,23 @@ version = "0.7.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
-name = "lrzcc_api"
+name = "avina_api"
 path = "src/lib.rs"
 
 [[bin]]
-name = "lrzcc-api"
+name = "avina-api"
 path = "src/main.rs"
 
 [features]
 default = ["all"]
 all = ["accounting", "budgeting", "hello", "pricing", "quota", "resources", "user"]
-accounting = ["lrzcc-wire/accounting"]
-budgeting = ["lrzcc-wire/budgeting"]
-hello = ["lrzcc-wire/hello"]
-pricing = ["lrzcc-wire/pricing"]
-quota = ["lrzcc-wire/quota"]
-resources = ["lrzcc-wire/resources"]
-user = ["lrzcc-wire/user"]
+accounting = ["avina-wire/accounting"]
+budgeting = ["avina-wire/budgeting"]
+hello = ["avina-wire/hello"]
+pricing = ["avina-wire/pricing"]
+quota = ["avina-wire/quota"]
+resources = ["avina-wire/resources"]
+user = ["avina-wire/user"]
 
 [dependencies]
 actix-web = "4"
@@ -48,7 +48,7 @@ serde-aux = "4"
 config = "0.15"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 jzon = "0.12"
-lrzcc-wire = { version = "1.6", path = "../wire" }
+avina-wire = { version = "1.6", path = "../wire" }
 thiserror = "2.0"
 chrono = { version = "0.4", features = ["serde"] }
 strum = { version = "0.27", features = ["derive"] }
@@ -77,4 +77,4 @@ once_cell = "1"
 cargo-husky = { workspace = true }
 wiremock = "0.6"
 rand = "0.9"
-lrzcc-test = { path = "../test" }
+avina-test = { path = "../test" }

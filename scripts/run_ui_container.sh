@@ -1,8 +1,8 @@
 #!/bin/bash
 
-docker stop lrzcc-ui || true
-docker rm lrzcc-ui || true
+docker stop avina-ui || true
+docker rm avina-ui || true
 docker run \
-    --name lrzcc-ui \
+    --name avina-ui \
     -d \
-    lrzcc-ui
+    avina-ui

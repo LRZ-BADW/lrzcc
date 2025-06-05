@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use lrzcc_wire::user::{Project, User, UserCreateData};
+use avina_wire::user::{Project, User, UserCreateData};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use crate::{

@@ -46,7 +46,7 @@ pub(crate) struct ServerConsumptionFilter {
 }
 
 pub(crate) fn server_consumption(
-    api: lrzcc::Api,
+    api: avina::Api,
     format: Format,
     begin: Option<DateTime<FixedOffset>>,
     end: Option<DateTime<FixedOffset>>,

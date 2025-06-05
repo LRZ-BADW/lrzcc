@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use lrzcc_wire::{
+use avina_wire::{
     accounting::ServerStateListParams,
     user::{Project, User},
 };

@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use anyhow::Context;
 use chrono::{DateTime, Datelike, FixedOffset, Utc};
-use lrzcc_api::{
+use avina_api::{
     configuration::{get_configuration, DatabaseSettings},
     database::{
         accounting::server_state::{
@@ -23,7 +23,7 @@ use lrzcc_api::{
     startup::{get_connection_pool, Application},
     telemetry::{get_subscriber, init_subscriber},
 };
-use lrzcc_wire::{
+use avina_wire::{
     accounting::ServerState,
     budgeting::{ProjectBudget, UserBudget},
     pricing::FlavorPrice,
