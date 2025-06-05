@@ -16,6 +16,9 @@ LRZ-specific features of the Openstack-based LRZ Compute Cloud,
 
 </div>
 
+## CLI Installation
+See: [cli/README.md](./cli/README.md)
+
 ## Crates
 - [api](api): backend API server application ![crates.io](https://img.shields.io/crates/v/avina-api?link=https://crates.io/crates/avina-api)
 - [cli](cli): cleint-side CLI application ![crates.io](https://img.shields.io/crates/v/avina-cli?link=https://crates.io/crates/avina-cli)
