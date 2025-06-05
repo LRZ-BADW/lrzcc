@@ -1,3 +1,4 @@
+//! **ATTENTION:** This has been renamed to [**avina**](https://crates.io/crates/avina).
 use anyhow::Context;
 use reqwest::blocking::ClientBuilder;
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};

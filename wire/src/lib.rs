@@ -1,3 +1,4 @@
+//! **ATTENTION:** This has been renamed to [**avina-wire**](https://crates.io/crates/avina-wire).
 pub mod common;
 pub mod error;
 

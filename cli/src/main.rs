@@ -1,3 +1,4 @@
+//! **ATTENTION:** This has been renamed to [**avina-cli**](https://crates.io/crates/avina-cli).
 use chrono::{DateTime, FixedOffset};
 use clap::{ArgAction::SetFalse, Args, Parser, Subcommand};
 use colored::Colorize;

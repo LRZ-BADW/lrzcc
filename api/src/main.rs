@@ -1,3 +1,4 @@
+//! **ATTENTION:** This has been renamed to [**avina-api**](https://crates.io/crates/avina-api).
 use lrzcc_api::configuration::get_configuration;
 use lrzcc_api::startup::Application;
 use lrzcc_api::telemetry::{get_subscriber, init_subscriber};

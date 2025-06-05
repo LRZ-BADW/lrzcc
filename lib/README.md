@@ -1,4 +1,7 @@
 # lrzcc-lib
+
+**ATTENTION:** This has been renamed to [**avina**](https://crates.io/crates/avina).
+
 API bindings written in Rust for LRZ-specific features of
 the Openstack-based LRZ Compute Cloud, [https://cc.lrz.de](https://cc.lrz.de), first and
 foremost the budgeting system.

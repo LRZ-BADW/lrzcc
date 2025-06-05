@@ -1,4 +1,7 @@
 # lrzcc-cli
+
+**ATTENTION:** This has been renamed to [**avina-cli**](https://crates.io/crates/avina-cli).
+
 CLI application written in Rust for LRZ-specific features of
 the Openstack-based LRZ Compute Cloud, [https://cc.lrz.de](https://cc.lrz.de), first and
 foremost the budgeting system.

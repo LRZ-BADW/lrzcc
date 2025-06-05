@@ -1,4 +1,7 @@
 # lrzcc-api
+
+**ATTENTION:** This has been renamed to [**avina-api**](https://crates.io/crates/avina-api).
+
 Partial Rust-rewrite of the API server application for the Openstack-based
 LRZ Compute Cloud, [https://cc.lrz.de](https://cc.lrz.de), first and foremost the budgeting
 system.
