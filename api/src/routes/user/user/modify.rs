@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User, UserModifyData};
+use avina_wire::user::{User, UserModifyData};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::UserIdParam;
@@ -16,8 +16,6 @@ use crate::{
 #[tracing::instrument(name = "user_modify")]
 pub async fn user_modify(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<UserModifyData>,
     params: Path<UserIdParam>,

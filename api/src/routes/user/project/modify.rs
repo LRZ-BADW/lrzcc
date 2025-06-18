@@ -16,8 +16,6 @@ use crate::{
 #[tracing::instrument(name = "project_modify")]
 pub async fn project_modify(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<ProjectModifyData>,
     params: Path<ProjectIdParam>,

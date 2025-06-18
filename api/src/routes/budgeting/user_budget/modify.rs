@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     budgeting::{UserBudget, UserBudgetModifyData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
@@ -19,8 +19,6 @@ use crate::{
 #[tracing::instrument(name = "user_budget_modify")]
 pub async fn user_budget_modify(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<UserBudgetModifyData>,
     params: Path<UserBudgetIdParam>,

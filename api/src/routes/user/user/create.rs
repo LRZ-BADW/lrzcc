@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User, UserCreateData};
+use avina_wire::user::{User, UserCreateData};
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use crate::{
@@ -43,8 +43,6 @@ impl TryFrom<UserCreateData> for NewUser {
 #[tracing::instrument(name = "user_create")]
 pub async fn user_create(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<UserCreateData>,
 ) -> Result<HttpResponse, OptionApiError> {
