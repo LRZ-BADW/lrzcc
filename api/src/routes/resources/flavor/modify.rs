@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     resources::{Flavor, FlavorModifyData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
@@ -22,8 +22,6 @@ use crate::{
 #[tracing::instrument(name = "flavor_modify")]
 pub async fn flavor_modify(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<FlavorModifyData>,
     params: Path<FlavorIdParam>,

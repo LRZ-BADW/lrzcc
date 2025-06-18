@@ -34,8 +34,6 @@ impl TryFrom<ProjectCreateData> for NewProject {
 #[tracing::instrument(name = "project_create")]
 pub async fn project_create(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<ProjectCreateData>,
 ) -> Result<HttpResponse, NormalApiError> {

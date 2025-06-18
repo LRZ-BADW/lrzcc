@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use anyhow::Context;
-use avina_wire::user::{Project, User};
+use avina_wire::user::User;
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
 use super::UserBudgetIdParam;
@@ -15,8 +15,6 @@ use crate::{
 #[tracing::instrument(name = "user_budget_delete")]
 pub async fn user_budget_delete(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     params: Path<UserBudgetIdParam>,
 ) -> Result<HttpResponse, NormalApiError> {

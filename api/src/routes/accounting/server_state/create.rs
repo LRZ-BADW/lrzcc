@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     accounting::{ServerState, ServerStateCreateData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::MySqlPool;
 
@@ -24,8 +24,6 @@ use crate::{
 #[tracing::instrument(name = "server_state_create")]
 pub async fn server_state_create(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<ServerStateCreateData>,
 ) -> Result<HttpResponse, OptionApiError> {

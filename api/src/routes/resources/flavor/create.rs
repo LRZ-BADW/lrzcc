@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     resources::{FlavorCreateData, FlavorDetailed, FlavorGroupMinimal},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::MySqlPool;
 
@@ -21,8 +21,6 @@ use crate::{
 #[tracing::instrument(name = "flavor_create")]
 pub async fn flavor_create(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<FlavorCreateData>,
 ) -> Result<HttpResponse, OptionApiError> {

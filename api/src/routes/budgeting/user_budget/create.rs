@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     budgeting::{UserBudget, UserBudgetCreateData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::MySqlPool;
 
@@ -21,8 +21,6 @@ use crate::{
 #[tracing::instrument(name = "user_budget_create")]
 pub async fn user_budget_create(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<UserBudgetCreateData>,
 ) -> Result<HttpResponse, OptionApiError> {

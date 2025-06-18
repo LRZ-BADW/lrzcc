@@ -5,7 +5,7 @@ use actix_web::{
 use anyhow::Context;
 use avina_wire::{
     accounting::{ServerState, ServerStateModifyData},
-    user::{Project, User},
+    user::User,
 };
 use sqlx::{Executor, MySql, MySqlPool, Transaction};
 
@@ -19,8 +19,6 @@ use crate::{
 #[tracing::instrument(name = "server_state_modify")]
 pub async fn server_state_modify(
     user: ReqData<User>,
-    // TODO: we don't need this right?
-    project: ReqData<Project>,
     db_pool: Data<MySqlPool>,
     data: Json<ServerStateModifyData>,
     params: Path<ServerStateIdParam>,
