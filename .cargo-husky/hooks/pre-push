@@ -2,8 +2,8 @@
 
 set -e
 
-echo '+cargo check --all'
-cargo check --all
+echo '+SQLX_OFFLINE=true cargo check --all'
+SQLX_OFFLINE=true cargo check --all
 
 echo '+cargo sqlx prepare --workspace --check'
 cargo sqlx prepare --workspace --check
@@ -14,8 +14,8 @@ cargo +nightly fmt --all -- --check
 echo '+cargo spellcheck --cfg=.spellcheck.toml'
 cargo spellcheck --cfg=.spellcheck.toml -m 1
 
-echo '+cargo clippy --all -- -D warnings'
-cargo clippy --all -- -D warnings
+echo '+SQLX_OFFLINE=true cargo clippy --all -- -D warnings'
+SQLX_OFFLINE=true cargo clippy --all -- -D warnings
 
 echo '+cargo machete'
 cargo machete
