@@ -29,10 +29,11 @@ quota = []
 resources = []
 user = []
 sqlx = ["dep:sqlx"]
+tabled = ["dep:tabled"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-tabled = "0.20"
+tabled = { version = "0.20", optional = true }
 chrono = { version = "0.4", features = ["serde"] }
 sqlx = { version = "0.8", features = ["macros", "mysql"], optional = true }
 
