@@ -40,6 +40,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
+      - name: Install mold
+        run: sudo apt update && sudo apt install mold -y
       - name: Build all crates
         run: SQLX_OFFLINE=true cargo build --all
 
