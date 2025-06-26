@@ -5,6 +5,9 @@ set -e
 echo '+SQLX_OFFLINE=true cargo check --all'
 SQLX_OFFLINE=true cargo check --all
 
+echo '+SQLX_OFFLINE=true cargo build --all'
+SQLX_OFFLINE=true cargo build --all
+
 echo '+cargo sqlx prepare --workspace --check'
 cargo sqlx prepare --workspace --check
 
