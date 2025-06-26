@@ -22,7 +22,7 @@ scripts/enter_db.sh
 source lrz_budgeting.sql
 quit
 
-RUST_LOG=info cargo run --bin avina-api | bunyan
+scripts/run_api.sh
 ```
 
 ### Calling the local API server
