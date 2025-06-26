@@ -82,9 +82,12 @@ pub async fn server_state_list(
             .await?
         }
     } else if let Some(server_id) = params.server.clone() {
-        let server_states =
-            select_server_states_by_server_from_db(&mut transaction, server_id)
-                .await?;
+        let server_states = select_server_states_by_server_from_db(
+            &mut transaction,
+            server_id,
+            false,
+        )
+        .await?;
         let server_state_user =
             select_user_from_db(&mut transaction, server_states[0].user as u64)
                 .await?;

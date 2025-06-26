@@ -274,6 +274,7 @@ pub async fn select_server_states_by_user_from_db(
 pub async fn select_server_states_by_server_from_db(
     transaction: &mut Transaction<'_, MySql>,
     server_id: String,
+    fetch_one: bool,
 ) -> Result<Vec<ServerState>, UnexpectedOnlyError> {
     let query = sqlx::query!(
         r#"
@@ -301,10 +302,20 @@ pub async fn select_server_states_by_server_from_db(
         "#,
         server_id
     );
-    let rows = transaction
-        .fetch_all(query)
-        .await
-        .context("Failed to execute select query")?
+    let queried_rows = if fetch_one {
+        let row = transaction
+            .fetch_one(query)
+            .await
+            .context("Failed to execute select query")?;
+        vec![row]
+    } else {
+        transaction
+            .fetch_all(query)
+            .await
+            .context("Failed to execute select query")?
+    };
+
+    let rows = queried_rows
         .into_iter()
         .map(|r| ServerStateRow::from_row(&r))
         .collect::<Result<Vec<_>, _>>()
