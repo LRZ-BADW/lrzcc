@@ -29,6 +29,7 @@ quota = ["avina-wire/quota"]
 resources = ["avina-wire/resources"]
 user = ["avina-wire/user"]
 sqlx = ["avina-wire/sqlx"]
+tabled = ["avina-wire/tabled"]
 
 [dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }
