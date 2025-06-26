@@ -18,15 +18,19 @@ use serde::Serialize;
 use sqlx::{MySql, MySqlPool, Transaction};
 
 use crate::{
-    authorization::require_admin_user,
+    authorization::{
+        require_admin_user, require_master_user_or_return_not_found,
+        require_user_or_project_master_or_not_found,
+    },
     database::{
         accounting::server_state::{
             select_ordered_server_states_by_server_begin_and_end_from_db,
             select_ordered_server_states_by_user_begin_and_end_from_db,
+            select_server_states_by_server_from_db,
         },
         user::{
             project::select_all_projects_from_db,
-            user::select_users_by_project_from_db,
+            user::{select_user_from_db, select_users_by_project_from_db},
         },
     },
     error::{OptionApiError, UnexpectedOnlyError},
@@ -271,8 +275,6 @@ pub async fn server_consumption(
     params: Query<ServerConsumptionParams>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    // TODO: add proper permission check
-    require_admin_user(&user)?;
     let end = params.end.unwrap_or(Utc::now().fixed_offset());
     let begin = params.begin.unwrap_or(
         Utc.with_ymd_and_hms(Utc::now().year(), 1, 1, 1, 0, 0)
@@ -284,6 +286,7 @@ pub async fn server_consumption(
         .await
         .context("Failed to begin transaction")?;
     let consumption = if params.all.unwrap_or(false) {
+        require_admin_user(&user)?;
         ServerConsumption::All(
             calculate_server_consumption_for_all(
                 &mut transaction,
@@ -294,6 +297,7 @@ pub async fn server_consumption(
             .await?,
         )
     } else if let Some(project_id) = params.project {
+        require_master_user_or_return_not_found(&user, project_id)?;
         ServerConsumption::Project(
             calculate_server_consumption_for_project(
                 &mut transaction,
@@ -305,6 +309,13 @@ pub async fn server_consumption(
             .await?,
         )
     } else if let Some(user_id) = params.user {
+        let user_queried =
+            select_user_from_db(&mut transaction, user_id as u64).await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            user_id,
+            user_queried.project,
+        )?;
         ServerConsumption::User(
             calculate_server_consumption_for_user(
                 &mut transaction,
@@ -316,6 +327,20 @@ pub async fn server_consumption(
             .await?,
         )
     } else if let Some(server_id) = params.server.clone() {
+        let server_state = select_server_states_by_server_from_db(
+            &mut transaction,
+            server_id.clone(),
+            true,
+        )
+        .await?;
+        let server_state_user =
+            select_user_from_db(&mut transaction, server_state[0].user as u64)
+                .await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            server_state_user.id,
+            server_state_user.project,
+        )?;
         ServerConsumption::Server(
             calculate_server_consumption_for_server(
                 &mut transaction,
