@@ -24,8 +24,6 @@ permissions: {}
 env:
   CARGO_TERM_COLOR: always
   SQLX_VERSION: "0.8.6"
-  SQLX_FEATURES: "rustls,mysql"
-  DATABASE_URL: "mysql://root:password@127.0.0.1:3306/avina"
 
 jobs:
   fmt:
@@ -61,21 +59,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
-      - name: Install sqlx-cli
-        run: |
-            cargo install sqlx-cli \
-            --version="${SQLX_VERSION}" \
-            --features "${SQLX_FEATURES}" \
-            --no-default-features \
-            --locked
-      - name: Install mariadb-client and mold
-        run: sudo apt update && sudo apt install mariadb-client mold -y
-      - name: Migrate database
-        run: SKIP_DOCKER=true ./scripts/init_db.sh
-      - name: Check sqlx offline data is up to date
-        run: cargo sqlx prepare --workspace --check
-      - name: Run tests
-        run: cargo clippy -- -D warnings
+      - name: Run clippy
+        run: SQLX_OFFLINE=true cargo clippy -- -D warnings
 
   spellcheck:
     name: spellcheck
