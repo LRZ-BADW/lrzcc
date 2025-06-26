@@ -1,14 +1,16 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "sqlx")]
 use sqlx::FromRow;
 use tabled::Tabled;
 
 use crate::{resources::FlavorGroupMinimal, user::UserMinimal};
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct Project {
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
@@ -38,13 +40,17 @@ impl PartialEq<ProjectDetailed> for Project {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectMinimal {
-    #[sqlx(try_from = "i32", rename = "project__id")]
+    #[cfg_attr(
+        feature = "sqlx",
+        sqlx(try_from = "i32", rename = "project__id")
+    )]
     pub id: u32,
-    #[sqlx(rename = "project__name")]
+    #[cfg_attr(feature = "sqlx", sqlx(rename = "project__name"))]
     pub name: String,
-    #[sqlx(rename = "project__user_class")]
+    #[cfg_attr(feature = "sqlx", sqlx(rename = "project__user_class"))]
     pub user_class: u32,
 }
 

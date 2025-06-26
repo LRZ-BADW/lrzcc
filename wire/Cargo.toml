@@ -28,12 +28,13 @@ pricing = []
 quota = []
 resources = []
 user = []
+sqlx = ["dep:sqlx"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 tabled = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
-sqlx = { version = "0.8", features = ["macros", "mysql"] }
+sqlx = { version = "0.8", features = ["macros", "mysql"], optional = true }
 
 [dev-dependencies]
 cargo-husky = { workspace = true }
