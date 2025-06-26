@@ -20,9 +20,15 @@ use sqlx::{MySql, MySqlPool, Transaction};
 use strum::{EnumIter, IntoEnumIterator};
 
 use crate::{
-    authorization::require_admin_user,
+    authorization::{
+        require_admin_user, require_master_user_or_return_not_found,
+        require_user_or_project_master_or_not_found,
+    },
     database::{
-        accounting::server_state::select_user_class_by_server_from_db,
+        accounting::server_state::{
+            select_server_states_by_server_from_db,
+            select_user_class_by_server_from_db,
+        },
         pricing::flavor_price::select_flavor_prices_for_period_from_db,
         resources::flavor::select_all_flavors_from_db,
         user::{
@@ -30,7 +36,7 @@ use crate::{
                 select_all_projects_from_db,
                 select_user_class_by_project_from_db,
             },
-            user::select_user_class_by_user_from_db,
+            user::{select_user_class_by_user_from_db, select_user_from_db},
         },
     },
     error::{OptionApiError, UnexpectedOnlyError},
@@ -910,8 +916,6 @@ pub async fn server_cost(
     params: Query<ServerCostParams>,
     // TODO: is the ValidationError variant ever used?
 ) -> Result<HttpResponse, OptionApiError> {
-    // TODO: add proper permission check
-    require_admin_user(&user)?;
     let end = params.end.unwrap_or(Utc::now().fixed_offset());
     let begin = params.begin.unwrap_or(
         Utc.with_ymd_and_hms(Utc::now().year(), 1, 1, 1, 0, 0)
@@ -923,6 +927,7 @@ pub async fn server_cost(
         .await
         .context("Failed to begin transaction")?;
     let cost = if params.all.unwrap_or(false) {
+        require_admin_user(&user)?;
         ServerCost::All(
             calculate_server_cost_for_all(
                 &mut transaction,
@@ -933,6 +938,7 @@ pub async fn server_cost(
             .await?,
         )
     } else if let Some(project_id) = params.project {
+        require_master_user_or_return_not_found(&user, project_id)?;
         ServerCost::Project(
             calculate_server_cost_for_project(
                 &mut transaction,
@@ -944,6 +950,13 @@ pub async fn server_cost(
             .await?,
         )
     } else if let Some(user_id) = params.user {
+        let user_queried =
+            select_user_from_db(&mut transaction, user_id as u64).await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            user_id,
+            user_queried.project,
+        )?;
         ServerCost::User(
             calculate_server_cost_for_user(
                 &mut transaction,
@@ -955,6 +968,20 @@ pub async fn server_cost(
             .await?,
         )
     } else if let Some(server_id) = params.server.clone() {
+        let server_state = select_server_states_by_server_from_db(
+            &mut transaction,
+            server_id.clone(),
+            true,
+        )
+        .await?;
+        let server_state_user =
+            select_user_from_db(&mut transaction, server_state[0].user as u64)
+                .await?;
+        require_user_or_project_master_or_not_found(
+            &user,
+            server_state_user.id,
+            server_state_user.project,
+        )?;
         ServerCost::Server(
             calculate_server_cost_for_server(
                 &mut transaction,
