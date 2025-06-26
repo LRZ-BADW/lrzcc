@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "sqlx")]
 use sqlx::{mysql::MySqlRow, FromRow, Row};
 use tabled::Tabled;
 
@@ -15,6 +16,7 @@ pub struct FlavorGroup {
     pub project: u32,
 }
 
+#[cfg(feature = "sqlx")]
 impl<'r> FromRow<'r, MySqlRow> for FlavorGroup {
     fn from_row(row: &'r MySqlRow) -> Result<Self, sqlx::Error> {
         Ok(Self {
@@ -36,7 +38,8 @@ impl Display for FlavorGroup {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorGroupMinimal {
     pub id: u32,
     pub name: String,

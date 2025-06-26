@@ -2,16 +2,18 @@ use std::fmt::Display;
 
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "sqlx")]
 use sqlx::FromRow;
 use tabled::Tabled;
 
 use crate::common::is_false;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct ProjectBudget {
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub project: u32,
     pub project_name: String,
     pub year: u32,

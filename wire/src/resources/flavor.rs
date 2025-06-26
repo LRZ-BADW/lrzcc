@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "sqlx")]
 use sqlx::{mysql::MySqlRow, FromRow, Row};
 use tabled::Tabled;
 
@@ -18,6 +19,7 @@ pub struct Flavor {
     pub weight: u32,
 }
 
+#[cfg(feature = "sqlx")]
 impl<'r> FromRow<'r, MySqlRow> for Flavor {
     fn from_row(row: &'r MySqlRow) -> Result<Self, sqlx::Error> {
         let id: u32 = row.try_get::<i32, _>("id")?.try_into().unwrap();
@@ -45,7 +47,8 @@ impl Display for Flavor {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq, FromRow)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct FlavorMinimal {
     pub id: u32,
     pub name: String,

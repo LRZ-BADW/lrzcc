@@ -1,18 +1,20 @@
 use std::{cmp::PartialEq, fmt::Display};
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "sqlx")]
 use sqlx::FromRow;
 use tabled::Tabled;
 
 use crate::user::ProjectMinimal;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct User {
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub project: u32,
     pub project_name: String,
     pub role: u32,
@@ -46,9 +48,10 @@ impl PartialEq<UserDetailed> for User {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserMinimal {
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
     pub name: String,
 }
@@ -71,13 +74,14 @@ impl Display for UserMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, FromRow, PartialEq)]
+#[cfg_attr(feature = "sqlx", derive(FromRow))]
+#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
 pub struct UserDetailed {
-    #[sqlx(try_from = "i32")]
+    #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4 without dashes
-    #[sqlx(flatten)]
+    #[cfg_attr(feature = "sqlx", sqlx(flatten))]
     pub project: ProjectMinimal,
     pub project_name: String,
     pub role: u32,
