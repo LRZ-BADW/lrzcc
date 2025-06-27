@@ -143,7 +143,7 @@ impl FlavorPriceModifyRequest {
 impl FlavorPriceApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorPriceApi {
         FlavorPriceApi {
-            url: format!("{}/pricing/flavorprices", base_url),
+            url: format!("{base_url}/pricing/flavorprices"),
             client: Rc::clone(client),
         }
     }

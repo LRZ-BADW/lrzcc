@@ -259,7 +259,7 @@ pub struct ServerConsumptionApi {
 impl ServerConsumptionApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerConsumptionApi {
         ServerConsumptionApi {
-            url: format!("{}/accounting/serverconsumption/", base_url),
+            url: format!("{base_url}/accounting/serverconsumption/"),
             client: Rc::clone(client),
         }
     }

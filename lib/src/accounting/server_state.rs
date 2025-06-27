@@ -193,7 +193,7 @@ impl ServerStateModifyRequest {
 impl ServerStateApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerStateApi {
         ServerStateApi {
-            url: format!("{}/accounting/serverstates", base_url),
+            url: format!("{base_url}/accounting/serverstates"),
             client: Rc::clone(client),
         }
     }

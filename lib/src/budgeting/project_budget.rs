@@ -255,7 +255,7 @@ impl ProjectBudgetOverRequest {
 impl ProjectBudgetApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ProjectBudgetApi {
         ProjectBudgetApi {
-            url: format!("{}/budgeting/projectbudgets", base_url),
+            url: format!("{base_url}/budgeting/projectbudgets"),
             client: Rc::clone(client),
         }
     }

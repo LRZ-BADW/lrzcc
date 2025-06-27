@@ -16,7 +16,7 @@ pub struct HelloApi {
 impl HelloApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> HelloApi {
         HelloApi {
-            url: format!("{}/hello", base_url),
+            url: format!("{base_url}/hello"),
             client: Rc::clone(client),
         }
     }

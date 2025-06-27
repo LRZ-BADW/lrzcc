@@ -149,7 +149,7 @@ impl ProjectModifyRequest {
 impl ProjectApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ProjectApi {
         ProjectApi {
-            url: format!("{}/user/projects", base_url),
+            url: format!("{base_url}/user/projects"),
             client: Rc::clone(client),
         }
     }

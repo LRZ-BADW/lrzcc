@@ -303,7 +303,7 @@ impl UserBudgetOverRequest {
 impl UserBudgetApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserBudgetApi {
         UserBudgetApi {
-            url: format!("{}/budgeting/userbudgets", base_url),
+            url: format!("{base_url}/budgeting/userbudgets"),
             client: Rc::clone(client),
         }
     }

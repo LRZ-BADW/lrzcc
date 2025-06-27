@@ -13,7 +13,7 @@ pub struct BudgetBulkCreateApi {
 impl BudgetBulkCreateApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> BudgetBulkCreateApi {
         BudgetBulkCreateApi {
-            url: format!("{}/budgeting/budgetbulkcreate/", base_url),
+            url: format!("{base_url}/budgeting/budgetbulkcreate/"),
             client: Rc::clone(client),
         }
     }
