@@ -201,7 +201,7 @@ impl ValueEnum for Format {
             "dots" => Ok(Table(Dots)),
             "re-structured-text" => Ok(Table(ReStructuredText)),
             "ascii-rounded" => Ok(Table(AsciiRounded)),
-            _ => Err(format!("Invalid format: {}", value)),
+            _ => Err(format!("Invalid format: {value}")),
         }
     }
 }

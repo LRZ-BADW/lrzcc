@@ -89,7 +89,7 @@ impl BudgetOverTreeRequest {
 impl BudgetOverTreeApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> BudgetOverTreeApi {
         BudgetOverTreeApi {
-            url: format!("{}/budgeting/budgetovertree/", base_url),
+            url: format!("{base_url}/budgeting/budgetovertree/"),
             client: Rc::clone(client),
         }
     }

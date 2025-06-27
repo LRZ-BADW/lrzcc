@@ -35,7 +35,7 @@ impl Token {
             .default_headers(headers)
             .build()
             .unwrap();
-        let url = format!("{}/auth/tokens/", auth_url);
+        let url = format!("{auth_url}/auth/tokens/");
         let data = object! {
             "auth": {
                 "identity": {

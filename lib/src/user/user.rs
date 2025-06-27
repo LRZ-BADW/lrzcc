@@ -175,7 +175,7 @@ impl UserModifyRequest {
 impl UserApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> UserApi {
         UserApi {
-            url: format!("{}/user/users", base_url),
+            url: format!("{base_url}/user/users"),
             client: Rc::clone(client),
         }
     }

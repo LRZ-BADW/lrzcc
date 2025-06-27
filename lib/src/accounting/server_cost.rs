@@ -257,7 +257,7 @@ pub struct ServerCostApi {
 impl ServerCostApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> ServerCostApi {
         ServerCostApi {
-            url: format!("{}/accounting/servercost/", base_url),
+            url: format!("{base_url}/accounting/servercost/"),
             client: Rc::clone(client),
         }
     }

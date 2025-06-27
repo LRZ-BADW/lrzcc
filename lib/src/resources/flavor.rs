@@ -327,7 +327,7 @@ impl FlavorUsageRequest {
 impl FlavorApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorApi {
         FlavorApi {
-            url: format!("{}/resources/flavors", base_url),
+            url: format!("{base_url}/resources/flavors"),
             client: Rc::clone(client),
         }
     }

@@ -32,7 +32,7 @@ where
     let mut request = client.request(method, url);
     if let Some(data) = data {
         request = request.body(serde_json::to_string(&data).context(
-            format!("Could not serialize json request body from {:?}", data),
+            format!("Could not serialize json request body from {data:?}"),
         )?);
     }
     let response = match request.send().context("") {
@@ -46,13 +46,11 @@ where
     let status = response.status();
     if status != expected_status {
         let text = response.text().context(format!(
-            "Could not retrieve response text on unexpected status code {}.",
-            status
+            "Could not retrieve response text on unexpected status code {status}.",
         ))?;
         let err_resp: ErrorResponse = serde_json::from_str(text.as_str())
             .context(format!(
-                "Unexpected status code {} without error message.",
-                status,
+                "Unexpected status code {status} without error message.",
             ))?;
         return Err(ApiError::ResponseError(err_resp.detail));
     }
@@ -75,6 +73,6 @@ where
         .text()
         .context("Could not retrieve response text.")?;
     let u: U = serde_json::from_str(text.as_str())
-        .context(format!("Could not parse response text: {}", text))?;
+        .context(format!("Could not parse response text: {text}"))?;
     Ok(u)
 }

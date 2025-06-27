@@ -163,7 +163,7 @@ pub struct FlavorQuotaCheckRequest {
 impl FlavorQuotaCheckRequest {
     pub fn new(url: &str, client: &Rc<Client>, user: u32, flavor: u32) -> Self {
         Self {
-            url: format!("{}/check/", url),
+            url: format!("{url}/check/"),
             client: Rc::clone(client),
 
             user,
@@ -203,7 +203,7 @@ impl FlavorQuotaCheckRequest {
 impl FlavorQuotaApi {
     pub fn new(base_url: &str, client: &Rc<Client>) -> FlavorQuotaApi {
         FlavorQuotaApi {
-            url: format!("{}/quota/flavorquotas", base_url),
+            url: format!("{base_url}/quota/flavorquotas"),
             client: Rc::clone(client),
         }
     }
