@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 use actix_web::{
-    web::{Data, Query, ReqData},
     HttpResponse,
+    web::{Data, Query, ReqData},
 };
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use avina_wire::{
     accounting::{
         ServerCostAll, ServerCostParams, ServerCostProject, ServerCostServer,
@@ -41,11 +41,11 @@ use crate::{
     },
     error::{OptionApiError, UnexpectedOnlyError},
     routes::accounting::server_consumption::get::{
-        calculate_server_consumption_for_all,
+        ServerConsumptionForAll, ServerConsumptionForProject,
+        ServerConsumptionForUser, calculate_server_consumption_for_all,
         calculate_server_consumption_for_project,
         calculate_server_consumption_for_server,
-        calculate_server_consumption_for_user, ServerConsumptionForAll,
-        ServerConsumptionForProject, ServerConsumptionForUser,
+        calculate_server_consumption_for_user,
     },
 };
 

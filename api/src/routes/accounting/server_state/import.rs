@@ -1,10 +1,10 @@
 use std::{collections::HashMap, hash::Hash};
 
 use actix_web::{
-    web::{Data, ReqData},
     HttpResponse,
+    web::{Data, ReqData},
 };
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use avina_wire::{accounting::ServerStateImport, user::User};
 use chrono::Utc;
 use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
@@ -12,8 +12,8 @@ use sqlx::{Executor, FromRow, MySql, MySqlPool, Transaction};
 use crate::{
     authorization::require_admin_user,
     database::accounting::server_state::{
-        insert_server_state_into_db, select_unfinished_server_states_from_db,
-        NewServerState,
+        NewServerState, insert_server_state_into_db,
+        select_unfinished_server_states_from_db,
     },
     error::{
         NotFoundOrUnexpectedApiError, OptionApiError, UnexpectedOnlyError,
@@ -102,7 +102,7 @@ pub async fn server_state_import(
                 return Err(anyhow!(
                     "Server state hash map contains invalid none-none pair."
                 )
-                .into())
+                .into());
             }
         }
     }

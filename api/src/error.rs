@@ -1,13 +1,13 @@
 use actix_web::{
+    HttpResponse, ResponseError,
     body::BoxBody,
     error::InternalError,
     http::{
-        header::{HeaderValue, CONTENT_TYPE},
         StatusCode,
+        header::{CONTENT_TYPE, HeaderValue},
     },
-    HttpResponse, ResponseError,
 };
-use avina_wire::error::{error_chain_fmt, ErrorResponse};
+use avina_wire::error::{ErrorResponse, error_chain_fmt};
 
 pub fn unauthorized_error(message: &str) -> actix_web::Error {
     InternalError::from_response(

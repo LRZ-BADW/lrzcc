@@ -1,23 +1,23 @@
 use std::net::TcpListener;
 
 use actix_web::{
-    dev::Server, middleware::from_fn, web, web::Data, App, HttpServer,
+    App, HttpServer, dev::Server, middleware::from_fn, web, web::Data,
 };
 use anyhow::Context;
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
 use tracing_actix_web::TracingLogger;
 
 use crate::{
     authentication::{extract_user_and_project, require_valid_token},
     configuration::{DatabaseSettings, Settings},
-    error::{not_found, MinimalApiError},
+    error::{MinimalApiError, not_found},
     openstack::OpenStack,
     routes::{
         accounting_scope, budgeting_scope, health_check, hello_scope,
         pricing_scope, quota_scope, resources_scope,
         user::{
-            project::create::{insert_project_into_db, NewProject},
-            user::create::{insert_user_into_db, NewUser},
+            project::create::{NewProject, insert_project_into_db},
+            user::create::{NewUser, insert_user_into_db},
         },
         user_scope,
     },

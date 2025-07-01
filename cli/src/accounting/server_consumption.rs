@@ -3,9 +3,9 @@ use std::error::Error;
 use chrono::{DateTime, FixedOffset};
 use clap::Args;
 
+use crate::common::{Format, print_hashmap, print_json};
 #[cfg(not(feature = "user"))]
 use crate::common::{find_id as project_find_id, find_id as user_find_id};
-use crate::common::{print_hashmap, print_json, Format};
 #[cfg(feature = "user")]
 use crate::user::{
     project::find_id as project_find_id, user::find_id as user_find_id,

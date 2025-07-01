@@ -1,9 +1,9 @@
 use actix_web::{
+    HttpMessage,
     body::MessageBody,
     dev::{ServiceRequest, ServiceResponse},
     middleware::Next,
     web::Data,
-    HttpMessage,
 };
 use avina_wire::user::{Project, User};
 use sqlx::MySqlPool;

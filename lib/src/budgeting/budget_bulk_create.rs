@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use avina_wire::budgeting::{BudgetBulkCreate, BudgetBulkCreateData};
-use reqwest::{blocking::Client, Method, StatusCode};
+use reqwest::{Method, StatusCode, blocking::Client};
 
 use crate::{common::request, error::ApiError};
 

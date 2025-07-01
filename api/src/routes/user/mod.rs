@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{get, scope},
     Scope,
+    web::{get, scope},
 };
 
 pub mod project;

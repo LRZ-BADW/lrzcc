@@ -3,7 +3,7 @@ use std::{rc::Rc, time::Duration};
 use anyhow::Context;
 use reqwest::{
     blocking::ClientBuilder,
-    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
+    header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 
 mod common;

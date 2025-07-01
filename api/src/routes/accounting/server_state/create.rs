@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, Json, ReqData},
     HttpResponse,
+    web::{Data, Json, ReqData},
 };
 use anyhow::Context;
 use avina_wire::{
@@ -13,7 +13,7 @@ use crate::{
     authorization::require_admin_user,
     database::{
         accounting::server_state::{
-            insert_server_state_into_db, NewServerState,
+            NewServerState, insert_server_state_into_db,
         },
         resources::flavor::select_flavor_name_from_db,
         user::user::select_user_name_from_db,

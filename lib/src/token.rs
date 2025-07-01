@@ -4,7 +4,7 @@ use anyhow::Context;
 use jzon::object;
 use reqwest::{
     blocking::{Client, ClientBuilder},
-    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
+    header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 
 #[derive(Clone)]
@@ -81,7 +81,7 @@ impl Token {
             None => {
                 return Err(anyhow::anyhow!(
                     "No token in authentication response header"
-                ))
+                ));
             }
         }
         .trim()

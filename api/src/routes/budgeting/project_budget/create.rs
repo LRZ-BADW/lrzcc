@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, Json, ReqData},
     HttpResponse,
+    web::{Data, Json, ReqData},
 };
 use anyhow::Context;
 use avina_wire::{
@@ -13,7 +13,7 @@ use crate::{
     authorization::require_admin_user,
     database::{
         budgeting::project_budget::{
-            insert_project_budget_into_db, NewProjectBudget,
+            NewProjectBudget, insert_project_budget_into_db,
         },
         user::project::select_project_name_from_db,
     },

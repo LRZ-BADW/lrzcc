@@ -2,7 +2,7 @@ use std::error::Error;
 
 use clap::Subcommand;
 
-use crate::common::{print_single_object, Execute, Format};
+use crate::common::{Execute, Format, print_single_object};
 
 #[derive(Subcommand, Debug)]
 pub(crate) enum HelloCommand {

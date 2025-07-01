@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, Json, Path, ReqData},
     HttpResponse,
+    web::{Data, Json, Path, ReqData},
 };
 use anyhow::Context;
 use avina_wire::user::{User, UserModifyData};

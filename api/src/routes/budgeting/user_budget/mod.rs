@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{delete, get, patch, post, scope},
     Scope,
+    web::{delete, get, patch, post, scope},
 };
 use serde::Deserialize;
 

@@ -1,4 +1,4 @@
-use actix_web::{web::scope, Scope};
+use actix_web::{Scope, web::scope};
 
 mod flavor_quota;
 use flavor_quota::flavor_quotas_scope;

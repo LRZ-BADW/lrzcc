@@ -6,10 +6,10 @@ use avina_wire::resources::{
     FlavorGroupDetailed, FlavorGroupInitialize, FlavorGroupListParams,
     FlavorGroupModifyData, FlavorGroupUsage, FlavorGroupUsageAggregate,
 };
-use reqwest::{blocking::Client, Method, StatusCode, Url};
+use reqwest::{Method, StatusCode, Url, blocking::Client};
 
 use crate::{
-    common::{request, request_bare, SerializableNone},
+    common::{SerializableNone, request, request_bare},
     error::ApiError,
 };
 

@@ -2,16 +2,16 @@ use std::ops::Range;
 
 use anyhow::Context;
 use avina_api::{
-    configuration::{get_configuration, DatabaseSettings},
+    configuration::{DatabaseSettings, get_configuration},
     database::{
         accounting::server_state::{
-            insert_server_state_into_db, NewServerState,
+            NewServerState, insert_server_state_into_db,
         },
         budgeting::{
-            project_budget::{insert_project_budget_into_db, NewProjectBudget},
-            user_budget::{insert_user_budget_into_db, NewUserBudget},
+            project_budget::{NewProjectBudget, insert_project_budget_into_db},
+            user_budget::{NewUserBudget, insert_user_budget_into_db},
         },
-        pricing::flavor_price::{insert_flavor_price_into_db, NewFlavorPrice},
+        pricing::flavor_price::{NewFlavorPrice, insert_flavor_price_into_db},
         quota::flavor_quota::insert_flavor_quota_into_db,
         resources::{
             flavor::insert_flavor_into_db,
@@ -19,7 +19,7 @@ use avina_api::{
         },
     },
     error::MinimalApiError,
-    startup::{get_connection_pool, Application},
+    startup::{Application, get_connection_pool},
     telemetry::{get_subscriber, init_subscriber},
 };
 use avina_wire::{
@@ -32,15 +32,15 @@ use avina_wire::{
 };
 use chrono::{DateTime, Datelike, FixedOffset, Utc};
 use once_cell::sync::Lazy;
-use rand::{distr::Alphanumeric, rng, Rng};
+use rand::{Rng, distr::Alphanumeric, rng};
 use serde_json::json;
 use sqlx::{
     Connection, Executor, MySql, MySqlConnection, MySqlPool, Transaction,
 };
 use uuid::Uuid;
 use wiremock::{
-    matchers::{header, method, path},
     Mock, MockServer, ResponseTemplate,
+    matchers::{header, method, path},
 };
 
 static TRACING: Lazy<()> = Lazy::new(|| {

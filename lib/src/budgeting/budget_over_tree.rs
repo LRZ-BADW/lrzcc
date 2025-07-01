@@ -3,10 +3,10 @@ use std::rc::Rc;
 use anyhow::Context;
 use avina_wire::budgeting::BudgetOverTree;
 use chrono::{DateTime, FixedOffset};
-use reqwest::{blocking::Client, Method, StatusCode, Url};
+use reqwest::{Method, StatusCode, Url, blocking::Client};
 
 use crate::{
-    common::{request, SerializableNone},
+    common::{SerializableNone, request},
     error::ApiError,
 };
 

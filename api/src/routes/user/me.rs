@@ -1,4 +1,4 @@
-use actix_web::{web::ReqData, HttpResponse};
+use actix_web::{HttpResponse, web::ReqData};
 use avina_wire::user::{Project, ProjectMinimal, User, UserDetailed};
 
 #[tracing::instrument(name = "user_me")]

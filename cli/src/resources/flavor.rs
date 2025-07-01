@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use clap::{Args, Subcommand};
 
 #[cfg(not(feature = "user"))]
@@ -11,8 +11,8 @@ use crate::user::{
 };
 use crate::{
     common::{
-        ask_for_confirmation, print_object_list, print_single_object, Execute,
-        Format,
+        Execute, Format, ask_for_confirmation, print_object_list,
+        print_single_object,
     },
     resources::flavor_group::find_id as flavor_group_find_id,
 };

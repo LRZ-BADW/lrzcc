@@ -5,8 +5,8 @@ use clap::{Args, Subcommand};
 #[cfg(not(feature = "user"))]
 use crate::common::find_id as user_find_id;
 use crate::common::{
-    ask_for_confirmation, print_object_list, print_single_object, Execute,
-    Format,
+    Execute, Format, ask_for_confirmation, print_object_list,
+    print_single_object,
 };
 #[cfg(not(feature = "resources"))]
 use crate::common::{

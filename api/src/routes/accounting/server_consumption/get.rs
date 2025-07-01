@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use actix_web::{
-    web::{Data, Query, ReqData},
     HttpResponse,
+    web::{Data, Query, ReqData},
 };
 use anyhow::Context;
 use avina_wire::{

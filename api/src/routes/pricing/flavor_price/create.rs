@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, Json, ReqData},
     HttpResponse,
+    web::{Data, Json, ReqData},
 };
 use anyhow::Context;
 use avina_wire::{
@@ -12,7 +12,7 @@ use sqlx::MySqlPool;
 use crate::{
     authorization::require_admin_user,
     database::{
-        pricing::flavor_price::{insert_flavor_price_into_db, NewFlavorPrice},
+        pricing::flavor_price::{NewFlavorPrice, insert_flavor_price_into_db},
         resources::flavor::select_flavor_name_from_db,
     },
     error::{NormalApiError, OptionApiError},
