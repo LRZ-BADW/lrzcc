@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use crate::common::{print_single_object, Format};
+use crate::common::{Format, print_single_object};
 
 pub(crate) fn budget_bulk_create(
     api: avina::Api,

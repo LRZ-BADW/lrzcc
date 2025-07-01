@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{get, scope, ReqData},
     HttpResponse, Scope,
+    web::{ReqData, get, scope},
 };
 use avina_wire::{
     hello::Hello,

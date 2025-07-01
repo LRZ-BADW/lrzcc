@@ -7,10 +7,10 @@ use avina_wire::budgeting::{
     ProjectBudgetOverSimple,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{blocking::Client, Method, StatusCode};
+use reqwest::{Method, StatusCode, blocking::Client};
 
 use crate::{
-    common::{request, request_bare, SerializableNone},
+    common::{SerializableNone, request, request_bare},
     error::ApiError,
 };
 

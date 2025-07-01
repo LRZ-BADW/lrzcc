@@ -6,10 +6,10 @@ use avina_wire::accounting::{
     ServerCostSimple, ServerCostUser,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{blocking::Client, Method, StatusCode};
+use reqwest::{Method, StatusCode, blocking::Client};
 
 use crate::{
-    common::{request, SerializableNone},
+    common::{SerializableNone, request},
     error::ApiError,
 };
 

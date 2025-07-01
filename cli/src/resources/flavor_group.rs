@@ -1,11 +1,11 @@
 use std::error::Error;
 
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use clap::{Args, Subcommand};
 
 use crate::common::{
-    ask_for_confirmation, print_object_list, print_single_object, Execute,
-    Format,
+    Execute, Format, ask_for_confirmation, print_object_list,
+    print_single_object,
 };
 #[cfg(not(feature = "user"))]
 use crate::common::{find_id as project_find_id, find_id as user_find_id};

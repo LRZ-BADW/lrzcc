@@ -3,7 +3,7 @@ mod server_cost;
 mod server_state;
 
 pub(crate) use server_consumption::{
-    server_consumption, ServerConsumptionFilter,
+    ServerConsumptionFilter, server_consumption,
 };
-pub(crate) use server_cost::{server_cost, ServerCostFilter};
+pub(crate) use server_cost::{ServerCostFilter, server_cost};
 pub(crate) use server_state::ServerStateCommand;

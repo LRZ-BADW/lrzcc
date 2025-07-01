@@ -326,8 +326,8 @@ async fn e2e_lib_master_user_can_list_own_projects_and_users_server_states() {
 }
 
 #[tokio::test]
-async fn e2e_lib_master_user_cannot_list_other_projects_and_users_server_states(
-) {
+async fn e2e_lib_master_user_cannot_list_other_projects_and_users_server_states()
+ {
     // arrange
     let server = spawn_app().await;
     let test_project_1 = server
@@ -406,8 +406,8 @@ async fn e2e_lib_master_user_cannot_list_other_projects_and_users_server_states(
 }
 
 #[tokio::test]
-async fn e2e_lib_server_state_list_server_filter_works_across_projects_for_admin_user(
-) {
+async fn e2e_lib_server_state_list_server_filter_works_across_projects_for_admin_user()
+ {
     // arrange
     let server = spawn_app().await;
     let test_project = server

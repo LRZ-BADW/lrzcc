@@ -3,8 +3,8 @@ use std::fmt::Debug;
 use anyhow::Context;
 use avina_wire::error::ErrorResponse;
 use reqwest::{
-    blocking::{Client, Response},
     Method, StatusCode,
+    blocking::{Client, Response},
 };
 use serde::{de::DeserializeOwned, ser::Serialize};
 

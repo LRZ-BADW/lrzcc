@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, ReqData},
     HttpResponse,
+    web::{Data, ReqData},
 };
 use anyhow::Context;
 use avina_wire::user::{Project, User};

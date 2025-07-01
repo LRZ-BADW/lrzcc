@@ -1,4 +1,4 @@
-use actix_web::{web::scope, Scope};
+use actix_web::{Scope, web::scope};
 
 mod flavor_price;
 use flavor_price::flavor_prices_scope;

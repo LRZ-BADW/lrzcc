@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{Data, Json, ReqData},
     HttpResponse,
+    web::{Data, Json, ReqData},
 };
 use anyhow::Context;
 use avina_wire::{
@@ -12,7 +12,7 @@ use sqlx::MySqlPool;
 use crate::{
     authorization::require_admin_user,
     database::{
-        budgeting::user_budget::{insert_user_budget_into_db, NewUserBudget},
+        budgeting::user_budget::{NewUserBudget, insert_user_budget_into_db},
         user::user::select_user_name_from_db,
     },
     error::{NormalApiError, OptionApiError},

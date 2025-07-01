@@ -1,6 +1,6 @@
 use actix_web::{
-    web::{post, scope},
     Scope,
+    web::{post, scope},
 };
 
 mod project_budget;

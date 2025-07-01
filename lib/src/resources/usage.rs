@@ -1,10 +1,10 @@
 use std::rc::Rc;
 
 use avina_wire::resources::CloudUsage;
-use reqwest::{blocking::Client, Method, StatusCode};
+use reqwest::{Method, StatusCode, blocking::Client};
 
 use crate::{
-    common::{request, SerializableNone},
+    common::{SerializableNone, request},
     error::ApiError,
 };
 

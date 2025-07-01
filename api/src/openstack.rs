@@ -3,8 +3,8 @@ use std::{collections::HashMap, time::Instant};
 use anyhow::Context;
 use jzon::object;
 use reqwest::{
-    header::{HeaderMap, HeaderValue, CONTENT_TYPE},
     ClientBuilder,
+    header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 use tokio::sync::RwLock;
 
@@ -384,7 +384,7 @@ pub async fn issue_token(
         None => {
             return Err(anyhow::anyhow!(
                 "No token in authentication response header"
-            ))
+            ));
         }
     }
     .trim()

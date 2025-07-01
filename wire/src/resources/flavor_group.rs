@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
-use sqlx::{mysql::MySqlRow, FromRow, Row};
+use sqlx::{FromRow, Row, mysql::MySqlRow};
 use tabled::Tabled;
 
 use crate::{resources::FlavorMinimal, user::ProjectMinimal};

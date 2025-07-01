@@ -1,16 +1,16 @@
 use std::{
     borrow::Cow,
     fmt::Display,
-    io::{stdin, stdout, Write},
+    io::{Write, stdin, stdout},
 };
 
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use chrono::Datelike;
-use clap::{builder::PossibleValue, ValueEnum};
+use clap::{ValueEnum, builder::PossibleValue};
 use serde::Serialize;
 use tabled::{
-    builder::Builder, grid::records::vec_records::Text, settings::Style, Table,
-    Tabled,
+    Table, Tabled, builder::Builder, grid::records::vec_records::Text,
+    settings::Style,
 };
 
 #[derive(Debug, Clone)]
