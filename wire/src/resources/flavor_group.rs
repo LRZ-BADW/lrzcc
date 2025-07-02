@@ -3,15 +3,17 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::{FromRow, Row, mysql::MySqlRow};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
 use crate::{resources::FlavorMinimal, user::ProjectMinimal};
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorGroup {
     pub id: u32,
     pub name: String,
-    #[tabled(skip)]
+    #[cfg_attr(feature = "tabled", tabled(skip))]
     pub flavors: Vec<u32>,
     pub project: u32,
 }
@@ -39,7 +41,8 @@ impl Display for FlavorGroup {
 }
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorGroupMinimal {
     pub id: u32,
     pub name: String,
@@ -52,11 +55,12 @@ impl Display for FlavorGroupMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorGroupDetailed {
     pub id: u32,
     pub name: String,
-    #[tabled(skip)]
+    #[cfg_attr(feature = "tabled", tabled(skip))]
     pub flavors: Vec<FlavorMinimal>,
     pub project: ProjectMinimal,
 }
@@ -72,11 +76,12 @@ pub struct FlavorGroupListParams {
     pub all: Option<bool>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorGroupCreated {
     pub id: u32,
     pub name: String,
-    #[tabled(skip)]
+    #[cfg_attr(feature = "tabled", tabled(skip))]
     pub flavors: Vec<FlavorMinimal>,
     pub project: u32,
 }
@@ -87,7 +92,8 @@ impl Display for FlavorGroupCreated {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorGroupInitialize {
     pub new_flavor_group_count: u32,
     pub new_flavor_count: u32,
@@ -128,7 +134,8 @@ impl FlavorGroupModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorGroupUsage {
     pub user_id: u32,
     pub user_name: String,
@@ -137,7 +144,8 @@ pub struct FlavorGroupUsage {
     pub usage: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorGroupUsageAggregate {
     pub flavorgroup_id: u32,
     pub flavorgroup_name: String,

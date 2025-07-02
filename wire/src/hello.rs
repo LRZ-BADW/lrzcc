@@ -1,9 +1,11 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Hello {
     pub message: String,
 }

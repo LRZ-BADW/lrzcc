@@ -3,10 +3,12 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::FromRow;
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorQuota {
     pub id: u32,
     pub user: u32,
@@ -25,7 +27,8 @@ impl Display for FlavorQuota {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorQuotaCheck {
     pub underquota: bool,
 }

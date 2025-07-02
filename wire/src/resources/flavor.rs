@@ -3,18 +3,22 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::{FromRow, Row, mysql::MySqlRow};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
-use crate::{common::display_option, resources::FlavorGroupMinimal};
+#[cfg(feature = "tabled")]
+use crate::common::display_option;
+use crate::resources::FlavorGroupMinimal;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Flavor {
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub group: Option<u32>,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub group_name: Option<String>,
     pub weight: u32,
 }
@@ -48,7 +52,8 @@ impl Display for Flavor {
 }
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorMinimal {
     pub id: u32,
     pub name: String,
@@ -61,14 +66,15 @@ impl Display for FlavorMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorDetailed {
     pub id: u32,
     pub name: String,
     pub openstack_id: String, // UUIDv4
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub group: Option<FlavorGroupMinimal>,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub group_name: Option<String>,
     pub weight: u32,
 }
@@ -86,7 +92,8 @@ pub struct FlavorListParams {
     pub group: Option<u32>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct FlavorImport {
     pub new_flavor_count: u32,
 }
@@ -138,27 +145,29 @@ impl FlavorModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorUsage {
     pub user_id: u32,
     pub user_name: String,
     pub flavor_id: u32,
     pub flavor_name: String,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub flavorgroup_id: Option<u32>,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub flavorgroup_name: Option<String>,
     pub count: u32,
     pub usage: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FlavorUsageAggregate {
     pub flavor_id: u32,
     pub flavor_name: String,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub flavorgroup_id: Option<u32>,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub flavorgroup_name: Option<String>,
     pub count: u32,
     pub usage: u32,

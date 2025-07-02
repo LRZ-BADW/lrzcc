@@ -4,12 +4,14 @@ use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::FromRow;
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
 use crate::common::is_false;
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProjectBudget {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -82,7 +84,8 @@ impl ProjectBudgetModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProjectBudgetOverSimple {
     pub budget_id: u32,
     pub project_id: u32,
@@ -90,7 +93,8 @@ pub struct ProjectBudgetOverSimple {
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProjectBudgetOverDetail {
     pub budget_id: u32,
     pub project_id: u32,

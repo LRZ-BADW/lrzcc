@@ -3,12 +3,14 @@ use std::{cmp::PartialEq, fmt::Display};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::FromRow;
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
 use crate::user::ProjectMinimal;
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct User {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -49,7 +51,8 @@ impl PartialEq<UserDetailed> for User {
 }
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserMinimal {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -75,7 +78,8 @@ impl Display for UserMinimal {
 }
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserDetailed {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -109,7 +113,8 @@ impl PartialEq<User> for UserDetailed {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserImport {
     pub new_project_count: u32,
     pub new_user_count: u32,

@@ -4,12 +4,16 @@ use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::FromRow;
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
-use crate::common::{display_option, is_false};
+#[cfg(feature = "tabled")]
+use crate::common::display_option;
+use crate::common::is_false;
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudget {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -84,7 +88,8 @@ impl UserBudgetModifyData {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudgetOverSimple {
     pub budget_id: u32,
     pub user_id: u32,
@@ -92,19 +97,21 @@ pub struct UserBudgetOverSimple {
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudgetOverCombined {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudgetOverDetail {
     pub budget_id: u32,
     pub user_id: u32,
@@ -114,24 +121,26 @@ pub struct UserBudgetOverDetail {
     pub budget: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudgetOverCombinedDetail {
     pub budget_id: u32,
     pub user_id: u32,
     pub user_name: String,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub project_budget_id: Option<u32>,
     pub project_id: u32,
     pub project_name: String,
     pub over: bool,
     pub project_cost: f64,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub project_budget: Option<u32>,
     pub user_cost: f64,
     pub user_budget: u32,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct UserBudgetSync {
     pub updated_budget_count: u32,
 }

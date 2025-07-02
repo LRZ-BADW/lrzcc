@@ -2,9 +2,11 @@ use std::{collections::HashMap, fmt::Debug};
 
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerCostSimple {
     pub total: f64,
 }
