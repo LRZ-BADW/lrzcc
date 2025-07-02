@@ -2,15 +2,18 @@ use std::fmt::Display;
 
 use chrono::{DateTime, FixedOffset};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
+#[cfg(feature = "tabled")]
 use crate::common::display_option;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerState {
     pub id: u32,
     pub begin: DateTime<FixedOffset>,
-    #[tabled(display = "display_option")]
+    #[cfg_attr(feature = "tabled", tabled(display = "display_option"))]
     pub end: Option<DateTime<FixedOffset>>,
     pub instance_id: String, // UUIDv4
     pub instance_name: String,
@@ -27,7 +30,8 @@ impl Display for ServerState {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ServerStateImport {
     pub new_state_count: u32,
     pub end_state_count: u32,

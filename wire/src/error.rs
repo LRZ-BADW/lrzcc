@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
-#[derive(Clone, Debug, Serialize, Deserialize, Tabled)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorResponse {
     pub detail: String,
 }

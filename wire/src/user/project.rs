@@ -3,12 +3,14 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "sqlx")]
 use sqlx::FromRow;
+#[cfg(feature = "tabled")]
 use tabled::Tabled;
 
 use crate::{resources::FlavorGroupMinimal, user::UserMinimal};
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Project {
     #[cfg_attr(feature = "sqlx", sqlx(try_from = "i32"))]
     pub id: u32,
@@ -41,7 +43,8 @@ impl PartialEq<ProjectDetailed> for Project {
 }
 
 #[cfg_attr(feature = "sqlx", derive(FromRow))]
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProjectMinimal {
     #[cfg_attr(
         feature = "sqlx",
@@ -76,7 +79,8 @@ impl Display for ProjectMinimal {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ProjectDetailed {
     pub id: u32,
     pub name: String,
@@ -85,9 +89,9 @@ pub struct ProjectDetailed {
     // TODO rethink list output in detailed structs:
     // maybe we could have only the first few entries followed by ...
     // in the output
-    #[tabled(skip)]
+    #[cfg_attr(feature = "tabled", tabled(skip))]
     pub users: Vec<UserMinimal>,
-    #[tabled(skip)]
+    #[cfg_attr(feature = "tabled", tabled(skip))]
     pub flavor_groups: Vec<FlavorGroupMinimal>,
 }
 
@@ -114,7 +118,8 @@ impl Display for ProjectDetailed {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Tabled, PartialEq)]
+#[cfg_attr(feature = "tabled", derive(Tabled))]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
 pub enum ProjectRetrieved {
     Detailed(ProjectDetailed),
