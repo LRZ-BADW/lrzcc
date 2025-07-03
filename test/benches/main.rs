@@ -5,6 +5,7 @@ use std::{env, str::FromStr};
 
 use avina::{Api, Token};
 use bencher::Bencher;
+use futures::executor::block_on;
 
 fn bench_hello_user(b: &mut Bencher) {
     let token =
@@ -14,7 +15,7 @@ fn bench_hello_user(b: &mut Bencher) {
             .unwrap();
 
     b.iter(|| {
-        api.hello.user().unwrap();
+        block_on(api.hello.user()).unwrap();
     });
 }
 

@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_admin_can_get_project_budget_over_for_all() {
@@ -21,22 +20,18 @@ async fn e2e_lib_admin_can_get_project_budget_over_for_all() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client.project_budget.over().all().send();
-
-        assert!(request.is_ok());
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client.project_budget.over().all().send().await;
+
+    assert!(request.is_ok());
 }
 
 #[tokio::test]
@@ -56,26 +51,22 @@ async fn e2e_lib_master_user_cannot_get_project_budget_over_for_all() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client.project_budget.over().all().send();
-
-        assert!(request.is_err());
-        assert_eq!(
-            request.unwrap_err().to_string(),
-            "Admin privileges required".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client.project_budget.over().all().send().await;
+
+    assert!(request.is_err());
+    assert_eq!(
+        request.unwrap_err().to_string(),
+        "Admin privileges required".to_string()
+    );
 }
 
 #[tokio::test]
@@ -96,22 +87,23 @@ async fn e2e_lib_user_can_get_own_project_budget_over_by_project() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client.project_budget.over().project(project.id).send();
-
-        assert!(request.is_ok());
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client
+        .project_budget
+        .over()
+        .project(project.id)
+        .send()
+        .await;
+
+    assert!(request.is_ok());
 }
 
 #[tokio::test]
@@ -136,26 +128,23 @@ async fn e2e_lib_user_can_get_own_project_budget_over_by_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client
-            .project_budget
-            .over()
-            .budget(project_budget.id)
-            .send();
-
-        assert!(request.is_ok());
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client
+        .project_budget
+        .over()
+        .budget(project_budget.id)
+        .send()
+        .await;
+
+    assert!(request.is_ok());
 }
 
 #[tokio::test]
@@ -184,26 +173,27 @@ async fn e2e_lib_master_user_cannot_get_other_project_budget_over_by_project() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client.project_budget.over().project(project_2.id).send();
-
-        assert!(request.is_err());
-        assert_eq!(
-            request.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client
+        .project_budget
+        .over()
+        .project(project_2.id)
+        .send()
+        .await;
+
+    assert!(request.is_err());
+    assert_eq!(
+        request.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }
 
 #[tokio::test]
@@ -237,28 +227,25 @@ async fn e2e_lib_master_user_cannot_get_other_project_budget_over_by_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let request = client
-            .project_budget
-            .over()
-            .budget(project_budget_2.id)
-            .send();
-
-        assert!(request.is_err());
-        assert_eq!(
-            request.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let request = client
+        .project_budget
+        .over()
+        .budget(project_budget_2.id)
+        .send()
+        .await;
+
+    assert!(request.is_err());
+    assert_eq!(
+        request.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }

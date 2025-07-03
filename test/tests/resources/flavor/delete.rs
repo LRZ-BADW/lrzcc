@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_flavor_delete_denies_access_to_normal_user() {
@@ -23,28 +22,24 @@ async fn e2e_lib_flavor_delete_denies_access_to_normal_user() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let delete = client.flavor.delete(flavor.id);
-
-        // assert
-        assert!(delete.is_err());
-        assert_eq!(
-            delete.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let delete = client.flavor.delete(flavor.id).await;
+
+    // assert
+    assert!(delete.is_err());
+    assert_eq!(
+        delete.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -66,28 +61,24 @@ async fn e2e_lib_flavor_delete_denies_access_to_master_user() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let delete = client.flavor.delete(flavor.id);
-
-        // assert
-        assert!(delete.is_err());
-        assert_eq!(
-            delete.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let delete = client.flavor.delete(flavor.id).await;
+
+    // assert
+    assert!(delete.is_err());
+    assert_eq!(
+        delete.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -109,27 +100,23 @@ async fn e2e_lib_flavor_delete_works() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - delete
-        client.flavor.delete(flavor.id).unwrap();
-
-        // act and assert 2 - get
-        let get = client.flavor.get(flavor.id);
-        assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - delete
+    client.flavor.delete(flavor.id).await.unwrap();
+
+    // act and assert 2 - get
+    let get = client.flavor.get(flavor.id).await;
+    assert!(get.is_err());
+    assert_eq!(
+        get.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }

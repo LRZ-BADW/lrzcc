@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_hello_user_works() {
@@ -17,30 +16,26 @@ async fn e2e_lib_hello_user_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let hello = client.hello.user().unwrap();
-
-        // assert
-        assert_eq!(
-            hello.message,
-            format!(
-                "Hello, {} from project {} with user class {}",
-                user.name, project.name, project.user_class
-            )
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let hello = client.hello.user().await.unwrap();
+
+    // assert
+    assert_eq!(
+        hello.message,
+        format!(
+            "Hello, {} from project {} with user class {}",
+            user.name, project.name, project.user_class
+        )
+    );
 }
 
 #[tokio::test]
@@ -56,28 +51,24 @@ async fn e2e_lib_hello_admin_denies_access_to_normal_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let hello = client.hello.admin();
-
-        // assert
-        assert!(hello.is_err());
-        assert_eq!(
-            hello.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let hello = client.hello.admin().await;
+
+    // assert
+    assert!(hello.is_err());
+    assert_eq!(
+        hello.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -93,28 +84,24 @@ async fn e2e_lib_hello_admin_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let hello = client.hello.admin().unwrap();
-
-        // assert
-        assert_eq!(
-            hello.message,
-            format!(
-                "Hello, admin {} from project {} with user class {}",
-                user.name, project.name, project.user_class
-            )
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let hello = client.hello.admin().await.unwrap();
+
+    // assert
+    assert_eq!(
+        hello.message,
+        format!(
+            "Hello, admin {} from project {} with user class {}",
+            user.name, project.name, project.user_class
+        )
+    );
 }

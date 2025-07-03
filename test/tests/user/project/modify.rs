@@ -5,7 +5,6 @@ use avina_test::{
     random_alphanumeric_string, random_number, random_uuid, spawn_app,
 };
 use avina_wire::user::ProjectRetrieved;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_project_modify_denies_access_to_normal_user() {
@@ -23,28 +22,24 @@ async fn e2e_lib_project_modify_denies_access_to_normal_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let modify = client.project.modify(project.id).send();
-
-        // assert
-        assert!(modify.is_err());
-        assert_eq!(
-            modify.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let modify = client.project.modify(project.id).send().await;
+
+    // assert
+    assert!(modify.is_err());
+    assert_eq!(
+        modify.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -63,28 +58,24 @@ async fn e2e_lib_project_modify_denies_access_to_master_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let modify = client.project.modify(project.id).send();
-
-        // assert
-        assert!(modify.is_err());
-        assert_eq!(
-            modify.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let modify = client.project.modify(project.id).send().await;
+
+    // assert
+    assert!(modify.is_err());
+    assert_eq!(
+        modify.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -100,40 +91,37 @@ async fn e2e_lib_project_modify_and_get_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - modify
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let modified = client
-            .project
-            .modify(project.id)
-            .name(name.clone())
-            .openstack_id(openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-        assert_eq!(name, modified.name);
-        assert_eq!(openstack_id, modified.openstack_id);
-        assert_eq!(user_class, modified.user_class);
-
-        // act and assert 2 - get
-        let ProjectRetrieved::Detailed(detailed) =
-            client.project.get(modified.id).unwrap()
-        else {
-            panic!("Expected ProjectDetailed")
-        };
-        assert_eq!(detailed, modified);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - modify
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let user_class = random_number(1..6);
+    let modified = client
+        .project
+        .modify(project.id)
+        .name(name.clone())
+        .openstack_id(openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(name, modified.name);
+    assert_eq!(openstack_id, modified.openstack_id);
+    assert_eq!(user_class, modified.user_class);
+
+    // act and assert 2 - get
+    let ProjectRetrieved::Detailed(detailed) =
+        client.project.get(modified.id).await.unwrap()
+    else {
+        panic!("Expected ProjectDetailed")
+    };
+    assert_eq!(detailed, modified);
 }
