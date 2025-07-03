@@ -2,10 +2,7 @@ use std::fmt::Debug;
 
 use anyhow::Context;
 use avina_wire::error::ErrorResponse;
-use reqwest::{
-    Method, StatusCode,
-    blocking::{Client, Response},
-};
+use reqwest::{Client, Method, Response, StatusCode};
 use serde::{de::DeserializeOwned, ser::Serialize};
 
 use crate::error::ApiError;
@@ -19,7 +16,7 @@ macro_rules! SerializableNone {
 }
 pub(crate) use SerializableNone;
 
-pub(crate) fn request_bare<T>(
+pub(crate) async fn request_bare<T>(
     client: &Client,
     method: Method,
     url: &str,
@@ -35,7 +32,7 @@ where
             format!("Could not serialize json request body from {data:?}"),
         )?);
     }
-    let response = match request.send().context("") {
+    let response = match request.send().await.context("") {
         Ok(response) => response,
         Err(err) => {
             let detail =
@@ -45,7 +42,7 @@ where
     };
     let status = response.status();
     if status != expected_status {
-        let text = response.text().context(format!(
+        let text = response.text().await.context(format!(
             "Could not retrieve response text on unexpected status code {status}.",
         ))?;
         let err_resp: ErrorResponse = serde_json::from_str(text.as_str())
@@ -57,7 +54,7 @@ where
     Ok(response)
 }
 
-pub(crate) fn request<T, U>(
+pub(crate) async fn request<T, U>(
     client: &Client,
     method: Method,
     url: &str,
@@ -68,9 +65,11 @@ where
     T: Serialize + Debug,
     U: DeserializeOwned,
 {
-    let response = request_bare(client, method, url, data, expected_status)?;
+    let response =
+        request_bare(client, method, url, data, expected_status).await?;
     let text = response
         .text()
+        .await
         .context("Could not retrieve response text.")?;
     let u: U = serde_json::from_str(text.as_str())
         .context(format!("Could not parse response text: {text}"))?;

@@ -5,7 +5,7 @@ use avina_wire::user::{
     User, UserCreateData, UserDetailed, UserImport, UserListParams,
     UserModifyData,
 };
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -38,7 +38,7 @@ impl UserListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<User>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<User>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters.")?;
         // TODO: maybe use url join
@@ -54,6 +54,7 @@ impl UserListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -104,7 +105,7 @@ impl UserCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<User, ApiError> {
+    pub async fn send(&self) -> Result<User, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -112,6 +113,7 @@ impl UserCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -161,7 +163,7 @@ impl UserModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<User, ApiError> {
+    pub async fn send(&self) -> Result<User, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -169,6 +171,7 @@ impl UserModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -184,7 +187,7 @@ impl UserApi {
         UserListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<UserDetailed, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<UserDetailed, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -194,6 +197,7 @@ impl UserApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -219,7 +223,7 @@ impl UserApi {
         UserModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -228,11 +232,12 @@ impl UserApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 
-    pub fn me(&self) -> Result<UserDetailed, ApiError> {
+    pub async fn me(&self) -> Result<UserDetailed, ApiError> {
         // TODO use Url.join
         let url = format!(
             "{}/me",
@@ -248,9 +253,10 @@ impl UserApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn import(&self) -> Result<UserImport, ApiError> {
+    pub async fn import(&self) -> Result<UserImport, ApiError> {
         // TODO use Url.join
         let url = format!(
             "{}/import/",
@@ -266,5 +272,6 @@ impl UserApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }

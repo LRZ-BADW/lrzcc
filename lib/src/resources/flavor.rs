@@ -5,7 +5,7 @@ use avina_wire::resources::{
     Flavor, FlavorCreateData, FlavorDetailed, FlavorImport, FlavorListParams,
     FlavorModifyData, FlavorUsage, FlavorUsageAggregate,
 };
-use reqwest::{Method, StatusCode, Url, blocking::Client};
+use reqwest::{Client, Method, StatusCode, Url};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -48,7 +48,7 @@ impl FlavorListRequest {
         self
     }
 
-    pub fn send(&self) -> Result<Vec<Flavor>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<Flavor>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -63,6 +63,7 @@ impl FlavorListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -97,7 +98,7 @@ impl FlavorCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorDetailed, ApiError> {
+    pub async fn send(&self) -> Result<FlavorDetailed, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -105,6 +106,7 @@ impl FlavorCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -149,7 +151,7 @@ impl FlavorModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<Flavor, ApiError> {
+    pub async fn send(&self) -> Result<Flavor, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -157,6 +159,7 @@ impl FlavorModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -198,7 +201,10 @@ impl FlavorUsageRequest {
         params
     }
 
-    pub fn user(&mut self, user: u32) -> Result<Vec<FlavorUsage>, ApiError> {
+    pub async fn user(
+        &mut self,
+        user: u32,
+    ) -> Result<Vec<FlavorUsage>, ApiError> {
         self.user = Some(user);
         self.aggregate = false;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
@@ -210,9 +216,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user_aggregate(
+    pub async fn user_aggregate(
         &mut self,
         user: u32,
     ) -> Result<Vec<FlavorUsageAggregate>, ApiError> {
@@ -227,9 +234,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project(
+    pub async fn project(
         &mut self,
         project: u32,
     ) -> Result<Vec<FlavorUsage>, ApiError> {
@@ -244,9 +252,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project_aggregate(
+    pub async fn project_aggregate(
         &mut self,
         project: u32,
     ) -> Result<Vec<FlavorUsageAggregate>, ApiError> {
@@ -261,9 +270,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all(&mut self) -> Result<Vec<FlavorUsage>, ApiError> {
+    pub async fn all(&mut self) -> Result<Vec<FlavorUsage>, ApiError> {
         self.all = true;
         self.aggregate = false;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
@@ -275,9 +285,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all_aggregate(
+    pub async fn all_aggregate(
         &mut self,
     ) -> Result<Vec<FlavorUsageAggregate>, ApiError> {
         self.all = true;
@@ -291,9 +302,10 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine(&mut self) -> Result<Vec<FlavorUsage>, ApiError> {
+    pub async fn mine(&mut self) -> Result<Vec<FlavorUsage>, ApiError> {
         self.aggregate = false;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
@@ -304,10 +316,11 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     // TODO this causes a http 500 error
-    pub fn mine_aggregate(
+    pub async fn mine_aggregate(
         &mut self,
     ) -> Result<Vec<FlavorUsageAggregate>, ApiError> {
         // TODO use Url.join
@@ -321,6 +334,7 @@ impl FlavorUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -336,7 +350,7 @@ impl FlavorApi {
         FlavorListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<FlavorDetailed, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<FlavorDetailed, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -346,6 +360,7 @@ impl FlavorApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -364,7 +379,7 @@ impl FlavorApi {
         FlavorModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -373,11 +388,12 @@ impl FlavorApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 
-    pub fn import(&self) -> Result<FlavorImport, ApiError> {
+    pub async fn import(&self) -> Result<FlavorImport, ApiError> {
         // TODO use Url.join
         let url = format!("{}/import/", self.url);
         request(
@@ -387,6 +403,7 @@ impl FlavorApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn usage(&self) -> FlavorUsageRequest {

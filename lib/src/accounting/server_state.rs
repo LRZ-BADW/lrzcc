@@ -6,7 +6,7 @@ use avina_wire::accounting::{
     ServerStateListParams, ServerStateModifyData,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -41,7 +41,7 @@ impl ServerStateListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<ServerState>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<ServerState>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -56,6 +56,7 @@ impl ServerStateListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn server(&mut self, server: &str) -> &mut Self {
@@ -117,7 +118,7 @@ impl ServerStateCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<ServerState, ApiError> {
+    pub async fn send(&self) -> Result<ServerState, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -125,6 +126,7 @@ impl ServerStateCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -179,7 +181,7 @@ impl ServerStateModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<ServerState, ApiError> {
+    pub async fn send(&self) -> Result<ServerState, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -187,6 +189,7 @@ impl ServerStateModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -202,7 +205,7 @@ impl ServerStateApi {
         ServerStateListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<ServerState, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<ServerState, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -212,6 +215,7 @@ impl ServerStateApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -243,7 +247,7 @@ impl ServerStateApi {
         ServerStateModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -252,11 +256,12 @@ impl ServerStateApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 
-    pub fn import(&self) -> Result<ServerStateImport, ApiError> {
+    pub async fn import(&self) -> Result<ServerStateImport, ApiError> {
         // TODO use Url.join
         let url = format!("{}/import/", self.url);
         request(
@@ -266,5 +271,6 @@ impl ServerStateApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }

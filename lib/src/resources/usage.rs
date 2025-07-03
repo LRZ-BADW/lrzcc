@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use avina_wire::resources::CloudUsage;
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request},
@@ -22,7 +22,7 @@ impl UsageApi {
         }
     }
 
-    pub fn get(&self) -> Result<CloudUsage, ApiError> {
+    pub async fn get(&self) -> Result<CloudUsage, ApiError> {
         request(
             &self.client,
             Method::GET,
@@ -30,5 +30,6 @@ impl UsageApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }

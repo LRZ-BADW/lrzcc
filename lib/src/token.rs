@@ -3,7 +3,7 @@ use std::{convert::AsRef, str::FromStr};
 use anyhow::Context;
 use jzon::object;
 use reqwest::{
-    blocking::{Client, ClientBuilder},
+    Client, ClientBuilder,
     header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 
@@ -20,7 +20,7 @@ pub struct Token {
 
 impl Token {
     // TODO maybe use generic request method in here
-    pub fn new(
+    pub async fn new(
         auth_url: &str,
         username: &str,
         password: &str,
@@ -60,6 +60,7 @@ impl Token {
             .post(url.as_str())
             .body(data.to_string())
             .send()
+            .await
             .context("")
         {
             Ok(response) => response,
@@ -91,6 +92,20 @@ impl Token {
             inner: Some(TokenInner { client, url }),
         })
     }
+
+    pub async fn delete(self) {
+        if let Some(inner) = self.inner.clone() {
+            let value = HeaderValue::from_str(self.token.as_str()).unwrap();
+            inner
+                .client
+                .delete(inner.url)
+                .header("X-Auth-Token", value.clone())
+                .header("X-Subject-Token", value)
+                .send()
+                .await
+                .unwrap();
+        }
+    }
 }
 
 impl FromStr for Token {
@@ -108,20 +123,5 @@ impl FromStr for Token {
 impl AsRef<str> for Token {
     fn as_ref(&self) -> &str {
         self.token.as_str()
-    }
-}
-
-impl Drop for Token {
-    fn drop(&mut self) {
-        if let Some(inner) = self.inner.clone() {
-            let value = HeaderValue::from_str(self.token.as_str()).unwrap();
-            inner
-                .client
-                .delete(inner.url)
-                .header("X-Auth-Token", value.clone())
-                .header("X-Subject-Token", value)
-                .send()
-                .unwrap();
-        }
     }
 }

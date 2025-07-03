@@ -5,7 +5,7 @@ use avina_wire::quota::{
     FlavorQuota, FlavorQuotaCheck, FlavorQuotaCreateData,
     FlavorQuotaListParams, FlavorQuotaModifyData,
 };
-use reqwest::{Method, StatusCode, Url, blocking::Client};
+use reqwest::{Client, Method, StatusCode, Url};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -39,7 +39,7 @@ impl FlavorQuotaListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<FlavorQuota>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<FlavorQuota>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -54,6 +54,7 @@ impl FlavorQuotaListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -98,7 +99,7 @@ impl FlavorQuotaCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorQuota, ApiError> {
+    pub async fn send(&self) -> Result<FlavorQuota, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -106,6 +107,7 @@ impl FlavorQuotaCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -140,7 +142,7 @@ impl FlavorQuotaModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorQuota, ApiError> {
+    pub async fn send(&self) -> Result<FlavorQuota, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -148,6 +150,7 @@ impl FlavorQuotaModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -187,7 +190,7 @@ impl FlavorQuotaCheckRequest {
         params
     }
 
-    pub fn send(&self) -> Result<FlavorQuotaCheck, ApiError> {
+    pub async fn send(&self) -> Result<FlavorQuotaCheck, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
         request(
@@ -197,6 +200,7 @@ impl FlavorQuotaCheckRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -212,7 +216,7 @@ impl FlavorQuotaApi {
         FlavorQuotaListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<FlavorQuota, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<FlavorQuota, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -222,6 +226,7 @@ impl FlavorQuotaApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -245,7 +250,7 @@ impl FlavorQuotaApi {
         FlavorQuotaModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -254,7 +259,8 @@ impl FlavorQuotaApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 

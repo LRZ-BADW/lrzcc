@@ -2,7 +2,7 @@ use std::{rc::Rc, time::Duration};
 
 use anyhow::Context;
 use reqwest::{
-    blocking::ClientBuilder,
+    ClientBuilder,
     header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use avina_wire::hello::Hello;
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request},
@@ -21,7 +21,7 @@ impl HelloApi {
         }
     }
 
-    pub fn admin(&self) -> Result<Hello, ApiError> {
+    pub async fn admin(&self) -> Result<Hello, ApiError> {
         request(
             &self.client,
             Method::GET,
@@ -29,9 +29,10 @@ impl HelloApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user(&self) -> Result<Hello, ApiError> {
+    pub async fn user(&self) -> Result<Hello, ApiError> {
         request(
             &self.client,
             Method::GET,
@@ -39,5 +40,6 @@ impl HelloApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }

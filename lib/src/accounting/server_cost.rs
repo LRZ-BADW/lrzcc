@@ -6,7 +6,7 @@ use avina_wire::accounting::{
     ServerCostSimple, ServerCostUser,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request},
@@ -50,7 +50,7 @@ impl ServerCostRequest {
         self
     }
 
-    pub fn server(
+    pub async fn server(
         &mut self,
         server: &str,
     ) -> Result<ServerCostSimple, ApiError> {
@@ -69,9 +69,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn server_detail(
+    pub async fn server_detail(
         &mut self,
         server: &str,
     ) -> Result<ServerCostServer, ApiError> {
@@ -91,9 +92,13 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user(&mut self, user: u32) -> Result<ServerCostSimple, ApiError> {
+    pub async fn user(
+        &mut self,
+        user: u32,
+    ) -> Result<ServerCostSimple, ApiError> {
         self.params.user = Some(user);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -109,9 +114,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user_detail(
+    pub async fn user_detail(
         &mut self,
         user: u32,
     ) -> Result<ServerCostUser, ApiError> {
@@ -131,9 +137,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project(
+    pub async fn project(
         &mut self,
         project: u32,
     ) -> Result<ServerCostSimple, ApiError> {
@@ -152,9 +159,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project_detail(
+    pub async fn project_detail(
         &mut self,
         project: u32,
     ) -> Result<ServerCostProject, ApiError> {
@@ -174,9 +182,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all(&mut self) -> Result<ServerCostSimple, ApiError> {
+    pub async fn all(&mut self) -> Result<ServerCostSimple, ApiError> {
         self.params.all = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -192,9 +201,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all_detail(&mut self) -> Result<ServerCostAll, ApiError> {
+    pub async fn all_detail(&mut self) -> Result<ServerCostAll, ApiError> {
         self.params.all = Some(true);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
@@ -211,9 +221,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine(&mut self) -> Result<ServerCostSimple, ApiError> {
+    pub async fn mine(&mut self) -> Result<ServerCostSimple, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -228,9 +239,10 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine_detail(&mut self) -> Result<ServerCostUser, ApiError> {
+    pub async fn mine_detail(&mut self) -> Result<ServerCostUser, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -246,6 +258,7 @@ impl ServerCostRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
