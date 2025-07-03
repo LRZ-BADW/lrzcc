@@ -1,4 +1,6 @@
+use avina::{Api, Token};
 use dioxus::prelude::*;
+use std::str::FromStr;
 
 fn main() {
     launch(app);
@@ -15,11 +17,21 @@ fn app() -> Element {
             window.parent.postMessage("request-token", "*");
             "#,
         );
-        let token: String = eval.recv().await.unwrap();
-        token
+        let token_str: String = eval.recv().await.unwrap();
+        let token = Token::from_str(&token_str).unwrap();
+        let api = Api::new(
+            "http://localhost:8000/api".to_string(),
+            token,
+            None,
+            None,
+        )
+        .unwrap();
+        api.user.me().await.unwrap()
     });
     match future.read_unchecked().as_ref() {
-        Some(v) => rsx! { p { "Hello from Dioxus! Token: {v}" } },
+        Some(user) => {
+            rsx! { p { "Hello {user.name} from Dioxus!" } }
+        }
         _ => rsx! { p { "No token provided!" } },
     }
 }
