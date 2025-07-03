@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 // Permission matrix:
 //                     own user     user from own project      other user
@@ -25,24 +24,20 @@ async fn e2e_lib_normal_user_can_get_own_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let detailed = client.user.get(user.id).unwrap();
-
-        // assert
-        assert_eq!(&detailed, &user);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let detailed = client.user.get(user.id).await.unwrap();
+
+    // assert
+    assert_eq!(&detailed, &user);
 }
 
 #[tokio::test]
@@ -66,30 +61,26 @@ async fn e2e_lib_normal_user_cannot_get_other_users() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        for user in [&user2, &user3] {
-            // act
-            let get = client.user.get(user.id);
-
-            // assert
-            assert!(get.is_err());
-            assert_eq!(
-                get.unwrap_err().to_string(),
-                "Resource not found".to_string()
-            );
-        }
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    for user in [&user2, &user3] {
+        // act
+        let get = client.user.get(user.id).await;
+
+        // assert
+        assert!(get.is_err());
+        assert_eq!(
+            get.unwrap_err().to_string(),
+            "Resource not found".to_string()
+        );
+    }
 }
 
 #[tokio::test]
@@ -108,26 +99,22 @@ async fn e2e_lib_master_user_can_get_own_projects_users() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let detailed = client.user.get(user.id).unwrap();
-        let detailed2 = client.user.get(user2.id).unwrap();
-
-        // assert
-        assert_eq!(&detailed, &user);
-        assert_eq!(&detailed2, &user2);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let detailed = client.user.get(user.id).await.unwrap();
+    let detailed2 = client.user.get(user2.id).await.unwrap();
+
+    // assert
+    assert_eq!(&detailed, &user);
+    assert_eq!(&detailed2, &user2);
 }
 
 #[tokio::test]
@@ -150,28 +137,24 @@ async fn e2e_lib_master_user_cannot_get_other_projects_users() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let get = client.user.get(user2.id);
-
-        // assert
-        assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let get = client.user.get(user2.id).await;
+
+    // assert
+    assert!(get.is_err());
+    assert_eq!(
+        get.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }
 
 #[tokio::test]
@@ -195,26 +178,22 @@ async fn e2e_lib_admin_can_get_all_kinds_of_users() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let detailed = client.user.get(user.id).unwrap();
-        let detailed2 = client.user.get(user2.id).unwrap();
-        let detailed3 = client.user.get(user3.id).unwrap();
-
-        // assert
-        assert_eq!(detailed, user);
-        assert_eq!(detailed2, user2);
-        assert_eq!(detailed3, user3);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let detailed = client.user.get(user.id).await.unwrap();
+    let detailed2 = client.user.get(user2.id).await.unwrap();
+    let detailed3 = client.user.get(user3.id).await.unwrap();
+
+    // assert
+    assert_eq!(detailed, user);
+    assert_eq!(detailed2, user2);
+    assert_eq!(detailed3, user3);
 }

@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 // Permission matrix:
 //                     no filter    project filter     all filter
@@ -25,25 +24,21 @@ async fn e2e_lib_normal_user_can_list_own_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let users = client.user.list().send().unwrap();
-
-        // assert
-        assert_eq!(users.len(), 1);
-        assert!(users.contains(&user));
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let users = client.user.list().send().await.unwrap();
+
+    // assert
+    assert_eq!(users.len(), 1);
+    assert!(users.contains(&user));
 }
 
 #[tokio::test]
@@ -62,34 +57,32 @@ async fn e2e_lib_normal_user_cannot_use_user_list_filters() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let list1 = client.user.list().all().send();
-        let list2 = client.user.list().project(project.id).send();
-
-        // assert
-        assert!(list1.is_err());
-        assert!(list2.is_err());
-        assert_eq!(
-            list1.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-        assert_eq!(
-            list2.unwrap_err().to_string(),
-            format!("Admin or master user privileges for respective project required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let list1 = client.user.list().all().send().await;
+    let list2 = client.user.list().project(project.id).send().await;
+
+    // assert
+    assert!(list1.is_err());
+    assert!(list2.is_err());
+    assert_eq!(
+        list1.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
+    assert_eq!(
+        list2.unwrap_err().to_string(),
+        format!(
+            "Admin or master user privileges for respective project required"
+        )
+    );
 }
 
 #[tokio::test]
@@ -113,29 +106,25 @@ async fn e2e_lib_master_user_can_list_own_projects_users() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let users1 = client.user.list().send().unwrap();
-        let users2 = client.user.list().project(project.id).send().unwrap();
-
-        // assert
-        assert_eq!(users1.len(), 1);
-        assert!(users1.contains(&user));
-        assert_eq!(users2.len(), 2);
-        assert!(users2.contains(&user));
-        assert!(users2.contains(&user2));
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let users1 = client.user.list().send().await.unwrap();
+    let users2 = client.user.list().project(project.id).send().await.unwrap();
+
+    // assert
+    assert_eq!(users1.len(), 1);
+    assert!(users1.contains(&user));
+    assert_eq!(users2.len(), 2);
+    assert!(users2.contains(&user));
+    assert!(users2.contains(&user2));
 }
 
 #[tokio::test]
@@ -161,33 +150,29 @@ async fn e2e_lib_admin_user_can_use_any_user_list_filters() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let users1 = client.user.list().send().unwrap();
-        let users2 = client.user.list().project(project.id).send().unwrap();
-        let users3 = client.user.list().all().send().unwrap();
-
-        // assert
-        assert_eq!(users1.len(), 1);
-        assert!(users1.contains(&user));
-        assert_eq!(users2.len(), 2);
-        assert!(users2.contains(&user));
-        assert!(users2.contains(&user2));
-        assert_eq!(users3.len(), 4);
-        assert!(users3.contains(&user));
-        assert!(users3.contains(&user2));
-        assert!(users3.contains(&user3));
-        assert!(users3.contains(&user4));
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let users1 = client.user.list().send().await.unwrap();
+    let users2 = client.user.list().project(project.id).send().await.unwrap();
+    let users3 = client.user.list().all().send().await.unwrap();
+
+    // assert
+    assert_eq!(users1.len(), 1);
+    assert!(users1.contains(&user));
+    assert_eq!(users2.len(), 2);
+    assert!(users2.contains(&user));
+    assert!(users2.contains(&user2));
+    assert_eq!(users3.len(), 4);
+    assert!(users3.contains(&user));
+    assert!(users3.contains(&user2));
+    assert!(users3.contains(&user3));
+    assert!(users3.contains(&user4));
 }

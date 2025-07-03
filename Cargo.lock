@@ -444,6 +444,7 @@ dependencies = [
  "bencher",
  "cargo-husky",
  "chrono",
+ "futures",
  "once_cell",
  "rand 0.9.1",
  "reqwest",

@@ -3,7 +3,6 @@ use std::str::FromStr;
 use avina::{Api, Token};
 use avina_test::{random_alphanumeric_string, random_uuid, spawn_app};
 use chrono::{DateTime, FixedOffset, Utc};
-use tokio::task::spawn_blocking;
 
 use super::assert_equal_server_states;
 
@@ -26,42 +25,39 @@ async fn e2e_lib_server_state_create_denies_access_to_normal_user() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let begin = DateTime::<FixedOffset>::from(Utc::now());
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let status = "ACTIVE".to_string();
-        let create = client
-            .server_state
-            .create(
-                begin,
-                instance_id,
-                instance_name,
-                flavor.id,
-                status,
-                user.id,
-            )
-            .send();
-
-        // assert
-        assert!(create.is_err());
-        assert_eq!(
-            create.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let begin = DateTime::<FixedOffset>::from(Utc::now());
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let status = "ACTIVE".to_string();
+    let create = client
+        .server_state
+        .create(
+            begin,
+            instance_id,
+            instance_name,
+            flavor.id,
+            status,
+            user.id,
+        )
+        .send()
+        .await;
+
+    // assert
+    assert!(create.is_err());
+    assert_eq!(
+        create.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -83,42 +79,39 @@ async fn e2e_lib_server_state_create_denies_access_to_master_user() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let begin = DateTime::<FixedOffset>::from(Utc::now());
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let status = "ACTIVE".to_string();
-        let create = client
-            .server_state
-            .create(
-                begin,
-                instance_id,
-                instance_name,
-                flavor.id,
-                status,
-                user.id,
-            )
-            .send();
-
-        // assert
-        assert!(create.is_err());
-        assert_eq!(
-            create.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let begin = DateTime::<FixedOffset>::from(Utc::now());
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let status = "ACTIVE".to_string();
+    let create = client
+        .server_state
+        .create(
+            begin,
+            instance_id,
+            instance_name,
+            flavor.id,
+            status,
+            user.id,
+        )
+        .send()
+        .await;
+
+    // assert
+    assert!(create.is_err());
+    assert_eq!(
+        create.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -140,46 +133,43 @@ async fn e2e_lib_server_state_create_works() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
+    .unwrap();
+
+    // act
+    let begin = DateTime::<FixedOffset>::from(Utc::now());
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let status = "ACTIVE".to_string();
+    let created = client
+        .server_state
+        .create(
+            begin,
+            instance_id.clone(),
+            instance_name.clone(),
+            flavor.id,
+            status.clone(),
+            user.id,
         )
+        .send()
+        .await
         .unwrap();
 
-        // act
-        let begin = DateTime::<FixedOffset>::from(Utc::now());
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let status = "ACTIVE".to_string();
-        let created = client
-            .server_state
-            .create(
-                begin,
-                instance_id.clone(),
-                instance_name.clone(),
-                flavor.id,
-                status.clone(),
-                user.id,
-            )
-            .send()
-            .unwrap();
-
-        // assert
-        assert_eq!(begin, created.begin);
-        assert_eq!(instance_id, created.instance_id);
-        assert_eq!(instance_name, created.instance_name);
-        assert_eq!(flavor.id, created.flavor);
-        assert_eq!(flavor.name, created.flavor_name);
-        assert_eq!(status, created.status);
-        assert_eq!(user.id, created.user);
-        assert_eq!(user.name, created.username);
-    })
-    .await
-    .unwrap();
+    // assert
+    assert_eq!(begin, created.begin);
+    assert_eq!(instance_id, created.instance_id);
+    assert_eq!(instance_name, created.instance_name);
+    assert_eq!(flavor.id, created.flavor);
+    assert_eq!(flavor.name, created.flavor_name);
+    assert_eq!(status, created.status);
+    assert_eq!(user.id, created.user);
+    assert_eq!(user.name, created.username);
 }
 
 #[tokio::test]
@@ -201,48 +191,45 @@ async fn e2e_lib_server_state_create_and_get_works() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - create
-        let begin = DateTime::<FixedOffset>::from(Utc::now());
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let status = "ACTIVE".to_string();
-        let created = client
-            .server_state
-            .create(
-                begin,
-                instance_id.clone(),
-                instance_name.clone(),
-                flavor.id,
-                status.clone(),
-                user.id,
-            )
-            .send()
-            .unwrap();
-        assert_eq!(begin, created.begin);
-        assert_eq!(instance_id, created.instance_id);
-        assert_eq!(instance_name, created.instance_name);
-        assert_eq!(flavor.id, created.flavor);
-        assert_eq!(flavor.name, created.flavor_name);
-        assert_eq!(status, created.status);
-        assert_eq!(user.id, created.user);
-        assert_eq!(user.name, created.username);
-
-        // act and assert 2 - get
-        let retrieved = client.server_state.get(created.id).unwrap();
-        assert_equal_server_states(&retrieved, &created);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - create
+    let begin = DateTime::<FixedOffset>::from(Utc::now());
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let status = "ACTIVE".to_string();
+    let created = client
+        .server_state
+        .create(
+            begin,
+            instance_id.clone(),
+            instance_name.clone(),
+            flavor.id,
+            status.clone(),
+            user.id,
+        )
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(begin, created.begin);
+    assert_eq!(instance_id, created.instance_id);
+    assert_eq!(instance_name, created.instance_name);
+    assert_eq!(flavor.id, created.flavor);
+    assert_eq!(flavor.name, created.flavor_name);
+    assert_eq!(status, created.status);
+    assert_eq!(user.id, created.user);
+    assert_eq!(user.name, created.username);
+
+    // act and assert 2 - get
+    let retrieved = client.server_state.get(created.id).await.unwrap();
+    assert_equal_server_states(&retrieved, &created);
 }
 
 #[tokio::test]
@@ -264,47 +251,44 @@ async fn e2e_lib_server_state_create_and_list_works() {
         .await
         .expect("Failed to setup test flavor");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - create
-        let begin = DateTime::<FixedOffset>::from(Utc::now());
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let status = "ACTIVE".to_string();
-        let created = client
-            .server_state
-            .create(
-                begin,
-                instance_id.clone(),
-                instance_name.clone(),
-                flavor.id,
-                status.clone(),
-                user.id,
-            )
-            .send()
-            .unwrap();
-        assert_eq!(begin, created.begin);
-        assert_eq!(instance_id, created.instance_id);
-        assert_eq!(instance_name, created.instance_name);
-        assert_eq!(flavor.id, created.flavor);
-        assert_eq!(flavor.name, created.flavor_name);
-        assert_eq!(status, created.status);
-        assert_eq!(user.id, created.user);
-        assert_eq!(user.name, created.username);
-
-        // act and assert 2 - list
-        let server_states = client.server_state.list().all().send().unwrap();
-        assert_eq!(server_states.len(), 1);
-        assert_equal_server_states(&server_states[0], &created);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - create
+    let begin = DateTime::<FixedOffset>::from(Utc::now());
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let status = "ACTIVE".to_string();
+    let created = client
+        .server_state
+        .create(
+            begin,
+            instance_id.clone(),
+            instance_name.clone(),
+            flavor.id,
+            status.clone(),
+            user.id,
+        )
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(begin, created.begin);
+    assert_eq!(instance_id, created.instance_id);
+    assert_eq!(instance_name, created.instance_name);
+    assert_eq!(flavor.id, created.flavor);
+    assert_eq!(flavor.name, created.flavor_name);
+    assert_eq!(status, created.status);
+    assert_eq!(user.id, created.user);
+    assert_eq!(user.name, created.username);
+
+    // act and assert 2 - list
+    let server_states = client.server_state.list().all().send().await.unwrap();
+    assert_eq!(server_states.len(), 1);
+    assert_equal_server_states(&server_states[0], &created);
 }

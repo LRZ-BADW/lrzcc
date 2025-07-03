@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::{random_alphanumeric_string, random_uuid, spawn_app};
-use tokio::task::spawn_blocking;
 
 use super::assert_equal_server_states;
 
@@ -29,28 +28,24 @@ async fn e2e_lib_server_state_modify_denies_access_to_normal_user() {
         .await
         .expect("Failed to setup test server state");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let modify = client.server_state.modify(server_state.id).send();
-
-        // assert
-        assert!(modify.is_err());
-        assert_eq!(
-            modify.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let modify = client.server_state.modify(server_state.id).send().await;
+
+    // assert
+    assert!(modify.is_err());
+    assert_eq!(
+        modify.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -76,28 +71,24 @@ async fn e2e_lib_server_state_modify_denies_access_to_master_user() {
         .await
         .expect("Failed to setup test server state");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let modify = client.server_state.modify(server_state.id).send();
-
-        // assert
-        assert!(modify.is_err());
-        assert_eq!(
-            modify.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let modify = client.server_state.modify(server_state.id).send().await;
+
+    // assert
+    assert!(modify.is_err());
+    assert_eq!(
+        modify.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -121,33 +112,30 @@ async fn e2e_lib_server_state_modify_and_get_works() {
         .await
         .expect("Failed to setup test server state");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - modify
-        let instance_id = random_uuid();
-        let instance_name = random_alphanumeric_string(10);
-        let modified = client
-            .server_state
-            .modify(server_state.id)
-            .instance_id(instance_id.clone())
-            .instance_name(instance_name.clone())
-            .send()
-            .unwrap();
-        assert_eq!(instance_id, modified.instance_id);
-        assert_eq!(instance_name, modified.instance_name);
-
-        // act and assert 2 - get
-        let retrieved = client.server_state.get(modified.id).unwrap();
-        assert_equal_server_states(&modified, &retrieved);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - modify
+    let instance_id = random_uuid();
+    let instance_name = random_alphanumeric_string(10);
+    let modified = client
+        .server_state
+        .modify(server_state.id)
+        .instance_id(instance_id.clone())
+        .instance_name(instance_name.clone())
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(instance_id, modified.instance_id);
+    assert_eq!(instance_name, modified.instance_name);
+
+    // act and assert 2 - get
+    let retrieved = client.server_state.get(modified.id).await.unwrap();
+    assert_equal_server_states(&modified, &retrieved);
 }

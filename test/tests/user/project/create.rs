@@ -5,7 +5,6 @@ use avina_test::{
     random_alphanumeric_string, random_number, random_uuid, spawn_app,
 };
 use avina_wire::user::ProjectRetrieved;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_project_create_denies_access_to_normal_user() {
@@ -22,30 +21,26 @@ async fn e2e_lib_project_create_denies_access_to_normal_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let create = client.project.create(name, openstack_id).send();
-
-        // assert
-        assert!(create.is_err());
-        assert_eq!(
-            create.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let create = client.project.create(name, openstack_id).send().await;
+
+    // assert
+    assert!(create.is_err());
+    assert_eq!(
+        create.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -63,30 +58,26 @@ async fn e2e_lib_project_create_denies_access_to_master_user() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let create = client.project.create(name, openstack_id).send();
-
-        // assert
-        assert!(create.is_err());
-        assert_eq!(
-            create.unwrap_err().to_string(),
-            format!("Admin privileges required")
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let create = client.project.create(name, openstack_id).send().await;
+
+    // assert
+    assert!(create.is_err());
+    assert_eq!(
+        create.unwrap_err().to_string(),
+        format!("Admin privileges required")
+    );
 }
 
 #[tokio::test]
@@ -102,34 +93,31 @@ async fn e2e_lib_project_create_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
+    .unwrap();
+
+    // act
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let user_class = random_number(1..6);
+    let created = client
+        .project
+        .create(name.clone(), openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await
         .unwrap();
 
-        // act
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let created = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-
-        // assert
-        assert_eq!(name, created.name);
-        assert_eq!(openstack_id, created.openstack_id);
-        assert_eq!(user_class, created.user_class);
-    })
-    .await
-    .unwrap();
+    // assert
+    assert_eq!(name, created.name);
+    assert_eq!(openstack_id, created.openstack_id);
+    assert_eq!(user_class, created.user_class);
 }
 
 // TODO: how can we test internal server error responses?
@@ -146,49 +134,47 @@ async fn e2e_lib_project_create_twice_returns_bad_request() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - create
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let created = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-        assert_eq!(name, created.name);
-        assert_eq!(openstack_id, created.openstack_id);
-        assert_eq!(user_class, created.user_class);
-
-        // act and assert 2 - create
-        let create = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send();
-        match create {
-            Err(avina::error::ApiError::ResponseError(message)) => {
-                assert_eq!(
-                    message,
-                    "Failed to insert new project, a conflicting entry exists"
-                        .to_string()
-                );
-            }
-            _ => panic!("Expected ApiError::ResponseError"),
-        }
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - create
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let user_class = random_number(1..6);
+    let created = client
+        .project
+        .create(name.clone(), openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(name, created.name);
+    assert_eq!(openstack_id, created.openstack_id);
+    assert_eq!(user_class, created.user_class);
+
+    // act and assert 2 - create
+    let create = client
+        .project
+        .create(name.clone(), openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await;
+    match create {
+        Err(avina::error::ApiError::ResponseError(message)) => {
+            assert_eq!(
+                message,
+                "Failed to insert new project, a conflicting entry exists"
+                    .to_string()
+            );
+        }
+        _ => panic!("Expected ApiError::ResponseError"),
+    }
 }
 
 #[tokio::test]
@@ -204,42 +190,39 @@ async fn e2e_lib_project_create_and_get_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - create
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let created = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-        assert_eq!(name, created.name);
-        assert_eq!(openstack_id, created.openstack_id);
-        assert_eq!(user_class, created.user_class);
-
-        // act and assert 2 - get
-        let ProjectRetrieved::Detailed(detailed) =
-            client.project.get(created.id).unwrap()
-        else {
-            panic!("Expected ProjectDetailed")
-        };
-        assert_eq!(detailed, created);
-        assert_eq!(detailed.users.len(), 0);
-        assert_eq!(detailed.flavor_groups.len(), 0);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - create
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let user_class = random_number(1..6);
+    let created = client
+        .project
+        .create(name.clone(), openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(name, created.name);
+    assert_eq!(openstack_id, created.openstack_id);
+    assert_eq!(user_class, created.user_class);
+
+    // act and assert 2 - get
+    let ProjectRetrieved::Detailed(detailed) =
+        client.project.get(created.id).await.unwrap()
+    else {
+        panic!("Expected ProjectDetailed")
+    };
+    assert_eq!(detailed, created);
+    assert_eq!(detailed.users.len(), 0);
+    assert_eq!(detailed.flavor_groups.len(), 0);
 }
 
 #[tokio::test]
@@ -255,36 +238,33 @@ async fn e2e_lib_project_create_and_list_works() {
         .mount(&server.keystone_server)
         .await;
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        // act and assert 1 - create
-        let name = random_alphanumeric_string(10);
-        let openstack_id = random_uuid();
-        let user_class = random_number(1..6);
-        let created = client
-            .project
-            .create(name.clone(), openstack_id.clone())
-            .user_class(user_class)
-            .send()
-            .unwrap();
-        assert_eq!(name, created.name);
-        assert_eq!(openstack_id, created.openstack_id);
-        assert_eq!(user_class, created.user_class);
-
-        // act and assert 2 - list
-        let projects = client.project.list().all().send().unwrap();
-        assert_eq!(projects.len(), 2);
-        assert_eq!(project, projects[0]);
-        assert_eq!(created, projects[1]);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    // act and assert 1 - create
+    let name = random_alphanumeric_string(10);
+    let openstack_id = random_uuid();
+    let user_class = random_number(1..6);
+    let created = client
+        .project
+        .create(name.clone(), openstack_id.clone())
+        .user_class(user_class)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(name, created.name);
+    assert_eq!(openstack_id, created.openstack_id);
+    assert_eq!(user_class, created.user_class);
+
+    // act and assert 2 - list
+    let projects = client.project.list().all().send().await.unwrap();
+    assert_eq!(projects.len(), 2);
+    assert_eq!(project, projects[0]);
+    assert_eq!(created, projects[1]);
 }

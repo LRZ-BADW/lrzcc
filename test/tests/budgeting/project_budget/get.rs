@@ -2,7 +2,6 @@ use std::str::FromStr;
 
 use avina::{Api, Token};
 use avina_test::spawn_app;
-use tokio::task::spawn_blocking;
 
 #[tokio::test]
 async fn e2e_lib_admin_can_get_own_project_budget() {
@@ -26,22 +25,18 @@ async fn e2e_lib_admin_can_get_own_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget.id);
-
-        assert_eq!(project_budget.id, get.unwrap().id);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget.id).await;
+
+    assert_eq!(project_budget.id, get.unwrap().id);
 }
 
 #[tokio::test]
@@ -71,22 +66,18 @@ async fn e2e_lib_admin_can_get_other_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget_2.id);
-
-        assert_eq!(get.unwrap().id, project_budget_2.id);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget_2.id).await;
+
+    assert_eq!(get.unwrap().id, project_budget_2.id);
 }
 
 #[tokio::test]
@@ -115,22 +106,18 @@ async fn e2e_lib_user_can_get_own_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget.id);
-
-        assert_eq!(get.unwrap().id, project_budget.id);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget.id).await;
+
+    assert_eq!(get.unwrap().id, project_budget.id);
 }
 
 #[tokio::test]
@@ -164,25 +151,21 @@ async fn e2e_lib_user_cannot_get_other_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget_2.id);
-        assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget_2.id).await;
+    assert!(get.is_err());
+    assert_eq!(
+        get.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }
 
 #[tokio::test]
@@ -211,22 +194,18 @@ async fn e2e_lib_master_user_can_get_own_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget.id);
-
-        assert_eq!(get.unwrap().id, project_budget.id);
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget.id).await;
+
+    assert_eq!(get.unwrap().id, project_budget.id);
 }
 
 #[tokio::test]
@@ -260,23 +239,19 @@ async fn e2e_lib_master_user_cannot_get_other_project_budget() {
         .await
         .expect("Failed to setup test user budget");
 
-    spawn_blocking(move || {
-        // arrange
-        let client = Api::new(
-            format!("{}/api", &server.address),
-            Token::from_str(&token).unwrap(),
-            None,
-            None,
-        )
-        .unwrap();
-
-        let get = client.project_budget.get(project_budget_2.id);
-        assert!(get.is_err());
-        assert_eq!(
-            get.unwrap_err().to_string(),
-            "Resource not found".to_string()
-        );
-    })
-    .await
+    // arrange
+    let client = Api::new(
+        format!("{}/api", &server.address),
+        Token::from_str(&token).unwrap(),
+        None,
+        None,
+    )
     .unwrap();
+
+    let get = client.project_budget.get(project_budget_2.id).await;
+    assert!(get.is_err());
+    assert_eq!(
+        get.unwrap_err().to_string(),
+        "Resource not found".to_string()
+    );
 }
