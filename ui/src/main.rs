@@ -1,6 +1,7 @@
+use std::str::FromStr;
+
 use avina::{Api, Token};
 use dioxus::prelude::*;
-use std::str::FromStr;
 
 fn main() {
     launch(app);
