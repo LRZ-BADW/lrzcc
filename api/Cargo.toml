@@ -35,6 +35,7 @@ user = ["avina-wire/user"]
 
 [dependencies]
 actix-web = "4"
+actix-cors = "0.7.1"
 tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-bunyan-formatter = "0.3"
