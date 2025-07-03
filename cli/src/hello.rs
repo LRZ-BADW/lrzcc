@@ -15,22 +15,22 @@ pub(crate) enum HelloCommand {
 pub(crate) use HelloCommand::*;
 
 impl Execute for HelloCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            Admin => admin(api, format),
-            User => user(api, format),
+            Admin => admin(api, format).await,
+            User => user(api, format).await,
         }
     }
 }
 
-fn admin(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.hello.admin()?, format)
+async fn admin(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.hello.admin().await?, format)
 }
 
-fn user(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.hello.user()?, format)
+async fn user(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.hello.user().await?, format)
 }

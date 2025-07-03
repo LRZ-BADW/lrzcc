@@ -105,43 +105,46 @@ pub(crate) enum FlavorQuotaCommand {
 pub(crate) use FlavorQuotaCommand::*;
 
 impl Execute for FlavorQuotaCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            List { filter } => list(api, format, filter).await,
+            Get { id } => get(api, format, id).await,
             Create {
                 flavor_group,
                 user,
                 quota,
-            } => create(api, format, flavor_group, user, *quota),
+            } => create(api, format, flavor_group, user, *quota).await,
             Modify {
                 id,
                 user,
                 quota,
                 flavor_group,
-            } => modify(
-                api,
-                format,
-                *id,
-                user.to_owned(),
-                *quota,
-                flavor_group.to_owned(),
-            ),
-            Delete { id } => delete(api, id),
+            } => {
+                modify(
+                    api,
+                    format,
+                    *id,
+                    user.to_owned(),
+                    *quota,
+                    flavor_group.to_owned(),
+                )
+                .await
+            }
+            Delete { id } => delete(api, id).await,
             Check {
                 user,
                 flavor,
                 count,
-            } => check(api, format, user, flavor, *count),
+            } => check(api, format, user, flavor, *count).await,
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &FlavorQuotaListFilter,
@@ -150,40 +153,40 @@ fn list(
     if filter.all {
         request.all();
     } else if let Some(group) = &filter.group {
-        let group_id = flavor_group_find_id(&api, group)?;
+        let group_id = flavor_group_find_id(&api, group).await?;
         request.group(group_id);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.flavor_quota.get(*id)?, format)
+    print_single_object(api.flavor_quota.get(*id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     flavor_group: &str,
     user: &str,
     quota: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
-    let flavor_group_id = flavor_group_find_id(&api, flavor_group)?;
-    let user_id = user_find_id(&api, user)?;
+    let flavor_group_id = flavor_group_find_id(&api, flavor_group).await?;
+    let user_id = user_find_id(&api, user).await?;
     let mut request = api.flavor_quota.create(flavor_group_id, user_id);
     if let Some(quota) = quota {
         request.quota(quota);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     id: u32,
@@ -193,36 +196,36 @@ fn modify(
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_quota.modify(id);
     if let Some(user) = user {
-        let user_id = user_find_id(&api, &user)?;
+        let user_id = user_find_id(&api, &user).await?;
         request.user(user_id);
     }
     if let Some(quota) = quota {
         request.quota(quota);
     }
     if let Some(flavor_group) = flavor_group {
-        let flavor_group_id = flavor_group_find_id(&api, &flavor_group)?;
+        let flavor_group_id = flavor_group_find_id(&api, &flavor_group).await?;
         request.flavor_group(flavor_group_id);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+async fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
-    Ok(api.flavor_quota.delete(*id)?)
+    Ok(api.flavor_quota.delete(*id).await?)
 }
 
-fn check(
+async fn check(
     api: avina::Api,
     format: Format,
     user: &str,
     flavor: &str,
     count: Option<u32>,
 ) -> Result<(), Box<dyn Error>> {
-    let user_id = user_find_id(&api, user)?;
-    let flavor_id = flavor_find_id(&api, flavor)?;
+    let user_id = user_find_id(&api, user).await?;
+    let flavor_id = flavor_find_id(&api, flavor).await?;
     let mut request = api.flavor_quota.check(user_id, flavor_id);
     if let Some(count) = count {
         request.count(count);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }

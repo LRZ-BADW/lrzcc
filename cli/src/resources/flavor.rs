@@ -141,52 +141,58 @@ pub(crate) enum FlavorCommand {
 pub(crate) use FlavorCommand::*;
 
 impl Execute for FlavorCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { name_or_id } => get(api, format, name_or_id),
+            List { filter } => list(api, format, filter).await,
+            Get { name_or_id } => get(api, format, name_or_id).await,
             Create {
                 name,
                 openstack_id,
                 group,
                 weight,
-            } => create(
-                api,
-                format,
-                name.to_owned(),
-                openstack_id.to_owned(),
-                group.to_owned(),
-                *weight,
-            ),
+            } => {
+                create(
+                    api,
+                    format,
+                    name.to_owned(),
+                    openstack_id.to_owned(),
+                    group.to_owned(),
+                    *weight,
+                )
+                .await
+            }
             Modify {
                 name_or_id,
                 name,
                 openstack_id,
                 group,
                 no_group,
-            } => modify(
-                api,
-                format,
-                name_or_id,
-                name.clone(),
-                openstack_id.clone(),
-                group.to_owned(),
-                *no_group,
-            ),
-            Delete { name_or_id } => delete(api, name_or_id),
-            Import { quiet } => import(api, format, *quiet),
+            } => {
+                modify(
+                    api,
+                    format,
+                    name_or_id,
+                    name.clone(),
+                    openstack_id.clone(),
+                    group.to_owned(),
+                    *no_group,
+                )
+                .await
+            }
+            Delete { name_or_id } => delete(api, name_or_id).await,
+            Import { quiet } => import(api, format, *quiet).await,
             Usage { filter, aggregate } => {
-                usage(api, format, filter, *aggregate)
+                usage(api, format, filter, *aggregate).await
             }
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &FlavorListFilter,
@@ -195,22 +201,22 @@ fn list(
     if filter.all {
         request.all();
     } else if let Some(group) = filter.group.to_owned() {
-        let group_id = flavor_group_find_id(&api, &group)?;
+        let group_id = flavor_group_find_id(&api, &group).await?;
         request.group(group_id);
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
-    print_single_object(api.flavor.get(id)?, format)
+    let id = find_id(&api, name_or_id).await?;
+    print_single_object(api.flavor.get(id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     name: String,
@@ -220,16 +226,16 @@ fn create(
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor.create(name, openstack_id);
     if let Some(group) = group {
-        let group_id = flavor_group_find_id(&api, &group)?;
+        let group_id = flavor_group_find_id(&api, &group).await?;
         request.group(group_id);
     }
     if let Some(weight) = weight {
         request.weight(weight);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
@@ -238,7 +244,7 @@ fn modify(
     group: Option<String>,
     no_group: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+    let id = find_id(&api, name_or_id).await?;
     let mut request = api.flavor.modify(id);
     if let Some(name) = name {
         request.name(name);
@@ -247,34 +253,37 @@ fn modify(
         request.openstack_id(openstack_id);
     }
     if let Some(group) = group {
-        let group_id = flavor_group_find_id(&api, &group)?;
+        let group_id = flavor_group_find_id(&api, &group).await?;
         request.group(group_id);
     } else if no_group {
         request.no_group();
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
 // TODO replace all command functions errors by anyhow::Error
-fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+async fn delete(
+    api: avina::Api,
+    name_or_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id).await?;
     ask_for_confirmation()?;
-    Ok(api.flavor.delete(id)?)
+    Ok(api.flavor.delete(id).await?)
 }
 
-fn import(
+async fn import(
     api: avina::Api,
     format: Format,
     quiet: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let result = api.flavor.import()?;
+    let result = api.flavor.import().await?;
     if !quiet || result.new_flavor_count > 0 {
         return print_single_object(result, format);
     }
     Ok(())
 }
 
-fn usage(
+async fn usage(
     api: avina::Api,
     format: Format,
     filter: &FlavorUsageFilter,
@@ -284,31 +293,31 @@ fn usage(
     if aggregate {
         print_object_list(
             if let Some(user) = filter.user.to_owned() {
-                let user_id = user_find_id(&api, &user)?;
-                request.user_aggregate(user_id)?
+                let user_id = user_find_id(&api, &user).await?;
+                request.user_aggregate(user_id).await?
             } else if let Some(project) = filter.project.to_owned() {
-                let project_id = project_find_id(&api, &project)?;
-                request.project_aggregate(project_id)?
+                let project_id = project_find_id(&api, &project).await?;
+                request.project_aggregate(project_id).await?
             } else if filter.all {
-                request.all_aggregate()?
+                request.all_aggregate().await?
             } else {
                 // TODO this causes a http 500 error
-                request.mine_aggregate()?
+                request.mine_aggregate().await?
             },
             format,
         )
     } else {
         print_object_list(
             if let Some(user) = filter.user.to_owned() {
-                let user_id = user_find_id(&api, &user)?;
-                request.user(user_id)?
+                let user_id = user_find_id(&api, &user).await?;
+                request.user(user_id).await?
             } else if let Some(project) = filter.project.to_owned() {
-                let project_id = project_find_id(&api, &project)?;
-                request.project(project_id)?
+                let project_id = project_find_id(&api, &project).await?;
+                request.project(project_id).await?
             } else if filter.all {
-                request.all()?
+                request.all().await?
             } else {
-                request.mine()?
+                request.mine().await?
             },
             format,
         )
@@ -316,7 +325,7 @@ fn usage(
 }
 
 // TODO the find id functions can be condensed into a macro
-pub(crate) fn find_id(
+pub(crate) async fn find_id(
     api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
@@ -324,12 +333,12 @@ pub(crate) fn find_id(
         return Ok(id);
     }
     // TODO cache me across arguments
-    let me = api.user.me().context("Failed to get own user")?;
+    let me = api.user.me().await.context("Failed to get own user")?;
     let mut request = api.flavor.list();
     if me.is_staff {
         request.all();
     }
-    let projects = request.send()?;
+    let projects = request.send().await?;
     if let Some(project) = projects
         .into_iter()
         .find(|f| f.openstack_id == name_or_id || f.name == name_or_id)

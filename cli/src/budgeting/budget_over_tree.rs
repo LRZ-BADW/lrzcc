@@ -31,7 +31,7 @@ pub(crate) struct BudgetOverTreeFilter {
     user: Option<String>,
 }
 
-pub(crate) fn budget_over_tree(
+pub(crate) async fn budget_over_tree(
     api: avina::Api,
     filter: BudgetOverTreeFilter,
     end: Option<DateTime<FixedOffset>>,
@@ -40,16 +40,16 @@ pub(crate) fn budget_over_tree(
     if filter.all {
         request.all();
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     }
     if let Some(end) = end {
         request.end(end);
     }
-    let result = request.send()?;
+    let result = request.send().await?;
     println!("{}", serde_json::to_string(&result)?);
     Ok(())
 }

@@ -45,7 +45,7 @@ pub(crate) struct ServerConsumptionFilter {
     all: bool,
 }
 
-pub(crate) fn server_consumption(
+pub(crate) async fn server_consumption(
     api: avina::Api,
     format: Format,
     begin: Option<DateTime<FixedOffset>>,
@@ -62,32 +62,32 @@ pub(crate) fn server_consumption(
     }
     if detail {
         if let Some(server) = filter.server {
-            print_json(request.server_detail(&server)?)
+            print_json(request.server_detail(&server).await?)
         } else if let Some(user) = filter.user {
-            let user_id = user_find_id(&api, &user)?;
-            print_json(request.user_detail(user_id)?)
+            let user_id = user_find_id(&api, &user).await?;
+            print_json(request.user_detail(user_id).await?)
         } else if let Some(project) = filter.project {
-            let project_id = project_find_id(&api, &project)?;
-            print_json(request.project_detail(project_id)?)
+            let project_id = project_find_id(&api, &project).await?;
+            print_json(request.project_detail(project_id).await?)
         } else if filter.all {
-            print_json(request.all_detail()?)
+            print_json(request.all_detail().await?)
         } else {
-            print_json(request.mine_detail()?)
+            print_json(request.mine_detail().await?)
         }
     } else {
         print_hashmap(
             if let Some(server) = filter.server {
-                request.server(&server)?
+                request.server(&server).await?
             } else if let Some(user) = filter.user {
-                let user_id = user_find_id(&api, &user)?;
-                request.user(user_id)?
+                let user_id = user_find_id(&api, &user).await?;
+                request.user(user_id).await?
             } else if let Some(project) = filter.project {
-                let project_id = project_find_id(&api, &project)?;
-                request.project(project_id)?
+                let project_id = project_find_id(&api, &project).await?;
+                request.project(project_id).await?
             } else if filter.all {
-                request.all()?
+                request.all().await?
             } else {
-                request.mine()?
+                request.mine().await?
             },
             "flavor",
             "seconds",

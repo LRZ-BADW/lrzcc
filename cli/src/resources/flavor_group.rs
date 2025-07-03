@@ -101,36 +101,39 @@ pub(crate) enum FlavorGroupCommand {
 pub(crate) use FlavorGroupCommand::*;
 
 impl Execute for FlavorGroupCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { name_or_id } => get(api, format, name_or_id),
-            Create { name } => create(api, format, name.to_owned()),
+            List { filter } => list(api, format, filter).await,
+            Get { name_or_id } => get(api, format, name_or_id).await,
+            Create { name } => create(api, format, name.to_owned()).await,
             Modify {
                 name_or_id,
                 name,
                 project,
-            } => modify(
-                api,
-                format,
-                name_or_id,
-                name.to_owned(),
-                project.to_owned(),
-            ),
-            Delete { name_or_id } => delete(api, name_or_id),
-            Initialize => initialize(api, format),
+            } => {
+                modify(
+                    api,
+                    format,
+                    name_or_id,
+                    name.to_owned(),
+                    project.to_owned(),
+                )
+                .await
+            }
+            Delete { name_or_id } => delete(api, name_or_id).await,
+            Initialize => initialize(api, format).await,
             Usage { filter, aggregate } => {
-                usage(api, format, filter, *aggregate)
+                usage(api, format, filter, *aggregate).await
             }
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &FlavorGroupListFilter,
@@ -139,57 +142,63 @@ fn list(
     if filter.all {
         request.all();
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
-    print_single_object(api.flavor_group.get(id)?, format)
+    let id = find_id(&api, name_or_id).await?;
+    print_single_object(api.flavor_group.get(id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     name: String,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.flavor_group.create(name).send()?, format)
+    print_single_object(api.flavor_group.create(name).send().await?, format)
 }
 
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
     name: Option<String>,
     project: Option<String>,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+    let id = find_id(&api, name_or_id).await?;
     let mut request = api.flavor_group.modify(id);
     if let Some(name) = name {
         request.name(name);
     }
     if let Some(project) = project {
-        let project_id = project_find_id(&api, &project)?;
+        let project_id = project_find_id(&api, &project).await?;
         request.project(project_id);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+async fn delete(
+    api: avina::Api,
+    name_or_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id).await?;
     ask_for_confirmation()?;
-    Ok(api.flavor_group.delete(id)?)
+    Ok(api.flavor_group.delete(id).await?)
 }
 
-fn initialize(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    let result = api.flavor_group.initialize()?;
+async fn initialize(
+    api: avina::Api,
+    format: Format,
+) -> Result<(), Box<dyn Error>> {
+    let result = api.flavor_group.initialize().await?;
     print_single_object(result, format)
 }
 
-fn usage(
+async fn usage(
     api: avina::Api,
     format: Format,
     filter: &FlavorGroupUsageFilter,
@@ -199,38 +208,38 @@ fn usage(
     if aggregate {
         print_object_list(
             if let Some(user) = filter.user.to_owned() {
-                let user_id = user_find_id(&api, &user)?;
-                request.user_aggregate(user_id)?
+                let user_id = user_find_id(&api, &user).await?;
+                request.user_aggregate(user_id).await?
             } else if let Some(project) = filter.project.to_owned() {
-                let project_id = project_find_id(&api, &project)?;
-                request.project_aggregate(project_id)?
+                let project_id = project_find_id(&api, &project).await?;
+                request.project_aggregate(project_id).await?
             } else if filter.all {
-                request.all_aggregate()?
+                request.all_aggregate().await?
             } else {
                 // TODO this causes a http 500 error
-                request.mine_aggregate()?
+                request.mine_aggregate().await?
             },
             format,
         )
     } else {
         print_object_list(
             if let Some(user) = filter.user.to_owned() {
-                let user_id = user_find_id(&api, &user)?;
-                request.user(user_id)?
+                let user_id = user_find_id(&api, &user).await?;
+                request.user(user_id).await?
             } else if let Some(project) = filter.project.to_owned() {
-                let project_id = project_find_id(&api, &project)?;
-                request.project(project_id)?
+                let project_id = project_find_id(&api, &project).await?;
+                request.project(project_id).await?
             } else if filter.all {
-                request.all()?
+                request.all().await?
             } else {
-                request.mine()?
+                request.mine().await?
             },
             format,
         )
     }
 }
 
-pub(crate) fn find_id(
+pub(crate) async fn find_id(
     api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
@@ -238,12 +247,12 @@ pub(crate) fn find_id(
         return Ok(id);
     }
     // TODO cache me across arguments
-    let me = api.user.me().context("Failed to get own user")?;
+    let me = api.user.me().await.context("Failed to get own user")?;
     let mut request = api.flavor_group.list();
     if me.is_staff {
         request.all();
     }
-    let projects = request.send()?;
+    let projects = request.send().await?;
     if let Some(project) = projects.into_iter().find(|f| f.name == name_or_id) {
         return Ok(project.id);
     }

@@ -45,7 +45,7 @@ pub(crate) struct ServerCostFilter {
     all: bool,
 }
 
-pub(crate) fn server_cost(
+pub(crate) async fn server_cost(
     api: avina::Api,
     format: Format,
     begin: Option<DateTime<FixedOffset>>,
@@ -62,32 +62,32 @@ pub(crate) fn server_cost(
     }
     if detail {
         if let Some(server) = filter.server {
-            print_json(request.server_detail(&server)?)
+            print_json(request.server_detail(&server).await?)
         } else if let Some(user) = filter.user {
-            let user_id = user_find_id(&api, &user)?;
-            print_json(request.user_detail(user_id)?)
+            let user_id = user_find_id(&api, &user).await?;
+            print_json(request.user_detail(user_id).await?)
         } else if let Some(project) = filter.project {
-            let project_id = project_find_id(&api, &project)?;
-            print_json(request.project_detail(project_id)?)
+            let project_id = project_find_id(&api, &project).await?;
+            print_json(request.project_detail(project_id).await?)
         } else if filter.all {
-            print_json(request.all_detail()?)
+            print_json(request.all_detail().await?)
         } else {
-            print_json(request.mine_detail()?)
+            print_json(request.mine_detail().await?)
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
         if let Some(server) = filter.server {
-            print_single_object(request.server(&server)?, format)
+            print_single_object(request.server(&server).await?, format)
         } else if let Some(user) = filter.user {
-            let user_id = user_find_id(&api, &user)?;
-            print_single_object(request.user(user_id)?, format)
+            let user_id = user_find_id(&api, &user).await?;
+            print_single_object(request.user(user_id).await?, format)
         } else if let Some(project) = filter.project {
-            let project_id = project_find_id(&api, &project)?;
-            print_single_object(request.project(project_id)?, format)
+            let project_id = project_find_id(&api, &project).await?;
+            print_single_object(request.project(project_id).await?, format)
         } else if filter.all {
-            print_single_object(request.all()?, format)
+            print_single_object(request.all().await?, format)
         } else {
-            print_single_object(request.mine()?, format)
+            print_single_object(request.mine().await?, format)
         }
     }
 }

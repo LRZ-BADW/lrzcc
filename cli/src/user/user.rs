@@ -113,14 +113,14 @@ pub(crate) enum UserCommand {
 pub(crate) use UserCommand::*;
 
 impl Execute for UserCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { name_or_id } => get(api, format, name_or_id),
+            List { filter } => list(api, format, filter).await,
+            Get { name_or_id } => get(api, format, name_or_id).await,
             Create {
                 name,
                 openstack_id,
@@ -128,16 +128,19 @@ impl Execute for UserCommand {
                 role,
                 staff,
                 inactive,
-            } => create(
-                api,
-                format,
-                name.to_owned(),
-                openstack_id.to_owned(),
-                project,
-                *role,
-                *staff,
-                *inactive,
-            ),
+            } => {
+                create(
+                    api,
+                    format,
+                    name.to_owned(),
+                    openstack_id.to_owned(),
+                    project,
+                    *role,
+                    *staff,
+                    *inactive,
+                )
+                .await
+            }
             Modify {
                 name_or_id,
                 name,
@@ -146,25 +149,28 @@ impl Execute for UserCommand {
                 role,
                 staff,
                 active,
-            } => modify(
-                api,
-                format,
-                name_or_id,
-                name.to_owned(),
-                openstack_id.to_owned(),
-                project.to_owned(),
-                role.to_owned(),
-                staff.to_owned(),
-                active.to_owned(),
-            ),
-            Delete { name_or_id } => delete(api, name_or_id),
-            Me => me(api, format),
-            Import { quiet } => import(api, format, *quiet),
+            } => {
+                modify(
+                    api,
+                    format,
+                    name_or_id,
+                    name.to_owned(),
+                    openstack_id.to_owned(),
+                    project.to_owned(),
+                    role.to_owned(),
+                    staff.to_owned(),
+                    active.to_owned(),
+                )
+                .await
+            }
+            Delete { name_or_id } => delete(api, name_or_id).await,
+            Me => me(api, format).await,
+            Import { quiet } => import(api, format, *quiet).await,
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &UserListFilter,
@@ -173,23 +179,23 @@ fn list(
     if filter.all {
         request.all();
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
-    print_single_object(api.user.get(id)?, format)
+    let id = find_id(&api, name_or_id).await?;
+    print_single_object(api.user.get(id).await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     name: String,
@@ -199,7 +205,7 @@ fn create(
     staff: bool,
     inactive: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let project_id = project_find_id(&api, project)?;
+    let project_id = project_find_id(&api, project).await?;
     let mut request = api.user.create(name, openstack_id, project_id);
     if let Some(role) = role {
         request.role(role);
@@ -210,11 +216,11 @@ fn create(
     if inactive {
         request.inactive();
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     name_or_id: &str,
@@ -225,7 +231,7 @@ fn modify(
     staff: Option<bool>,
     active: Option<bool>,
 ) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+    let id = find_id(&api, name_or_id).await?;
     let mut request = api.user.modify(id);
     if let Some(name) = name {
         request.name(name);
@@ -234,7 +240,7 @@ fn modify(
         request.openstack_id(openstack_id);
     }
     if let Some(project) = project {
-        let project_id = project_find_id(&api, &project)?;
+        let project_id = project_find_id(&api, &project).await?;
         request.project(project_id);
     }
     if let Some(role) = role {
@@ -246,32 +252,35 @@ fn modify(
     if let Some(active) = active {
         request.is_active(active);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, name_or_id: &str) -> Result<(), Box<dyn Error>> {
-    let id = find_id(&api, name_or_id)?;
+async fn delete(
+    api: avina::Api,
+    name_or_id: &str,
+) -> Result<(), Box<dyn Error>> {
+    let id = find_id(&api, name_or_id).await?;
     ask_for_confirmation()?;
-    Ok(api.user.delete(id)?)
+    Ok(api.user.delete(id).await?)
 }
 
-fn me(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.user.me()?, format)
+async fn me(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.user.me().await?, format)
 }
 
-fn import(
+async fn import(
     api: avina::Api,
     format: Format,
     quiet: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let result = api.user.import()?;
+    let result = api.user.import().await?;
     if !quiet || result.new_project_count > 0 || result.new_user_count > 0 {
         return print_single_object(result, format);
     }
     Ok(())
 }
 
-pub(crate) fn find_id(
+pub(crate) async fn find_id(
     api: &avina::Api,
     name_or_id: &str,
 ) -> Result<u32, anyhow::Error> {
@@ -279,14 +288,14 @@ pub(crate) fn find_id(
         return Ok(id);
     }
     // TODO cache me across arguments
-    let me = api.user.me().context("Failed to get own user")?;
+    let me = api.user.me().await.context("Failed to get own user")?;
     let mut request = api.user.list();
     if me.is_staff {
         request.all();
     } else if me.role == 2 {
         request.project(me.project.id);
     }
-    let users = request.send()?;
+    let users = request.send().await?;
     if let Some(user) = users
         .into_iter()
         .find(|u| u.openstack_id == name_or_id || u.name == name_or_id)
