@@ -126,10 +126,16 @@ impl Api {
             Some(timeout) => timeout,
             None => DEFAULT_TIMEOUT,
         };
+        let mut builder = ClientBuilder::new();
+
+        #[cfg(not(target_family = "wasm"))]
+        {
+            builder = builder.timeout(Duration::from_secs(timeout));
+        }
+
         let client = Rc::new(
-            ClientBuilder::new()
+            builder
                 .default_headers(headers)
-                .timeout(Duration::from_secs(timeout))
                 .build()
                 .context("Failed to build http client")?,
         );
