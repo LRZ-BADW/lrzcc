@@ -8,6 +8,7 @@ use crate::{
     error::ApiError,
 };
 
+#[derive(Debug)]
 pub struct HelloApi {
     pub url: String,
     pub client: Rc<Client>,

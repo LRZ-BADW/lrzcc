@@ -13,6 +13,7 @@ use crate::{
     error::ApiError,
 };
 
+#[derive(Debug)]
 pub struct FlavorGroupApi {
     pub url: String,
     pub client: Rc<Client>,

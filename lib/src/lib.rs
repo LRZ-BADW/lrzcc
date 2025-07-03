@@ -61,6 +61,7 @@ use user::UserApi;
 
 pub const DEFAULT_TIMEOUT: u64 = 300;
 
+#[derive(Debug)]
 pub struct Api {
     // url: Rc<str>,
     #[allow(unused)]
