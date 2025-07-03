@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use avina_wire::budgeting::{BudgetBulkCreate, BudgetBulkCreateData};
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{common::request, error::ApiError};
 
@@ -18,7 +18,7 @@ impl BudgetBulkCreateApi {
         }
     }
 
-    pub fn run(&self, year: i32) -> Result<BudgetBulkCreate, ApiError> {
+    pub async fn run(&self, year: i32) -> Result<BudgetBulkCreate, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -26,5 +26,6 @@ impl BudgetBulkCreateApi {
             Some(&BudgetBulkCreateData { year }),
             StatusCode::OK,
         )
+        .await
     }
 }

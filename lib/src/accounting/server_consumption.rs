@@ -6,7 +6,7 @@ use avina_wire::accounting::{
     ServerConsumptionProject, ServerConsumptionServer, ServerConsumptionUser,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request},
@@ -49,7 +49,7 @@ impl ServerConsumptionRequest {
         self
     }
 
-    pub fn server(
+    pub async fn server(
         &mut self,
         server: &str,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
@@ -68,9 +68,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn server_detail(
+    pub async fn server_detail(
         &mut self,
         server: &str,
     ) -> Result<ServerConsumptionServer, ApiError> {
@@ -90,9 +91,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user(
+    pub async fn user(
         &mut self,
         user: u32,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
@@ -111,9 +113,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user_detail(
+    pub async fn user_detail(
         &mut self,
         user: u32,
     ) -> Result<ServerConsumptionUser, ApiError> {
@@ -133,9 +136,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project(
+    pub async fn project(
         &mut self,
         project: u32,
     ) -> Result<ServerConsumptionFlavors, ApiError> {
@@ -154,9 +158,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project_detail(
+    pub async fn project_detail(
         &mut self,
         project: u32,
     ) -> Result<ServerConsumptionProject, ApiError> {
@@ -176,9 +181,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
+    pub async fn all(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
         self.params.all = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -194,9 +200,12 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all_detail(&mut self) -> Result<ServerConsumptionAll, ApiError> {
+    pub async fn all_detail(
+        &mut self,
+    ) -> Result<ServerConsumptionAll, ApiError> {
         self.params.all = Some(true);
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
@@ -213,9 +222,10 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
+    pub async fn mine(&mut self) -> Result<ServerConsumptionFlavors, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -230,9 +240,12 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine_detail(&mut self) -> Result<ServerConsumptionUser, ApiError> {
+    pub async fn mine_detail(
+        &mut self,
+    ) -> Result<ServerConsumptionUser, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -248,6 +261,7 @@ impl ServerConsumptionRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 

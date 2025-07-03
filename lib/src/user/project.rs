@@ -5,7 +5,7 @@ use avina_wire::user::{
     Project, ProjectCreateData, ProjectListParams, ProjectModifyData,
     ProjectRetrieved,
 };
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -37,7 +37,7 @@ impl ProjectListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<Project>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<Project>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters.")?;
         // TODO: maybe use url join
@@ -53,6 +53,7 @@ impl ProjectListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -93,7 +94,7 @@ impl ProjectCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<Project, ApiError> {
+    pub async fn send(&self) -> Result<Project, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -101,6 +102,7 @@ impl ProjectCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -135,7 +137,7 @@ impl ProjectModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<Project, ApiError> {
+    pub async fn send(&self) -> Result<Project, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -143,6 +145,7 @@ impl ProjectModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -158,7 +161,7 @@ impl ProjectApi {
         ProjectListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<ProjectRetrieved, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<ProjectRetrieved, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -168,6 +171,7 @@ impl ProjectApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -191,7 +195,7 @@ impl ProjectApi {
         ProjectModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -200,7 +204,8 @@ impl ProjectApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 }

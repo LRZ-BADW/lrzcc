@@ -6,7 +6,7 @@ use avina_wire::pricing::{
     FlavorPriceModifyData,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, Url, blocking::Client};
+use reqwest::{Client, Method, StatusCode, Url};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -32,7 +32,7 @@ impl FlavorPriceListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<FlavorPrice>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<FlavorPrice>, ApiError> {
         let url = Url::parse(self.url.as_str())
             .context("Could not parse URL GET parameters.")?;
         request(
@@ -42,6 +42,7 @@ impl FlavorPriceListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -79,7 +80,7 @@ impl FlavorPriceCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorPrice, ApiError> {
+    pub async fn send(&self) -> Result<FlavorPrice, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -87,6 +88,7 @@ impl FlavorPriceCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -129,7 +131,7 @@ impl FlavorPriceModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorPrice, ApiError> {
+    pub async fn send(&self) -> Result<FlavorPrice, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -137,6 +139,7 @@ impl FlavorPriceModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -152,7 +155,7 @@ impl FlavorPriceApi {
         FlavorPriceListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<FlavorPrice, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<FlavorPrice, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -162,6 +165,7 @@ impl FlavorPriceApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(
@@ -185,7 +189,7 @@ impl FlavorPriceApi {
         FlavorPriceModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -194,11 +198,12 @@ impl FlavorPriceApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 
-    pub fn initialize(&self) -> Result<FlavorPriceInitialize, ApiError> {
+    pub async fn initialize(&self) -> Result<FlavorPriceInitialize, ApiError> {
         // TODO use Url.join
         let url = format!("{}/initialize/", self.url);
         request(
@@ -208,5 +213,6 @@ impl FlavorPriceApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }

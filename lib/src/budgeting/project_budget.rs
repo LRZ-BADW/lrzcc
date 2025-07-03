@@ -7,7 +7,7 @@ use avina_wire::budgeting::{
     ProjectBudgetOverSimple,
 };
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, blocking::Client};
+use reqwest::{Client, Method, StatusCode};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -42,7 +42,7 @@ impl ProjectBudgetListRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<ProjectBudget>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<ProjectBudget>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -57,6 +57,7 @@ impl ProjectBudgetListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn user(&mut self, user: u32) -> &mut Self {
@@ -106,7 +107,7 @@ impl ProjectBudgetCreateRequest {
         self
     }
 
-    pub fn send(&self) -> Result<ProjectBudget, ApiError> {
+    pub async fn send(&self) -> Result<ProjectBudget, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -114,6 +115,7 @@ impl ProjectBudgetCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -143,7 +145,7 @@ impl ProjectBudgetModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<ProjectBudget, ApiError> {
+    pub async fn send(&self) -> Result<ProjectBudget, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -151,6 +153,7 @@ impl ProjectBudgetModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -178,7 +181,7 @@ impl ProjectBudgetOverRequest {
         }
     }
 
-    pub fn send(&self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -193,6 +196,7 @@ impl ProjectBudgetOverRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn end(&mut self, end: DateTime<FixedOffset>) -> &mut Self {
@@ -215,7 +219,9 @@ impl ProjectBudgetOverRequest {
         self
     }
 
-    pub fn normal(&mut self) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
+    pub async fn normal(
+        &mut self,
+    ) -> Result<Vec<ProjectBudgetOverSimple>, ApiError> {
         self.params.detail = Some(false);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -231,9 +237,12 @@ impl ProjectBudgetOverRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn detail(&mut self) -> Result<Vec<ProjectBudgetOverDetail>, ApiError> {
+    pub async fn detail(
+        &mut self,
+    ) -> Result<Vec<ProjectBudgetOverDetail>, ApiError> {
         self.params.detail = Some(true);
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
@@ -249,6 +258,7 @@ impl ProjectBudgetOverRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -264,7 +274,7 @@ impl ProjectBudgetApi {
         ProjectBudgetListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<ProjectBudget, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<ProjectBudget, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -274,6 +284,7 @@ impl ProjectBudgetApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(&self, project: u32) -> ProjectBudgetCreateRequest {
@@ -288,7 +299,7 @@ impl ProjectBudgetApi {
         ProjectBudgetModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -297,7 +308,8 @@ impl ProjectBudgetApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 

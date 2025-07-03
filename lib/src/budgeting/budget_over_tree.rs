@@ -3,7 +3,7 @@ use std::rc::Rc;
 use anyhow::Context;
 use avina_wire::budgeting::BudgetOverTree;
 use chrono::{DateTime, FixedOffset};
-use reqwest::{Method, StatusCode, Url, blocking::Client};
+use reqwest::{Client, Method, StatusCode, Url};
 
 use crate::{
     common::{SerializableNone, request},
@@ -53,7 +53,7 @@ impl BudgetOverTreeRequest {
         params
     }
 
-    pub fn send(&self) -> Result<BudgetOverTree, ApiError> {
+    pub async fn send(&self) -> Result<BudgetOverTree, ApiError> {
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
         request(
@@ -63,6 +63,7 @@ impl BudgetOverTreeRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn all(&mut self) -> &mut Self {

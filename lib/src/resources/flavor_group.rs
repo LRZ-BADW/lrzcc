@@ -6,7 +6,7 @@ use avina_wire::resources::{
     FlavorGroupDetailed, FlavorGroupInitialize, FlavorGroupListParams,
     FlavorGroupModifyData, FlavorGroupUsage, FlavorGroupUsageAggregate,
 };
-use reqwest::{Method, StatusCode, Url, blocking::Client};
+use reqwest::{Client, Method, StatusCode, Url};
 
 use crate::{
     common::{SerializableNone, request, request_bare},
@@ -37,7 +37,7 @@ impl FlavorGroupListRequest {
     }
 
     // TODO: only the return type changes, pull these functions into a macro
-    pub fn send(&self) -> Result<Vec<FlavorGroup>, ApiError> {
+    pub async fn send(&self) -> Result<Vec<FlavorGroup>, ApiError> {
         let params = serde_urlencoded::to_string(&self.params)
             .context("Failed to encode URL parameters")?;
         let url = if params.is_empty() {
@@ -52,6 +52,7 @@ impl FlavorGroupListRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn all(&mut self) -> &mut Self {
@@ -76,7 +77,7 @@ impl FlavorGroupCreateRequest {
         }
     }
 
-    pub fn send(&self) -> Result<FlavorGroupCreated, ApiError> {
+    pub async fn send(&self) -> Result<FlavorGroupCreated, ApiError> {
         request(
             &self.client,
             Method::POST,
@@ -84,6 +85,7 @@ impl FlavorGroupCreateRequest {
             Some(&self.data),
             StatusCode::CREATED,
         )
+        .await
     }
 }
 
@@ -113,7 +115,7 @@ impl FlavorGroupModifyRequest {
         self
     }
 
-    pub fn send(&self) -> Result<FlavorGroup, ApiError> {
+    pub async fn send(&self) -> Result<FlavorGroup, ApiError> {
         request(
             &self.client,
             Method::PATCH,
@@ -121,6 +123,7 @@ impl FlavorGroupModifyRequest {
             Some(&self.data),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -162,7 +165,7 @@ impl FlavorGroupUsageRequest {
         params
     }
 
-    pub fn user(
+    pub async fn user(
         &mut self,
         user: u32,
     ) -> Result<Vec<FlavorGroupUsage>, ApiError> {
@@ -177,9 +180,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn user_aggregate(
+    pub async fn user_aggregate(
         &mut self,
         user: u32,
     ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
@@ -194,9 +198,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project(
+    pub async fn project(
         &mut self,
         project: u32,
     ) -> Result<Vec<FlavorGroupUsage>, ApiError> {
@@ -211,9 +216,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn project_aggregate(
+    pub async fn project_aggregate(
         &mut self,
         project: u32,
     ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
@@ -228,9 +234,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+    pub async fn all(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
         self.all = true;
         self.aggregate = false;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
@@ -242,9 +249,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn all_aggregate(
+    pub async fn all_aggregate(
         &mut self,
     ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
         self.all = true;
@@ -258,9 +266,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
+    pub async fn mine(&mut self) -> Result<Vec<FlavorGroupUsage>, ApiError> {
         self.aggregate = false;
         let url = Url::parse_with_params(self.url.as_str(), self.params())
             .context("Could not parse URL GET parameters.")?;
@@ -271,9 +280,10 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
-    pub fn mine_aggregate(
+    pub async fn mine_aggregate(
         &mut self,
     ) -> Result<Vec<FlavorGroupUsageAggregate>, ApiError> {
         // TODO use Url.join
@@ -287,6 +297,7 @@ impl FlavorGroupUsageRequest {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 }
 
@@ -302,7 +313,7 @@ impl FlavorGroupApi {
         FlavorGroupListRequest::new(self.url.as_ref(), &self.client)
     }
 
-    pub fn get(&self, id: u32) -> Result<FlavorGroupDetailed, ApiError> {
+    pub async fn get(&self, id: u32) -> Result<FlavorGroupDetailed, ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}", self.url, id);
         request(
@@ -312,6 +323,7 @@ impl FlavorGroupApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn create(&self, name: String) -> FlavorGroupCreateRequest {
@@ -326,7 +338,7 @@ impl FlavorGroupApi {
         FlavorGroupModifyRequest::new(url.as_ref(), &self.client, id)
     }
 
-    pub fn delete(&self, id: u32) -> Result<(), ApiError> {
+    pub async fn delete(&self, id: u32) -> Result<(), ApiError> {
         // TODO use Url.join
         let url = format!("{}/{}/", self.url, id);
         request_bare(
@@ -335,11 +347,12 @@ impl FlavorGroupApi {
             url.as_str(),
             SerializableNone!(),
             StatusCode::NO_CONTENT,
-        )?;
+        )
+        .await?;
         Ok(())
     }
 
-    pub fn initialize(&self) -> Result<FlavorGroupInitialize, ApiError> {
+    pub async fn initialize(&self) -> Result<FlavorGroupInitialize, ApiError> {
         // TODO use Url.join
         let url = format!("{}/initialize/", self.url);
         request(
@@ -349,6 +362,7 @@ impl FlavorGroupApi {
             SerializableNone!(),
             StatusCode::OK,
         )
+        .await
     }
 
     pub fn usage(&self) -> FlavorGroupUsageRequest {
