@@ -1,5 +1,6 @@
 use std::net::TcpListener;
 
+use actix_cors::Cors;
 use actix_web::{
     App, HttpServer, dev::Server, middleware::from_fn, web, web::Data,
 };
@@ -126,7 +127,14 @@ async fn run(
     let base_url = Data::new(ApplicationBaseUrl(base_url));
     let openstack = Data::new(openstack);
     let server = HttpServer::new(move || {
+        // TODO: this should be configurable
+        let cors = Cors::default()
+            .allowed_origin("http://localhost:8080")
+            .allow_any_header()
+            .allow_any_method()
+            .expose_any_header();
         App::new()
+            .wrap(cors)
             .wrap(TracingLogger::default())
             .app_data(db_pool.clone())
             .app_data(base_url.clone())
