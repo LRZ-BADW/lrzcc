@@ -475,6 +475,7 @@ dependencies = [
 name = "avina-ui"
 version = "0.0.1"
 dependencies = [
+ "avina",
  "dioxus",
 ]
 
