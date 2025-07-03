@@ -265,6 +265,7 @@ impl ServerConsumptionRequest {
     }
 }
 
+#[derive(Debug)]
 pub struct ServerConsumptionApi {
     pub url: String,
     pub client: Rc<Client>,

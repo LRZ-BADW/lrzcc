@@ -262,6 +262,7 @@ impl ServerCostRequest {
     }
 }
 
+#[derive(Debug)]
 pub struct ServerCostApi {
     pub url: String,
     pub client: Rc<Client>,

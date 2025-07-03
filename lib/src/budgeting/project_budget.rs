@@ -14,6 +14,7 @@ use crate::{
     error::ApiError,
 };
 
+#[derive(Debug)]
 pub struct ProjectBudgetApi {
     pub url: String,
     pub client: Rc<Client>,

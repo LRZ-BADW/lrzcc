@@ -7,12 +7,13 @@ use reqwest::{
     header::{CONTENT_TYPE, HeaderMap, HeaderValue},
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct TokenInner {
     url: String,
     client: Client,
 }
 
+#[derive(Debug)]
 pub struct Token {
     token: String,
     inner: Option<TokenInner>,

@@ -5,6 +5,7 @@ use reqwest::{Client, Method, StatusCode};
 
 use crate::{common::request, error::ApiError};
 
+#[derive(Debug)]
 pub struct BudgetBulkCreateApi {
     pub url: String,
     pub client: Rc<Client>,
