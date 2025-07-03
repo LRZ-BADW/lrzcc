@@ -125,7 +125,6 @@ async fn run(
     let db_pool = Data::new(db_pool);
     let base_url = Data::new(ApplicationBaseUrl(base_url));
     let openstack = Data::new(openstack);
-    // TODO add default service for proper 404
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
