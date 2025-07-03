@@ -68,55 +68,61 @@ pub(crate) enum FlavorPriceCommand {
 pub(crate) use FlavorPriceCommand::*;
 
 impl Execute for FlavorPriceCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List => list(api, format),
-            Get { id } => get(api, format, id),
+            List => list(api, format).await,
+            Get { id } => get(api, format, id).await,
             Create {
                 flavor,
                 user_class,
                 price,
                 start_time,
-            } => create(api, format, flavor, *user_class, *price, *start_time),
+            } => {
+                create(api, format, flavor, *user_class, *price, *start_time)
+                    .await
+            }
             Modify {
                 id,
                 flavor,
                 user_class,
                 price,
                 start_time,
-            } => modify(
-                api,
-                format,
-                *id,
-                flavor.to_owned(),
-                *user_class,
-                *price,
-                *start_time,
-            ),
-            Delete { id } => delete(api, id),
-            Initialize => initialize(api, format),
+            } => {
+                modify(
+                    api,
+                    format,
+                    *id,
+                    flavor.to_owned(),
+                    *user_class,
+                    *price,
+                    *start_time,
+                )
+                .await
+            }
+            Delete { id } => delete(api, id).await,
+            Initialize => initialize(api, format).await,
         }
     }
 }
 
-fn list(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
+async fn list(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
     let request = api.flavor_price.list();
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.flavor_price.get(*id)?, format)
+    print_single_object(api.flavor_price.get(*id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     flavor: &str,
@@ -124,7 +130,7 @@ fn create(
     price: Option<f64>,
     start_time: Option<DateTime<FixedOffset>>,
 ) -> Result<(), Box<dyn Error>> {
-    let flavor_id = flavor_find_id(&api, flavor)?;
+    let flavor_id = flavor_find_id(&api, flavor).await?;
     let mut request = api.flavor_price.create(flavor_id, user_class);
     if let Some(price) = price {
         request.price(price);
@@ -132,10 +138,10 @@ fn create(
     if let Some(start_time) = start_time {
         request.start_time(start_time);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     id: u32,
@@ -146,7 +152,7 @@ fn modify(
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.flavor_price.modify(id);
     if let Some(flavor) = flavor {
-        let flavor_id = flavor_find_id(&api, &flavor)?;
+        let flavor_id = flavor_find_id(&api, &flavor).await?;
         request.flavor(flavor_id);
     }
     if let Some(user_class) = user_class {
@@ -158,15 +164,18 @@ fn modify(
     if let Some(start_time) = start_time {
         request.start_time(start_time);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+async fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
-    Ok(api.flavor_price.delete(*id)?)
+    Ok(api.flavor_price.delete(*id).await?)
 }
 
-fn initialize(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    let result = api.flavor_price.initialize()?;
+async fn initialize(
+    api: avina::Api,
+    format: Format,
+) -> Result<(), Box<dyn Error>> {
+    let result = api.flavor_price.initialize().await?;
     print_single_object(result, format)
 }

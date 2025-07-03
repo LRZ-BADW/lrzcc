@@ -149,14 +149,14 @@ pub(crate) enum ServerStateCommand {
 pub(crate) use ServerStateCommand::*;
 
 impl Execute for ServerStateCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            List { filter } => list(api, format, filter).await,
+            Get { id } => get(api, format, id).await,
             Create {
                 begin,
                 end,
@@ -165,17 +165,20 @@ impl Execute for ServerStateCommand {
                 flavor,
                 status,
                 user,
-            } => create(
-                api,
-                format,
-                *begin,
-                *end,
-                instance_id.clone(),
-                instance_name.clone(),
-                flavor,
-                status.clone(),
-                user,
-            ),
+            } => {
+                create(
+                    api,
+                    format,
+                    *begin,
+                    *end,
+                    instance_id.clone(),
+                    instance_name.clone(),
+                    flavor,
+                    status.clone(),
+                    user,
+                )
+                .await
+            }
             Modify {
                 id,
                 begin,
@@ -185,25 +188,28 @@ impl Execute for ServerStateCommand {
                 flavor,
                 status,
                 user,
-            } => modify(
-                api,
-                format,
-                *id,
-                *begin,
-                *end,
-                instance_id.clone(),
-                instance_name.clone(),
-                flavor.to_owned(),
-                status.clone(),
-                user.to_owned(),
-            ),
-            Delete { id } => delete(api, id),
-            Import { quiet } => import(api, format, *quiet),
+            } => {
+                modify(
+                    api,
+                    format,
+                    *id,
+                    *begin,
+                    *end,
+                    instance_id.clone(),
+                    instance_name.clone(),
+                    flavor.to_owned(),
+                    status.clone(),
+                    user.to_owned(),
+                )
+                .await
+            }
+            Delete { id } => delete(api, id).await,
+            Import { quiet } => import(api, format, *quiet).await,
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &ServerStateListFilter,
@@ -212,27 +218,27 @@ fn list(
     if let Some(server) = &filter.server {
         request.server(server);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if filter.all {
         request.all();
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.server_state.get(*id)?, format)
+    print_single_object(api.server_state.get(*id).await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     begin: DateTime<FixedOffset>,
@@ -243,8 +249,8 @@ fn create(
     status: String,
     user: &str,
 ) -> Result<(), Box<dyn Error>> {
-    let flavor_id = flavor_find_id(&api, flavor)?;
-    let user_id = user_find_id(&api, user)?;
+    let flavor_id = flavor_find_id(&api, flavor).await?;
+    let user_id = user_find_id(&api, user).await?;
     ask_for_confirmation()?;
     let mut request = api.server_state.create(
         begin,
@@ -257,11 +263,11 @@ fn create(
     if let Some(end) = end {
         request.end(end);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     id: u32,
@@ -288,30 +294,30 @@ fn modify(
         request.instance_name(instance_name);
     }
     if let Some(flavor) = flavor {
-        let flavor_id = flavor_find_id(&api, &flavor)?;
+        let flavor_id = flavor_find_id(&api, &flavor).await?;
         request.flavor(flavor_id);
     }
     if let Some(status) = status {
         request.status(status);
     }
     if let Some(user) = user {
-        let user_id = user_find_id(&api, &user)?;
+        let user_id = user_find_id(&api, &user).await?;
         request.user(user_id);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+async fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
-    Ok(api.server_state.delete(*id)?)
+    Ok(api.server_state.delete(*id).await?)
 }
 
-fn import(
+async fn import(
     api: avina::Api,
     format: Format,
     quiet: bool,
 ) -> Result<(), Box<dyn Error>> {
-    let result = api.server_state.import()?;
+    let result = api.server_state.import().await?;
     if !quiet || result.new_state_count > 0 || result.end_state_count > 0 {
         return print_single_object(result, format);
     }

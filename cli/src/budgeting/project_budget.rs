@@ -129,43 +129,43 @@ pub(crate) enum ProjectBudgetCommand {
 pub(crate) use ProjectBudgetCommand::*;
 
 impl Execute for ProjectBudgetCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            List { filter } => list(api, format, filter).await,
+            Get { id } => get(api, format, id).await,
             Create {
                 project,
                 year,
                 amount,
-            } => create(api, format, project, *year, *amount),
+            } => create(api, format, project, *year, *amount).await,
             Modify { id, amount, force } => {
-                modify(api, format, *id, *amount, *force)
+                modify(api, format, *id, *amount, *force).await
             }
-            Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id).await,
             Over {
                 filter,
                 end,
                 detail,
-            } => over(api, format, filter, *end, *detail),
+            } => over(api, format, filter, *end, *detail).await,
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &ProjectBudgetListFilter,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.project_budget.list();
     if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if filter.all {
         request.all();
@@ -173,25 +173,25 @@ fn list(
     if let Some(year) = filter.year {
         request.year(year);
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.project_budget.get(*id)?, format)
+    print_single_object(api.project_budget.get(*id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     project: &str,
     year: Option<u32>,
     amount: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
-    let project_id = project_find_id(&api, project)?;
+    let project_id = project_find_id(&api, project).await?;
     let mut request = api.project_budget.create(project_id);
     if let Some(year) = year {
         request.year(year);
@@ -199,11 +199,11 @@ fn create(
     if let Some(amount) = amount {
         request.amount(amount);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     id: u32,
@@ -217,15 +217,15 @@ fn modify(
     if force {
         request.force();
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+async fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
-    Ok(api.project_budget.delete(*id)?)
+    Ok(api.project_budget.delete(*id).await?)
 }
 
-fn over(
+async fn over(
     api: avina::Api,
     format: Format,
     filter: &ProjectBudgetOverFilter,
@@ -236,7 +236,7 @@ fn over(
     if let Some(budget) = filter.budget {
         request.budget(budget);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if filter.all {
         request.all();
@@ -245,8 +245,8 @@ fn over(
         request.end(end);
     }
     if detail {
-        print_object_list(request.detail()?, format)
+        print_object_list(request.detail().await?, format)
     } else {
-        print_object_list(request.normal()?, format)
+        print_object_list(request.normal().await?, format)
     }
 }

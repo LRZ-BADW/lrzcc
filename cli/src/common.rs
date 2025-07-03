@@ -207,7 +207,7 @@ impl ValueEnum for Format {
 }
 
 pub(crate) trait Execute {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,

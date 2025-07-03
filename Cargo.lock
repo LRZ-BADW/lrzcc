@@ -430,6 +430,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tabled",
+ "tokio",
 ]
 
 [[package]]
@@ -3312,7 +3313,6 @@ dependencies = [
  "bytes",
  "cookie 0.18.1",
  "cookie_store",
- "futures-channel",
  "futures-core",
  "futures-util",
  "http 1.2.0",

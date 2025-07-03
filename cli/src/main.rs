@@ -325,7 +325,8 @@ enum Command {
     },
 }
 
-fn main() -> ExitCode {
+#[tokio::main]
+async fn main() -> ExitCode {
     let cli = Cli::parse();
     let token = match match cli.credentials.token {
         // TODO handle error when Token cannot be created due to wrong format
@@ -345,6 +346,7 @@ fn main() -> ExitCode {
                 user_domain_name.as_str(),
                 project_domain_id.as_str(),
             )
+            .await
         }
     } {
         Ok(token) => token,
@@ -435,30 +437,36 @@ fn main() -> ExitCode {
     ))]
     match match cli.command {
         #[cfg(feature = "hello")]
-        Command::Hello { ref command } => command.execute(api, cli.format),
+        Command::Hello { ref command } => {
+            command.execute(api, cli.format).await
+        }
         #[cfg(feature = "user")]
-        Command::User { ref command } => command.execute(api, cli.format),
+        Command::User { ref command } => command.execute(api, cli.format).await,
         #[cfg(feature = "user")]
-        Command::Project { ref command } => command.execute(api, cli.format),
+        Command::Project { ref command } => {
+            command.execute(api, cli.format).await
+        }
         #[cfg(feature = "pricing")]
         Command::FlavorPrice { ref command } => {
-            command.execute(api, cli.format)
+            command.execute(api, cli.format).await
         }
         #[cfg(feature = "quota")]
         Command::FlavorQuota { ref command } => {
-            command.execute(api, cli.format)
+            command.execute(api, cli.format).await
         }
         #[cfg(feature = "resources")]
-        Command::Flavor { ref command } => command.execute(api, cli.format),
+        Command::Flavor { ref command } => {
+            command.execute(api, cli.format).await
+        }
         #[cfg(feature = "resources")]
         Command::FlavorGroup { ref command } => {
-            command.execute(api, cli.format)
+            command.execute(api, cli.format).await
         }
         #[cfg(feature = "resources")]
-        Command::Usage => resources::usage(api),
+        Command::Usage => resources::usage(api).await,
         #[cfg(feature = "accounting")]
         Command::ServerState { ref command } => {
-            command.execute(api, cli.format)
+            command.execute(api, cli.format).await
         }
         #[cfg(feature = "accounting")]
         Command::ServerCost {
@@ -468,6 +476,7 @@ fn main() -> ExitCode {
             detail,
         } => {
             accounting::server_cost(api, cli.format, begin, end, filter, detail)
+                .await
         }
         #[cfg(feature = "accounting")]
         Command::ServerConsumption {
@@ -475,22 +484,27 @@ fn main() -> ExitCode {
             end,
             filter,
             detail,
-        } => accounting::server_consumption(
-            api, cli.format, begin, end, filter, detail,
-        ),
-        #[cfg(feature = "budgeting")]
-        Command::ProjectBudget { ref command } => {
-            command.execute(api, cli.format)
+        } => {
+            accounting::server_consumption(
+                api, cli.format, begin, end, filter, detail,
+            )
+            .await
         }
         #[cfg(feature = "budgeting")]
-        Command::UserBudget { ref command } => command.execute(api, cli.format),
+        Command::ProjectBudget { ref command } => {
+            command.execute(api, cli.format).await
+        }
+        #[cfg(feature = "budgeting")]
+        Command::UserBudget { ref command } => {
+            command.execute(api, cli.format).await
+        }
         #[cfg(feature = "budgeting")]
         Command::BudgetOverTree { filter, end } => {
-            budgeting::budget_over_tree(api, filter, end)
+            budgeting::budget_over_tree(api, filter, end).await
         }
         #[cfg(feature = "budgeting")]
         Command::BudgetBulkCreate { year } => {
-            budgeting::budget_bulk_create(api, cli.format, year)
+            budgeting::budget_bulk_create(api, cli.format, year).await
         }
     } {
         Ok(_) => {}

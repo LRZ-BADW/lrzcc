@@ -140,43 +140,43 @@ pub(crate) enum UserBudgetCommand {
 pub(crate) use UserBudgetCommand::*;
 
 impl Execute for UserBudgetCommand {
-    fn execute(
+    async fn execute(
         &self,
         api: avina::Api,
         format: Format,
     ) -> Result<(), Box<dyn Error>> {
         match self {
-            List { filter } => list(api, format, filter),
-            Get { id } => get(api, format, id),
+            List { filter } => list(api, format, filter).await,
+            Get { id } => get(api, format, id).await,
             Create { user, year, amount } => {
-                create(api, format, user, *year, *amount)
+                create(api, format, user, *year, *amount).await
             }
             Modify { id, amount, force } => {
-                modify(api, format, *id, *amount, *force)
+                modify(api, format, *id, *amount, *force).await
             }
-            Delete { id } => delete(api, id),
+            Delete { id } => delete(api, id).await,
             Over {
                 filter,
                 end,
                 combined,
                 detail,
-            } => over(api, format, filter, *end, *combined, *detail),
-            Sync => sync(api, format),
+            } => over(api, format, filter, *end, *combined, *detail).await,
+            Sync => sync(api, format).await,
         }
     }
 }
 
-fn list(
+async fn list(
     api: avina::Api,
     format: Format,
     filter: &UserBudgetListFilter,
 ) -> Result<(), Box<dyn Error>> {
     let mut request = api.user_budget.list();
     if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if filter.all {
         request.all();
@@ -184,25 +184,25 @@ fn list(
     if let Some(year) = filter.year {
         request.year(year);
     }
-    print_object_list(request.send()?, format)
+    print_object_list(request.send().await?, format)
 }
 
-fn get(
+async fn get(
     api: avina::Api,
     format: Format,
     id: &u32,
 ) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.user_budget.get(*id)?, format)
+    print_single_object(api.user_budget.get(*id).await?, format)
 }
 
-fn create(
+async fn create(
     api: avina::Api,
     format: Format,
     user: &str,
     year: Option<u32>,
     amount: Option<i64>,
 ) -> Result<(), Box<dyn Error>> {
-    let user_id = user_find_id(&api, user)?;
+    let user_id = user_find_id(&api, user).await?;
     let mut request = api.user_budget.create(user_id);
     if let Some(year) = year {
         request.year(year);
@@ -210,11 +210,11 @@ fn create(
     if let Some(amount) = amount {
         request.amount(amount);
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
 #[allow(clippy::too_many_arguments)]
-fn modify(
+async fn modify(
     api: avina::Api,
     format: Format,
     id: u32,
@@ -228,15 +228,15 @@ fn modify(
     if force {
         request.force();
     }
-    print_single_object(request.send()?, format)
+    print_single_object(request.send().await?, format)
 }
 
-fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
+async fn delete(api: avina::Api, id: &u32) -> Result<(), Box<dyn Error>> {
     ask_for_confirmation()?;
-    Ok(api.user_budget.delete(*id)?)
+    Ok(api.user_budget.delete(*id).await?)
 }
 
-fn over(
+async fn over(
     api: avina::Api,
     format: Format,
     filter: &UserBudgetOverFilter,
@@ -248,10 +248,10 @@ fn over(
     if let Some(budget) = filter.budget {
         request.budget(budget);
     } else if let Some(user) = &filter.user {
-        let user_id = user_find_id(&api, user)?;
+        let user_id = user_find_id(&api, user).await?;
         request.user(user_id);
     } else if let Some(project) = &filter.project {
-        let project_id = project_find_id(&api, project)?;
+        let project_id = project_find_id(&api, project).await?;
         request.project(project_id);
     } else if filter.all {
         request.all();
@@ -260,14 +260,16 @@ fn over(
         request.end(end);
     }
     match (detail, combined) {
-        (false, false) => print_object_list(request.normal()?, format),
+        (false, false) => print_object_list(request.normal().await?, format),
 
-        (true, false) => print_object_list(request.detail()?, format),
-        (false, true) => print_object_list(request.combined()?, format),
-        (true, true) => print_object_list(request.combined_detail()?, format),
+        (true, false) => print_object_list(request.detail().await?, format),
+        (false, true) => print_object_list(request.combined().await?, format),
+        (true, true) => {
+            print_object_list(request.combined_detail().await?, format)
+        }
     }
 }
 
-fn sync(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
-    print_single_object(api.user_budget.sync()?, format)
+async fn sync(api: avina::Api, format: Format) -> Result<(), Box<dyn Error>> {
+    print_single_object(api.user_budget.sync().await?, format)
 }
